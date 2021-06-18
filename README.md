@@ -1,6 +1,6 @@
 # About mst-backbone
 
-mst-backbone(sem-gm) is a phylogeny inference program that performs constrained search through tree-space. The main features of the program are
+mst-backbone is a phylogeny inference program that performs constrained search through tree-space. The main features of the program are
 
 1) The use of a minimum spanning tree framework for constraining search through phylogenetic tree-space.
 
