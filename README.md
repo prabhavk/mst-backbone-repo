@@ -12,7 +12,7 @@ https://www.biorxiv.org/content/10.1101/2020.06.30.180315v1
 
 # Instructions for compilation
 
-Please download all the files in the repository and run make. The binary file for conducting tree search is called mst-backbone
+Please download all the files in the repository and run make. The binary file for conducting tree search is **mst-backbone**
 
 # Usage: 
 
