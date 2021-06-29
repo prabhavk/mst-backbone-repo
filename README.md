@@ -12,7 +12,7 @@ https://www.biorxiv.org/content/10.1101/2020.06.30.180315v1
 
 # Instructions for compilation
 
-The binary file that is made available in this repository is called mst-backbone. It has been compiled on a linux machine. If you wish to compile the code on your computer then please download all the files in the repository and run make.
+Please download all the files in the repository and run make. The binary file for conducting tree search is called mst-backbone
 
 # Usage: 
 
