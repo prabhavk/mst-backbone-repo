@@ -40,6 +40,7 @@ private:
 	chrono::seconds timeTakenToRootViaEdgeLoglikelihoods;
 	chrono::seconds timeTakenToRootViaRestrictedSEM;
 	string sequenceFileName;	
+	string prefix_for_output_files;
 	string ancestralSequencesString;
 	string MSTFileName;
 	// Remove this
@@ -53,9 +54,9 @@ private:
 	SEM * t;
 //	phylogeny_tree * P_ptr;
 //	rootedPhylogeny_tree * RT_ptr;
-//	void ComputeMST(string sequenceFileName);	
+//	void ComputeMST(string sequenceFileName);
 //	void ComputeVMST(string sequenceFileName);
-	void WriteOutputFiles();	
+	void WriteOutputFiles();
 	bool debug;
 	int numberOfVerticesInSubtree;
 	string GetSequenceListToWriteToFile(map <string, vector <unsigned char>> compressedSeqMap, vector <vector <int> > sitePatternRepetitions);
@@ -66,15 +67,19 @@ public:
 	void MSTBackboneWithOneExternalVertex();
 	void MSTBackboneWithFullSEMAndMultipleExternalVertices();
 	void MSTBackboneWithRootSEMAndMultipleExternalVertices();
-	MSTBackbone(string sequenceFileNameToAdd, int subtreeSizeThresholdToset) {
+	MSTBackbone(string sequenceFileNameToAdd, int subtreeSizeThresholdToset, string prefix_for_output_files_to_set) {
 		start_time = chrono::high_resolution_clock::now();				
 		this->sequenceFileName = sequenceFileNameToAdd;
 		this->numberOfLargeEdgesThreshold = subtreeSizeThresholdToset;
+		this->prefix_for_output_files = prefix_for_output_files_to_set;
 		// output files		
-		this->mstBackboneLogFile.open(sequenceFileName + ".mstbackboneSEM_log");
-		mstBackboneLogFile << "Subtree size is set at:\t" << this->numberOfLargeEdgesThreshold << endl;		
-		cout << "Subtree size is set at:\t" << this->numberOfLargeEdgesThreshold << endl;		
-		MSTFileName = sequenceFileName + ".initial_MST";		
+		this->mstBackboneLogFile.open(this->prefix_for_output_files + ".mstbackbone_log");
+		mstBackboneLogFile << "Subtree size is set at\t" << this->numberOfLargeEdgesThreshold << endl;		
+		cout << "Subtree size is set at\t" << this->numberOfLargeEdgesThreshold << endl;		
+
+		mstBackboneLogFile << "Prefix for output files is\t" << this->prefix_for_output_files << endl;		
+		cout << "Prefix for output files is\t" << this->prefix_for_output_files << endl;		
+		MSTFileName = prefix_for_output_files + ".initial_MST";		
 		this->SetDNAMap();	
 		this->ancestralSequencesString = "";
 		this->M = new MST_tree(this->sequenceFileName);				
@@ -86,11 +91,11 @@ public:
 		cout << "Writing ancestral sequences to file " << endl;
 		this->mstBackboneLogFile << "Writing ancestral sequences to file " << endl;
 		ofstream ancestralSequencesFile;		
-		ancestralSequencesFile.open(this->sequenceFileName+".ancestralSequences");
+		ancestralSequencesFile.open(this->prefix_for_output_files+".ancestralSequences");
 		ancestralSequencesFile << this->ancestralSequencesString;
 		ancestralSequencesFile.close();
-		this->T->WriteRootedTreeAsEdgeList(sequenceFileName + ".edgeList");
-		this->T->WriteRootedTreeInNewickFormat(sequenceFileName + ".newick");
+		this->T->WriteRootedTreeAsEdgeList(this->prefix_for_output_files + ".edgeList");
+		this->T->WriteRootedTreeInNewickFormat(this->prefix_for_output_files + ".newick");
 //		this->MSTBackboneWithOneExternalVertex();	
 		current_time = std::chrono::high_resolution_clock::now();
 		cout << "Total CPU time used is " << chrono::duration_cast<chrono::seconds>(current_time-start_time).count() << " second(s)\n";
