@@ -77,8 +77,8 @@ public:
 		mstBackboneLogFile << "Subtree size is set at\t" << this->numberOfLargeEdgesThreshold << endl;		
 		cout << "Subtree size is set at\t" << this->numberOfLargeEdgesThreshold << endl;		
 
-		mstBackboneLogFile << "Prefix for output files is\t" << this->prefix_for_output_files << endl;		
-		cout << "Prefix for output files is\t" << this->prefix_for_output_files << endl;		
+		mstBackboneLogFile << "Prefix for output files is \t" << this->prefix_for_output_files << endl;		
+		cout << "Prefix for output files is \t" << this->prefix_for_output_files << endl;		
 		MSTFileName = prefix_for_output_files + ".initial_MST";		
 		this->SetDNAMap();	
 		this->ancestralSequencesString = "";
