@@ -67,6 +67,7 @@ public:
 	void MSTBackboneWithOneExternalVertex();
 	void MSTBackboneWithFullSEMAndMultipleExternalVertices();
 	void MSTBackboneWithRootSEMAndMultipleExternalVertices();
+	void MSTBackboneOverlappingSets();
 	MSTBackbone(string sequenceFileNameToAdd, int subtreeSizeThresholdToset, string prefix_for_output_files_to_set) {
 		start_time = chrono::high_resolution_clock::now();				
 		this->sequenceFileName = sequenceFileNameToAdd;
@@ -114,6 +115,20 @@ void MSTBackbone::SetDNAMap() {
 	this->mapDNAtoInteger["G"] = 2;
 	this->mapDNAtoInteger["T"] = 3;
 }
+
+
+void MSTBackbone::MSTBackboneOverlappingSets() {
+// Implement here
+// Print the vertex names and edges (u_name, v_name) in the MST
+// this->M ;
+// this->M->vertexMap (contains map of vertex names)
+// this->M->edgeWeightsMap (map from name of the edge to weight of the edge)
+// Select non-leaf vertices
+// For each non-leaf vertex
+//		Select the neighborhood of the vertex
+//	Print the list of vertex names in each neighborhood
+}
+
 
 //	Input:	Multiple sequence alignment A, MST M = (Vm,Em), subtree size threshold s_min
 //	1.	Initialize global phylogenetic tree T as the empty graph
