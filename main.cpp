@@ -22,7 +22,7 @@ int main(int argc, char **argv)
 	bool flag_size_of_subtree = 0;
 	bool flag_prefix = 0;
     if (argc < 2) {        
-        cerr << "Usage: " << argv[0] << " --seq sequence_alignment_file --size size_of_subtree --prefix_for_output_files" << endl;
+        cerr << "Usage: " << argv[0] << " --seq sequence_alignment_file --size size_of_subtree --out prefix_for_output_files" << endl;
         return (-1);
     } else {        
         // parse arguments            
