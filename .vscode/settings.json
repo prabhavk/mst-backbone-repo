@@ -3,5 +3,6 @@
         "*.rmd": "markdown",
         "iostream": "cpp",
         "string": "cpp"
-    }
+    },
+    "jupyter.jupyterServerType": "local"
 }
