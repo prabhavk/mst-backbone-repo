@@ -15,14 +15,16 @@ int main(int argc, char **argv)
 	fs::path alignment_file_path_obj;
 	fs::path prefix_path_obj;
     string prefix_for_output_files;
-	string path_to_directory;
+	string path_to_directory;	
     int size_of_subtree;
+	bool parallel_comp = 0;
+	int int_parallel_comp;
  	struct stat buffer;
 	bool flag_alignment_file = 0;
 	bool flag_size_of_subtree = 0;
 	bool flag_prefix = 0;
     if (argc < 2) {        
-        cerr << "Usage: " << argv[0] << " --seq sequence_alignment_file --size size_of_subtree --out prefix_for_output_files" << endl;
+        cerr << "Usage: " << argv[0] << " --seq sequence_alignment_file --size size_of_subtree --out prefix_for_output_files --parallel_comp boolflag" << endl;
         return (-1);
     } else {        
         // parse arguments            
@@ -57,6 +59,17 @@ int main(int argc, char **argv)
 					flag_size_of_subtree = 1;
                     size_of_subtree = stoi(argv[++i]);
                 }
+			}  else if (strcmp(argv[i], "--parallel_comp") == 0) {
+                if (i < argc -1) {
+					int_parallel_comp = stoi(argv[++i]);
+					// cout << "input for parallel_comp is " << stoi(argv[++i]) << endl;					
+					if (int_parallel_comp == 0 || int_parallel_comp == 1) {
+						parallel_comp = (bool) int_parallel_comp;
+						cout << "flag is either 0 or 1" << endl;
+					} else {						
+						parallel_comp = 0;
+					}                 
+                }
 			}        
         }
 
@@ -69,7 +82,8 @@ int main(int argc, char **argv)
 			prefix_path_obj /= "mst-backbone_default_output";			
 			// prefix_for_output_files = path_obj.parent_path().string() + "mst_backbone";
 		}
-		MSTBackbone MSTBackboneObj(path_to_alignment_file, size_of_subtree, prefix_path_obj.string());
+		cout << "Calling MSTbackbone " << endl;
+		MSTBackbone MSTBackboneObj(path_to_alignment_file, size_of_subtree, prefix_path_obj.string(),parallel_comp);
     }
 
 	return 0;

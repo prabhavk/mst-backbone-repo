@@ -68,7 +68,7 @@ public:
 	void MSTBackboneWithFullSEMAndMultipleExternalVertices();
 	void MSTBackboneWithRootSEMAndMultipleExternalVertices();
 	void MSTBackboneOverlappingSets();
-	MSTBackbone(string sequenceFileNameToAdd, int subtreeSizeThresholdToset, string prefix_for_output_files_to_set) {
+	MSTBackbone(string sequenceFileNameToAdd, int subtreeSizeThresholdToset, string prefix_for_output_files_to_set, bool parallel_comp_flag) {
 		start_time = chrono::high_resolution_clock::now();				
 		this->sequenceFileName = sequenceFileNameToAdd;
 		this->numberOfLargeEdgesThreshold = subtreeSizeThresholdToset;
@@ -87,21 +87,26 @@ public:
 		this->M->ComputeMST();
 		this->M->WriteToFile(MSTFileName);
 		this->M->SetNumberOfLargeEdgesThreshold(this->numberOfLargeEdgesThreshold);		
-		this->MSTBackboneWithFullSEMAndMultipleExternalVertices(); // MAIN MST_BACKBONE FUNCTION
-//		this->MSTBackboneWithRootSEMAndMultipleExternalVertices();
-		cout << "Writing ancestral sequences to file " << endl;
-		this->mstBackboneLogFile << "Writing ancestral sequences to file " << endl;
-		ofstream ancestralSequencesFile;		
-		ancestralSequencesFile.open(this->prefix_for_output_files+".ancestralSequences");
-		ancestralSequencesFile << this->ancestralSequencesString;
-		ancestralSequencesFile.close();
-		this->T->WriteRootedTreeAsEdgeList(this->prefix_for_output_files + ".edgeList");
-		this->T->WriteRootedTreeInNewickFormat(this->prefix_for_output_files + ".newick");
-//		this->MSTBackboneWithOneExternalVertex();	
-		current_time = std::chrono::high_resolution_clock::now();
-		cout << "Total CPU time used is " << chrono::duration_cast<chrono::seconds>(current_time-start_time).count() << " second(s)\n";
-		this->mstBackboneLogFile << "Total CPU time used is " << chrono::duration_cast<chrono::seconds>(current_time-start_time).count() << " second(s)\n";
-		this->mstBackboneLogFile.close();		
+		if (parallel_comp_flag) { // parallel version of MST-backbone
+			this->MSTBackboneOverlappingSets();
+
+		} else { // current version of MST-backbone
+			this->MSTBackboneWithFullSEMAndMultipleExternalVertices(); // MAIN MST_BACKBONE FUNCTION
+	//		this->MSTBackboneWithRootSEMAndMultipleExternalVertices();
+			cout << "Writing ancestral sequences to file " << endl;
+			this->mstBackboneLogFile << "Writing ancestral sequences to file " << endl;
+			ofstream ancestralSequencesFile;		
+			ancestralSequencesFile.open(this->prefix_for_output_files+".ancestralSequences");
+			ancestralSequencesFile << this->ancestralSequencesString;
+			ancestralSequencesFile.close();
+			this->T->WriteRootedTreeAsEdgeList(this->prefix_for_output_files + ".edgeList");
+			this->T->WriteRootedTreeInNewickFormat(this->prefix_for_output_files + ".newick");
+	//		this->MSTBackboneWithOneExternalVertex();	
+			current_time = std::chrono::high_resolution_clock::now();
+			cout << "Total CPU time used is " << chrono::duration_cast<chrono::seconds>(current_time-start_time).count() << " second(s)\n";
+			this->mstBackboneLogFile << "Total CPU time used is " << chrono::duration_cast<chrono::seconds>(current_time-start_time).count() << " second(s)\n";
+			this->mstBackboneLogFile.close();
+		}				
 			}
 	~MSTBackbone(){
 		delete this->T;	
@@ -118,14 +123,35 @@ void MSTBackbone::SetDNAMap() {
 
 
 void MSTBackbone::MSTBackboneOverlappingSets() {
+	cout << "MSTbackbone with overlapping sets" << endl;
+	this->T = new SEM(1);
 // Implement here
 // Print the vertex names and edges (u_name, v_name) in the MST
 // this->M ;
 // this->M->vertexMap (contains map of vertex names)
 // this->M->edgeWeightsMap (map from name of the edge to weight of the edge)
-// Select non-leaf vertices
-// For each non-leaf vertex
-//		Select the neighborhood of the vertex
+// MST_vertex * v;
+// int count_leaves = 0;
+// int count_nonleaves = 0;
+// vector <MST_vertex * > nonLeafVertices;
+// // Select non-leaf vertices
+// for (pair<int,MST_vertex*> vertexIDpair : this->M->vertexMap) {
+// 	v = vertexIDpair.second;
+// 	if (v->degree == 0) {
+// 		count_leaves += 1;
+// 	} else {
+// 		nonLeafVertices.push_back(v);
+// 	}
+// }
+// // For each non-leaf vertex
+// for (MST_vertex * v : nonLeafVertices) {
+// 	cout << "The neighbors of " << v->name << " are ";
+// 	//		Select the neighborhood of the vertex
+// 	for (MST_vertex * n: v->neighbors){
+// 		cout << n->name << "\t";
+// 	}
+// 	cout << endl;
+// }
 //	Print the list of vertex names in each neighborhood
 }
 

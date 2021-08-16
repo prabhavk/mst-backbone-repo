@@ -1,0 +1,16 @@
+Subtree size is set at	20
+Prefix for output files is	/home/kalaghat/Projects/mst-backbone-repo/data/H3N2_156_sub_20
+Number of vertices in MST is 156
+Number of vertices in MST is 128
+Number of vertices in MST is 104
+Number of vertices in MST is 82
+Number of vertices in MST is 57
+CPU time used for computing global unrooted phylogenetic tree T is 28 second(s)
+Fitting a general Markov (GM) model to T using reconstructed ancestral sequences
+CPU time used for fitting a GM model to fully labeled T is 0 second(s)
+Log likelihood of fitting a GM model to fully labeled T is -20396.8
+Rooting T by fitting a GM model using restricted SEM
+CPU time used for rooting leaf-labeled T via restricted SEM is 2 second(s)
+Log likelihood of fitting a GM model to leaf-labeled T via restricted SEM is -10418.6
+Writing ancestral sequences to file 
+Total CPU time used is 30 second(s)
