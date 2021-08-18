@@ -130,10 +130,10 @@ void MSTBackbone::MSTBackboneOverlappingSets() {
  this->M ;
  this->M->vertexMap; //(contains map of vertex names);
  this->M->edgeWeightsMap; //(map from name of the edge to weight of the edge);
-// MST_vertex * v;
-// int count_leaves = 0;
-// int count_nonleaves = 0;
-// vector <MST_vertex * > nonLeafVertices;
+ MST_vertex * v;
+ int count_leaves = 0;
+ int count_nonleaves = 0;
+ vector <MST_vertex * > nonLeafVertices;
  // Select non-leaf vertices
 // for (pair<int,MST_vertex * > vertexIDpair : this->M->vertexMap) {
 // 	v = vertexIDpair.second;
