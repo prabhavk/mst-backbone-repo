@@ -135,14 +135,14 @@ void MSTBackbone::MSTBackboneOverlappingSets() {
  int count_nonleaves = 0;
  vector <MST_vertex * > nonLeafVertices;
  // Select non-leaf vertices
-// for (pair<int,MST_vertex * > vertexIDpair : this->M->vertexMap) {
-// 	v = vertexIDpair.second;
-// 	if (v->degree == 0) {
-// 		count_leaves += 1;
-// 	} else {
-// 		nonLeafVertices.push_back(v);
-// 	}
-// }
+ for (pair<int,MST_vertex * > vertexIDpair : this->M->vertexMap) {
+ 	v = vertexIDpair.second;
+ 	if (v->degree == 0) {
+ 		count_leaves += 1;
+ 	} else {
+ 		nonLeafVertices.push_back(v);
+ 	}
+ }
 // // For each non-leaf vertex
 // for (MST_vertex * v : nonLeafVertices) {
 // 	cout << "The neighbors of " << v->name << " are ";
