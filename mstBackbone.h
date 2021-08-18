@@ -152,7 +152,7 @@ void MSTBackbone::MSTBackboneOverlappingSets() {
  	}
  	cout << endl;
  }
-//	Print the list of vertex names in each neighborhood
+//	Build the phylogeny for each overlapping set
 }
 
 
