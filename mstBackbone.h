@@ -144,14 +144,14 @@ void MSTBackbone::MSTBackboneOverlappingSets() {
  	}
  }
 // // For each non-leaf vertex
-// for (MST_vertex * v : nonLeafVertices) {
-// 	cout << "The neighbors of " << v->name << " are ";
+ for (MST_vertex * v : nonLeafVertices) {
+ 	cout << "The neighbors of " << v->name << " are ";
 // 	//		Select the neighborhood of the vertex
-// 	for (MST_vertex * n: v->neighbors){
-// 		cout << n->name << "\t";
-// 	}
-// 	cout << endl;
-// }
+ 	for (MST_vertex * n: v->neighbors){
+ 		cout << n->name << "\t";
+ 	}
+ 	cout << endl;
+ }
 //	Print the list of vertex names in each neighborhood
 }
 
