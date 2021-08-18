@@ -128,8 +128,8 @@ void MSTBackbone::MSTBackboneOverlappingSets() {
 // Implement here
 // Print the vertex names and edges (u_name, v_name) in the MST
  this->M ;
- this->M->vertexMap (contains map of vertex names);
- this->M->edgeWeightsMap (map from name of the edge to weight of the edge);
+ this->M->vertexMap; //(contains map of vertex names);
+ this->M->edgeWeightsMap; //(map from name of the edge to weight of the edge);
  MST_vertex * v;
  int count_leaves = 0;
  int count_nonleaves = 0;
