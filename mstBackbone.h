@@ -127,22 +127,22 @@ void MSTBackbone::MSTBackboneOverlappingSets() {
 	this->T = new SEM(1);
 // Implement here
 // Print the vertex names and edges (u_name, v_name) in the MST
-// this->M ;
-// this->M->vertexMap (contains map of vertex names)
-// this->M->edgeWeightsMap (map from name of the edge to weight of the edge)
-// MST_vertex * v;
-// int count_leaves = 0;
-// int count_nonleaves = 0;
-// vector <MST_vertex * > nonLeafVertices;
-// // Select non-leaf vertices
-// for (pair<int,MST_vertex*> vertexIDpair : this->M->vertexMap) {
-// 	v = vertexIDpair.second;
-// 	if (v->degree == 0) {
-// 		count_leaves += 1;
-// 	} else {
-// 		nonLeafVertices.push_back(v);
-// 	}
-// }
+ this->M ;
+ this->M->vertexMap (contains map of vertex names);
+ this->M->edgeWeightsMap (map from name of the edge to weight of the edge);
+ MST_vertex * v;
+ int count_leaves = 0;
+ int count_nonleaves = 0;
+ vector <MST_vertex * > nonLeafVertices;
+ // Select non-leaf vertices
+ for (pair<int,MST_vertex*> vertexIDpair : this->M->vertexMap) {
+ 	v = vertexIDpair.second;
+ 	if (v->degree == 0) {
+ 		count_leaves += 1;
+ 	} else {
+ 		nonLeafVertices.push_back(v);
+ 	}
+ }
 // // For each non-leaf vertex
 // for (MST_vertex * v : nonLeafVertices) {
 // 	cout << "The neighbors of " << v->name << " are ";
