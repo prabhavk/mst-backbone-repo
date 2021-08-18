@@ -138,7 +138,7 @@ void MSTBackbone::MSTBackboneOverlappingSets() {
  for (pair <int, MST_vertex *> vertexIDpair : * this->M->vertexMap) {
  	v = vertexIDpair.second;
  	if (v->degree > 1) {
- 		count_leaves += 1;
+ 		count_nonleaves += 1;
  	} else {
  		nonLeafVertices.push_back(v);
  	}
