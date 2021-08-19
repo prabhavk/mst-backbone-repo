@@ -1,4 +1,4 @@
-#ifndef mstBackbone_H
+a#ifndef mstBackbone_H
 #define mstBackbone_H
 
 #include <string>
@@ -153,6 +153,7 @@ void MSTBackbone::MSTBackboneOverlappingSets() {
  	cout << endl;
  }
 // Build the phylogeny for each overlapping set!
+<<<<<<< HEAD
             // this->t = new SEM(largestIdOfVertexInMST);
 			// this->t->AddSequences(sequences);
 			// this->t->SetNumberOfVerticesInSubtree(this->numberOfVerticesInSubtree);
@@ -163,6 +164,18 @@ void MSTBackbone::MSTBackboneOverlappingSets() {
 			// this->t->AddSitePatternWeights(sitePatternWeights);
 			// this->t->AddSitePatternRepeats(sitePatternRepetitions);			
 			// this->t->OptimizeTopologyAndParametersOfGMM();
+=======
+           // this->t = new SEM(largestIdOfVertexInMST);
+			//this->t->AddSequences(sequences);
+			//this->t->SetNumberOfVerticesInSubtree(this->numberOfVerticesInSubtree);
+			//this->t->SetNumberOfInputSequences(numberOfInputSequences);
+			//this->t->AddRootVertex();
+			//this->t->AddNames(names);
+			//this->t->AddGlobalIds(idsOfVerticesForSEM);
+			//this->t->AddSitePatternWeights(sitePatternWeights);
+			//this->t->AddSitePatternRepeats(sitePatternRepetitions);			
+			//this->t->OptimizeTopologyAndParametersOfGMM();
+>>>>>>> fbe1d7d4854a3bd850c935235fe85cb66d540743
 
 
 //	Input:	Multiple sequence alignment A, MST M = (Vm,Em), subtree size threshold s_min
