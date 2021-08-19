@@ -152,7 +152,7 @@ void MSTBackbone::MSTBackboneOverlappingSets() {
  	}
  	cout << endl;
  }
-//	Build the phylogeny for each overlapping set
+//	Build the phylogeny for each overlapping set!
 }
 
 
