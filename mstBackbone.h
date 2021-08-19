@@ -152,8 +152,17 @@ void MSTBackbone::MSTBackboneOverlappingSets() {
  	}
  	cout << endl;
  }
-//	Build the phylogeny for each overlapping set!
-}
+// Build the phylogeny for each overlapping set!
+            this->t = new SEM(largestIdOfVertexInMST);
+			this->t->AddSequences(sequences);
+			this->t->SetNumberOfVerticesInSubtree(this->numberOfVerticesInSubtree);
+			this->t->SetNumberOfInputSequences(numberOfInputSequences);
+			this->t->AddRootVertex();
+			this->t->AddNames(names);
+			this->t->AddGlobalIds(idsOfVerticesForSEM);
+			this->t->AddSitePatternWeights(sitePatternWeights);
+			this->t->AddSitePatternRepeats(sitePatternRepetitions);			
+			this->t->OptimizeTopologyAndParametersOfGMM();
 
 
 //	Input:	Multiple sequence alignment A, MST M = (Vm,Em), subtree size threshold s_min
