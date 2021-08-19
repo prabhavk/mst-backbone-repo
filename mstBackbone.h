@@ -1,4 +1,4 @@
-a#ifndef mstBackbone_H
+#ifndef mstBackbone_H
 #define mstBackbone_H
 
 #include <string>
