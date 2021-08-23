@@ -155,7 +155,60 @@ void MSTBackbone::MSTBackboneOverlappingSets() {
 }
 
  //build a phylogeny
-11
+    vector <string> names;
+	vector <vector <unsigned char> > sequences;
+	vector <int> sitePatternWeights;
+	vector <vector <int> > sitePatternRepetitions;	
+	vector <int> idsOfVerticesToRemove;
+	vector <int> idsOfVerticesToKeep;
+	vector <int> idsOfExternalVertices;
+	vector <int> idsOfVerticesForSEM;
+	vector <tuple <int, string, vector <unsigned char>>> idAndNameAndSeqTupleForVerticesToAdd;
+
+	int numberOfInputSequences = (int) this->M->vertexMap->size();	
+	this->T = new SEM(1);
+
+	idsOfVerticesForSEM.clear();
+	for (pair <int, MST_vertex *> vIdAndPtr : * this->M->vertexMap) {
+		idsOfVerticesForSEM.push_back(vIdAndPtr.first);
+	}
+	tie (names, sequences, sitePatternWeights, sitePatternRepetitions) = this->M->GetCompressedSequencesSiteWeightsAndSiteRepeats(idsOfVerticesForSEM);	
+	this->T->sequenceFileName = this->sequenceFileName;
+	this->T->AddSequences(sequences);
+	this->T->AddNames(names);
+	this->T->AddSitePatternWeights(sitePatternWeights);
+	this->T->SetNumberOfInputSequences(numberOfInputSequences);	
+	this->T->numberOfObservedVertices = numberOfInputSequences;
+
+ int largestIdOfVertexInMST = numberOfInputSequences;
+ bool computeLocalPhylogeneticTree = 1;
+
+ while (computeLocalPhylogeneticTree) {
+		cout << "Number of vertices in MST is " << this->M->vertexMap->size() << endl;
+		this->mstBackboneLogFile << "Number of vertices in MST is " << this->M->vertexMap->size() << endl;
+
+		computeLocalPhylogeneticTree = this->M->ShouldIComputeALocalPhylogeneticTree();
+
+		if (computeLocalPhylogeneticTree) {
+			this->M->SetIdsOfOverlappingSetVertices();
+			idsOfOverlappingSetVertices = this->M->idsOfOverlappingSetVertices;
+			idsOfVerticesForSEM = this->M->vertexIDpair.second_ptr->idsOfVerticesInSubtree;
+			this->numberOfVerticesInSubtree = this->M->vertexIDpair.second_ptr->idsOfVerticesInSubtree.size();
+			for (int id: idsOfOverlappingSetVertices) {
+				idsOfVerticesForSEM.push_back(id);
+			}
+			tie (names, sequences, sitePatternWeights, sitePatternRepetitions) = this->M->GetCompressedSequencesSiteWeightsAndSiteRepeats(idsOfVerticesForSEM);
+
+	        this->t = new SEM(largestIdOfVertexInMST);
+			this->t->AddSequences(sequences);
+			this->t->SetNumberOfVerticesInSubtree(this->numberOfVerticesInSubtree);
+			this->t->SetNumberOfInputSequences(numberOfInputSequences);
+			this->t->AddRootVertex();
+			this->t->AddNames(names);
+			this->t->AddGlobalIds(idsOfVerticesForSEM);
+			this->t->AddSitePatternWeights(sitePatternWeights);
+			this->t->AddSitePatternRepeats(sitePatternRepetitions);			
+			this->t->OptimizeTopologyAndParametersOfGMM();
 
 //	Input:	Multiple sequence alignment A, MST M = (Vm,Em), subtree size threshold s_min
 //	1.	Initialize global phylogenetic tree T as the empty graph
