@@ -166,7 +166,7 @@ void MSTBackbone::MSTBackboneOverlappingSets() {
 	vector <tuple <int, string, vector <unsigned char>>> idAndNameAndSeqTupleForVerticesToAdd;
 
 	int numberOfInputSequences = (int) this->M->vertexMap->size();	
-	this->T = new SEM(1);
+
 
 	idsOfVerticesForSEM.clear();
 	for (pair <int, MST_vertex *> vIdAndPtr : * this->M->vertexMap) {
