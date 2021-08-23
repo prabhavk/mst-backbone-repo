@@ -122,7 +122,7 @@ void MSTBackbone::SetDNAMap() {
 }
 
 
-
+void MSTBackbone::MSTBackboneOverlappingSets() {
 	cout << "MSTbackbone with overlapping sets" << endl;
 	this->T = new SEM(1);
 // Implement here
@@ -152,7 +152,7 @@ void MSTBackbone::SetDNAMap() {
  	}
  	cout << endl;
  }
-}
+
 
  //build a phylogeny
  void MSTBackbone::MSTBackboneOverlappingSets() {
@@ -209,6 +209,7 @@ void MSTBackbone::SetDNAMap() {
 			this->t->AddSitePatternWeights(sitePatternWeights);
 			this->t->AddSitePatternRepeats(sitePatternRepetitions);			
 			this->t->OptimizeTopologyAndParametersOfGMM();
+		}	
 
 //	Input:	Multiple sequence alignment A, MST M = (Vm,Em), subtree size threshold s_min
 //	1.	Initialize global phylogenetic tree T as the empty graph
