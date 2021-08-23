@@ -122,7 +122,7 @@ void MSTBackbone::SetDNAMap() {
 }
 
 
-void MSTBackbone::MSTBackboneOverlappingSets() {
+
 	cout << "MSTbackbone with overlapping sets" << endl;
 	this->T = new SEM(1);
 // Implement here
