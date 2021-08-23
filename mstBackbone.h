@@ -155,6 +155,7 @@ void MSTBackbone::MSTBackboneOverlappingSets() {
 }
 
  //build a phylogeny
+ void MSTBackbone::MSTBackboneOverlappingSets() {
     vector <string> names;
 	vector <vector <unsigned char> > sequences;
 	vector <int> sitePatternWeights;
