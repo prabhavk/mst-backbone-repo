@@ -180,8 +180,8 @@ void MSTBackbone::MSTBackboneOverlappingSets() {
 	this->T->SetNumberOfInputSequences(numberOfInputSequences);	
 	this->T->numberOfObservedVertices = numberOfInputSequences;
 
- int largestIdOfVertexInMST = numberOfInputSequences;
- bool computeLocalPhylogeneticTree = 1;
+    int largestIdOfVertexInMST = numberOfInputSequences;
+    bool computeLocalPhylogeneticTree = 1;
 
  while (computeLocalPhylogeneticTree) {
 		cout << "Number of vertices in MST is " << this->M->vertexMap->size() << endl;
