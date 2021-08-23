@@ -189,11 +189,11 @@ void MSTBackbone::MSTBackboneOverlappingSets() {
 		computeLocalPhylogeneticTree = this->M->ShouldIComputeALocalPhylogeneticTree();
 
 		if (computeLocalPhylogeneticTree) {
-			this->M->SetIdsOfOverlappingSetVertices();
-			idsOfOverlappingSetVertices = this->M->idsOfOverlappingSetVertices;
+			this->M->SetIdsOfExternalVertices();
+			idsOfOverlappingSetVertices = this->M->idsOfExternalVertices;
 			idsOfVerticesForSEM = this->M->vertexIDpair.second_ptr->idsOfVerticesInSubtree;
 			this->numberOfVerticesInSubtree = this->M->vertexIDpair.second_ptr->idsOfVerticesInSubtree.size();
-			for (int id: idsOfOverlappingSetVertices) {
+			for (int id: idsOfExternalVertices) {
 				idsOfVerticesForSEM.push_back(id);
 			}
 			tie (names, sequences, sitePatternWeights, sitePatternRepetitions) = this->M->GetCompressedSequencesSiteWeightsAndSiteRepeats(idsOfVerticesForSEM);
