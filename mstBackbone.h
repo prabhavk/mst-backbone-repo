@@ -170,7 +170,7 @@ void MSTBackbone::MSTBackboneOverlappingSets() {
 
 	idsOfVerticesForSEM.clear();
 	for (pair <int, MST_vertex *>  vertexIDpair : * this->M->vertexMap) {
-		v = vertexIDpair.second
+		v = vertexIDpair.second;
 		idsOfVerticesForSEM.push_back(v);
 	}
 	tie (names, sequences, sitePatternWeights, sitePatternRepetitions) = this->M->GetCompressedSequencesSiteWeightsAndSiteRepeats(idsOfVerticesForSEM);	
