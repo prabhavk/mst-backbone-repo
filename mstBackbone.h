@@ -208,8 +208,8 @@ void MSTBackbone::MSTBackboneOverlappingSets() {
 			this->t->AddSitePatternRepeats(sitePatternRepetitions);			
 			this->t->OptimizeTopologyAndParametersOfGMM();
 		}	
-	}	
-
+	  }
+	}
 //	Input:	Multiple sequence alignment A, MST M = (Vm,Em), subtree size threshold s_min
 //	1.	Initialize global phylogenetic tree T as the empty graph
 //	2.	Compute the size of smallest subtree ts = (Vs,Es) of M s.t.
