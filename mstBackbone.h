@@ -155,22 +155,23 @@ void MSTBackbone::MSTBackboneOverlappingSets() {
 
 
  //build a phylogeny
-  //  vector <string> names;
-//	vector <vector <unsigned char> > sequences;
-//	vector <int> sitePatternWeights;
-//	vector <vector <int> > sitePatternRepetitions;	
-//	vector <int> idsOfVerticesToRemove;
-//	vector <int> idsOfVerticesToKeep;
-//	vector <int> idsOfExternalVertices;
-//	vector <int> idsOfVerticesForSEM;
-//	vector <tuple <int, string, vector <unsigned char>>> idAndNameAndSeqTupleForVerticesToAdd;
+    vector <string> names;
+	vector <vector <unsigned char> > sequences;
+	vector <int> sitePatternWeights;
+	vector <vector <int> > sitePatternRepetitions;	
+	vector <int> idsOfVerticesToRemove;
+	vector <int> idsOfVerticesToKeep;
+	vector <int> idsOfExternalVertices;
+	vector <int> idsOfVerticesForSEM;
+	vector <tuple <int, string, vector <unsigned char>>> idAndNameAndSeqTupleForVerticesToAdd;
 
 	int numberOfInputSequences = (int) this->M->vertexMap->size();	
     this->T = new SEM(1);
 
 	idsOfVerticesForSEM.clear();
-	for (pair <int, MST_vertex *>  vIdAndPtr : * this->M->vertexMap) {
-		idsOfVerticesForSEM.push_back(vIdAndPtr.first);
+	for (pair <int, MST_vertex *>  vertexIDpair : * this->M->vertexMap) {
+		v = vertexIDpair.second
+		idsOfVerticesForSEM.push_back(v);
 	}
 	tie (names, sequences, sitePatternWeights, sitePatternRepetitions) = this->M->GetCompressedSequencesSiteWeightsAndSiteRepeats(idsOfVerticesForSEM);	
 	this->T->sequenceFileName = this->sequenceFileName;
