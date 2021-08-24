@@ -200,7 +200,6 @@ void MSTBackbone::MSTBackboneOverlappingSets() {
 
 	        this->t = new SEM(largestIdOfVertexInMST);
 			this->t->AddSequences(sequences);
-			this->t->SetNumberOfVerticesInSubtree(this->numberOfVerticesInSubtree);
 			this->t->SetNumberOfInputSequences(numberOfInputSequences);
 			this->t->AddRootVertex();
 			this->t->AddNames(names);
