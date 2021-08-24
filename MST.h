@@ -176,8 +176,6 @@ bool MST_tree::ShouldIComputeALocalPhylogeneticTree() {
 	return (valueToReturn);
 }
 
-
-
 void MST_tree::ResetSubtreeSizeThreshold() {
 	this->numberOfLargeEdgesThreshold = this->numberOfLargeEdgesThreshold_input;
 }
