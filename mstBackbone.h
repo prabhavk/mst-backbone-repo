@@ -191,8 +191,7 @@ void MSTBackbone::MSTBackboneOverlappingSets() {
 		if (computeLocalPhylogeneticTree) {
 			this->M->SetIdsOfExternalVertices();
 			idsOfExternalVertices = this->M->idsOfExternalVertices;
-			idsOfVerticesForSEM = this->M->vertexMap->idsOfVerticesInSubtree;
-			this->numberOfVerticesInSubtree = this->M->vertexMap->idsOfVerticesInSubtree.size();
+			idsOfVerticesForSEM = this->M->vertexMap;
 			for (int id: idsOfExternalVertices) {
 				idsOfVerticesForSEM.push_back(id);
 			}
