@@ -252,7 +252,7 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 	// Initialize global phylogeny
 	idsOfVerticesForSEM.clear();
 	for (pair <int, MST_vertex *> vIdAndPtr : * this->M->vertexMap) {
-		idsOfVerticesForSEM.push_back(vIdAndPtr.first);
+		idsOfVerticesForSEM.push_back(vIdAndPtr.first); //mod
 	}
 	tie (names, sequences, sitePatternWeights, sitePatternRepetitions) = this->M->GetCompressedSequencesSiteWeightsAndSiteRepeats(idsOfVerticesForSEM);	
 	this->T->sequenceFileName = this->sequenceFileName;
