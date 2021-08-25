@@ -89,6 +89,7 @@ public:
 	int GetEdgeIndex (int vertexIndex1, int vertexIndex2, int numberOfVertices);
 	int GetNumberOfVertices();
 	void ComputeMST();
+	void ComputeMST_nonACGT();
 	void ResetSubtreeSizeThreshold();
 	void DoubleSubtreeSizeThreshold();
 	int ComputeHammingDistance(vector <unsigned char> recodedSeq1, vector <unsigned char> recodedSeq2);			
@@ -110,6 +111,14 @@ public:
 		mapDNAtoInteger["C"] = 1;
 		mapDNAtoInteger["G"] = 2;
 		mapDNAtoInteger["T"] = 3;		
+		mapDNAtoInteger["-"] = 4;
+		mapDNAtoInteger["N"] = 4;
+		//mapDNAtoInteger["N"] = 4;
+		//mapDNAtoInteger["N"] = 4;
+		//mapDNAtoInteger["N"] = 4;
+		//mapDNAtoInteger["N"] = 4;
+		//mapDNAtoInteger["N"] = 4;
+		//mapDNAtoInteger["N"] = 4;		
 	}
 	~MST_tree() {		
 		for (pair<int,MST_vertex*> VptrMap: *this->vertexMap){			
@@ -779,6 +788,12 @@ void MST_tree::WriteToFile(string FileName) {
 		}
 	}
 	mstFile.close();
+}
+
+void MST_tree::ComputeMST_nonACGT() {
+
+
+
 }
 
 void MST_tree::ComputeMST() {
