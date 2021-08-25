@@ -164,9 +164,9 @@ for (MST_vertex * v : nonLeafVertices) {
 //		Select the neighborhood of the vertex
  	for (MST_vertex * n: v->neighbors) {
  		vertexAndNeighbors.push_back(n->id);
-		//  cout << n->name << "\t";
+		   cout << n->name << "\t";
  	}
-	// this->vertexMap->insert(pair<int,MST_vertex*>(id,v));
+	 this->vertexMap->insert(pair<int,MST_vertex*>(id,v));
 	nonLeafVertexToVertexGroup_map.insert(pair<int, vector<int>>(v->id,vertexAndNeighbors)); 	
  }
 
