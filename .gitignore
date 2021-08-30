@@ -1,2 +1,5 @@
 mst-backbone
 mst-backbone.o
+data/mst-backbone_default_output*
+data/H3N2_156.fasta.*
+data/H3N2_974.fasta.*
