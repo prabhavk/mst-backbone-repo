@@ -1683,7 +1683,7 @@ void SEM::StoreEdgeListAndSeqToAdd() {
 Matrix4f SEM::GetTransitionMatrix(SEM_vertex * p, SEM_vertex * c) {	
 	Matrix4f P = ArrayXXf::Zero(4,4);			
 	int dna_p; int dna_c;
-	for (int site = 0; site < this->numberOfSitePatterns; site ++) {
+	for (int site = 0; site < this->numberOfSitePatterns; site ++) {		
 		dna_p = p->compressedSequence[site];
 		dna_c = c->compressedSequence[site];
 		P(dna_p,dna_c) += this->sitePatternWeights[site];	
