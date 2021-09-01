@@ -164,27 +164,32 @@ for (MST_vertex * v : nonLeafVertices) {
 //		Select the neighborhood of the vertex
  	for (MST_vertex * n: v->neighbors) {
  		vertexAndNeighbors.push_back(n->id);
-		//  cout << n->name << "\t";
+		//    cout << n->name << "\t";
  	}
-	// this->vertexMap->insert(pair<int,MST_vertex*>(id,v));
+	//  this->vertexMap->insert(pair<int,MST_vertex*>(id,v));
 	nonLeafVertexToVertexGroup_map.insert(pair<int, vector<int>>(v->id,vertexAndNeighbors)); 	
  }
 
  // Buid local phylogeny for each vertex group
-// map <int, SEM *> localPhylogenies_map;
-// vector <int> idsForBuildingLocalPhylo;
-// for (MST_vertex * v : nonLeafVertices) {
-// 	idsForBuildingLocalPhylo = nonLeafVertexToVertexGroup_map[v->id];
-// 	tie (names, sequences, sitePatternWeights, sitePatternRepetitions) = this->M->GetCompressedSequencesSiteWeightsAndSiteRepeats(idsForBuildingLocalPhylo);		
-// 	this->t = new SEM(1);
-// 	// this->T->sequenceFileName = this->sequenceFileName;
-// 	this->t->AddSequences(sequences);
-// 	this->t->AddNames(names);
-// 	this->t->AddSitePatternWeights(sitePatternWeights);
-// 	// this->T->SetNumberOfInputSequences(numberOfInputSequences);	
-// 	// this->T->numberOfObservedVertices = numberOfInputSequences;
-// 	localPhylogenies_map.insert(pair<int, SEM *> (v->id, this->t)));
-// }
+
+vector <string> names;
+vector <vector <unsigned char> > sequences;
+vector <int> sitePatternWeights;
+vector <vector <int> > sitePatternRepetitions;
+map <int, SEM *> localPhylogenies_map;
+vector <int> idsForBuildingLocalPhylo;
+for (MST_vertex * v : nonLeafVertices) {
+	idsForBuildingLocalPhylo = nonLeafVertexToVertexGroup_map[v->id];
+	tie (names, sequences, sitePatternWeights, sitePatternRepetitions) = this->M->GetCompressedSequencesSiteWeightsAndSiteRepeats(idsForBuildingLocalPhylo);		
+	this->t = new SEM(1);
+	// this->T->sequenceFileName = this->sequenceFileName;
+	this->t->AddSequences(sequences);
+	this->t->AddNames(names);
+	this->t->AddSitePatternWeights(sitePatternWeights);
+	// this->T->SetNumberOfInputSequences(numberOfInputSequences);	
+	// this->T->numberOfObservedVertices = numberOfInputSequences;
+	localPhylogenies_map.insert(pair<int, SEM *> (v->id, this->t));
+}
  
  // Join the local phylogenies and build a global phylogeny
 
