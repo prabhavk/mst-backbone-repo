@@ -113,6 +113,16 @@ public:
 		mapDNAtoInteger["T"] = 3;		
 		mapDNAtoInteger["-"] = 4;
 		mapDNAtoInteger["N"] = 4;
+		mapDNAtoInteger["W"] = 4;
+		mapDNAtoInteger["S"] = 4;
+		mapDNAtoInteger["M"] = 4;
+		mapDNAtoInteger["K"] = 4;
+		mapDNAtoInteger["R"] = 4;
+		mapDNAtoInteger["Y"] = 4;
+		mapDNAtoInteger["B"] = 4;
+		mapDNAtoInteger["D"] = 4;
+		mapDNAtoInteger["H"] = 4;
+		mapDNAtoInteger["V"] = 4;		
 		//mapDNAtoInteger["N"] = 4;
 		//mapDNAtoInteger["N"] = 4;
 		//mapDNAtoInteger["N"] = 4;
