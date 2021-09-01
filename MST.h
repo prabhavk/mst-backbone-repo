@@ -800,6 +800,9 @@ void MST_tree::ComputeMST() {
 	vector <unsigned char> recodedSequence;
 	recodedSequence.clear();
 	unsigned int site = 0;
+	unsigned char dna_char;
+	int num_amb = 0;
+	int num_non_amb = 0;
 //	cout << "Sequence file name is " << this->sequenceFileName << endl;
 	ifstream inputFile(this->sequenceFileName.c_str());
 	string seqName;
@@ -809,7 +812,14 @@ void MST_tree::ComputeMST() {
 			if (seq != "") {
 //				sequenceNames.push_back(seqName);
 				for (char const dna: seq) {
-					recodedSequence.push_back(mapDNAtoInteger[string(1,toupper(dna))]);					
+					dna_char = mapDNAtoInteger[string(1,toupper(dna))];
+					if (dna_char > 3) { // FIX_AMB
+						num_amb += 1;
+						dna_char = 3;
+					} else {
+						num_non_amb += 1;
+					}
+					recodedSequence.push_back(dna_char);					
 					site += 1;
 					}
 				this->AddVertex(seqName,recodedSequence);
@@ -824,7 +834,14 @@ void MST_tree::ComputeMST() {
 		}		
 	}		
 	for (char const dna: seq) {
-		recodedSequence.push_back(mapDNAtoInteger[string(1,toupper(dna))]);		
+		dna_char = mapDNAtoInteger[string(1,toupper(dna))];
+		if (dna_char > 3) { // FIX_AMB
+			num_amb += 1;
+			dna_char = 3;
+		} else {
+			num_non_amb += 1;
+		}
+		recodedSequence.push_back(dna_char);
 		site += 1;
 	}
 	this->AddVertex(seqName,recodedSequence);
@@ -832,6 +849,8 @@ void MST_tree::ComputeMST() {
 //	sequenceNames.push_back(seqName);
 	inputFile.close();
 	
+	cout << "Fraction of ambiguous characters is " << float(num_amb)/float(num_amb + num_non_amb) << endl;
+
 	int numberOfVertices = (this->v_ind);		
 	const int numberOfEdges = numberOfVertices*(numberOfVertices-1)/2;		
 	

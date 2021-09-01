@@ -209,7 +209,7 @@ void clique::ComputeBelief() {
 	Matrix4f factor = this->initialPotential;	
 	vector <clique *> neighbors = this->children;
 	std::array <float, 4> messageFromNeighbor;
-	bool debug = 1;	
+	bool debug = 0;	
 	if (debug) {
 		cout << "Computing belief for clique " << this->name << endl;
 	}
@@ -2020,7 +2020,7 @@ void SEM::InitializeTransitionMatricesAndRootProbability() {
 }
 
 void SEM::TestSEM() {
-	this->debug = 1;	
+	this->debug = 0;	
 	cout << "Testing structural EM" << endl;	
 	this->OptimizeTopologyAndParametersOfGMM();
 }
@@ -2232,7 +2232,7 @@ void SEM::ComputeMAPEstimateOfAncestralSequencesUsingCliques() {
 
 
 void SEM::ComputeExpectedCountsForFullStructureSearch() {
-	bool debug = 1;
+	bool debug = 0;
 //void SEM::ComputeExpectedCounts() {
 	if (debug) {
 		cout << "Constructing sorted list of all clique pairs" << endl;	
@@ -2289,9 +2289,9 @@ void SEM::ComputeExpectedCountsForFullStructureSearch() {
 		}
 		this->AddToExpectedCountsForEachVariable();
 		this->AddToExpectedCountsForEachVariablePair();
-		if (debug) {
-			break;
-		}
+		// if (debug) {
+		// 	break;
+		// }
 	}
 	// Compare observed counts with expected counts (done)
 	if (debug) {
@@ -3138,7 +3138,7 @@ void SEM::OptimizeTopologyAndParametersOfGMM() {
 	int iter = 0;
 	int maxIter = 100;	
 	bool continueIterations = 1;
-	this->debug = 1;
+	this->debug = 0;
 //	string chowLiuTreeFileNamePrefix = "/home/pk/Projects/MSTBasedForests/data/trees/chowLiuTree_test_numberOfLeaves_16_replicate_1";
 //	string MLRootedTreeFileNamePrefix = "/home/pk/Projects/MSTBasedForests/data/trees/MLRootedTree_test_numberOfLeaves_16_replicate_1";
 //	string cliqueTreeFileNamePrefix = "/home/pk/Projects/MSTBasedForests/data/trees/cliqueTree_test_numberOfLeaves_16_replicate_1";
@@ -4604,7 +4604,7 @@ void SEM::ComputeMLEOfTransitionMatrices() {
 }
 
 void SEM::ComputeInitialEstimateOfModelParameters() {	
-	bool debug = 1;
+	bool debug = 0;
 	this->rootProbability = GetBaseComposition(this->root);	
 	this->root->rootProbability = this->rootProbability;
 	if (debug) {
