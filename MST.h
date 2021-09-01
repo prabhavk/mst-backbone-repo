@@ -873,7 +873,7 @@ void MST_tree::ComputeMST() {
 	recodedSequence.clear();
 //	sequenceNames.push_back(seqName);
 	inputFile.close();
-	cout << "Number of ambiguous characters is " << float(num_amb) << "Number of nonambiguous characters is " << float(num_non_amb) << endl;
+	cout << "Number of ambiguous characters is " << float(num_amb) << "\tNumber of nonambiguous characters is " << float(num_non_amb) << endl;
 	cout << "Fraction of ambiguous characters is " << float(num_amb)/float(num_amb + num_non_amb) << endl;
 
 	int numberOfVertices = (this->v_ind);		
