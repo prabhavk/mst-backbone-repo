@@ -821,7 +821,7 @@ void MST_tree::ComputeMST() {
 					}
 					recodedSequence.push_back(dna_char);					
 					site += 1;
-					}
+				}
 				this->AddVertex(seqName,recodedSequence);
 				recodedSequence.clear();
 			} 
