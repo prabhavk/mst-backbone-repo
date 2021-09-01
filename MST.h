@@ -101,28 +101,29 @@ public:
 	void SetIdsOfExternalVertices();
 	bool ShouldIComputeALocalPhylogeneticTree();
 	void WriteToFile(string fileName);
+	unsigned char ConvertDNAToChar(char dna);
 	MST_tree(string sequenceFileNameToSet) {
 		this->sequenceFileName = sequenceFileNameToSet;
 		this->v_ind = 0;
 		vector <unsigned char> emptySequence;
 		this->allEdgeWeights = new map <pair<int,int>,int> ; 
 		this->vertexMap = new map <int, MST_vertex *>;
-		mapDNAtoInteger["A"] = 0;
-		mapDNAtoInteger["C"] = 1;
-		mapDNAtoInteger["G"] = 2;
-		mapDNAtoInteger["T"] = 3;		
-		mapDNAtoInteger["-"] = 4;
-		mapDNAtoInteger["N"] = 4;
-		mapDNAtoInteger["W"] = 4;
-		mapDNAtoInteger["S"] = 4;
-		mapDNAtoInteger["M"] = 4;
-		mapDNAtoInteger["K"] = 4;
-		mapDNAtoInteger["R"] = 4;
-		mapDNAtoInteger["Y"] = 4;
-		mapDNAtoInteger["B"] = 4;
-		mapDNAtoInteger["D"] = 4;
-		mapDNAtoInteger["H"] = 4;
-		mapDNAtoInteger["V"] = 4;		
+		this->mapDNAtoInteger["A"] = 0;
+		this->mapDNAtoInteger["C"] = 1;
+		this->mapDNAtoInteger["G"] = 2;
+		this->mapDNAtoInteger["T"] = 3;		
+		this->mapDNAtoInteger["-"] = 4;
+		this->mapDNAtoInteger["N"] = 4;
+		this->mapDNAtoInteger["W"] = 4;
+		this->mapDNAtoInteger["S"] = 4;
+		this->mapDNAtoInteger["M"] = 4;
+		this->mapDNAtoInteger["K"] = 4;
+		this->mapDNAtoInteger["R"] = 4;
+		this->mapDNAtoInteger["Y"] = 4;
+		this->mapDNAtoInteger["B"] = 4;
+		this->mapDNAtoInteger["D"] = 4;
+		this->mapDNAtoInteger["H"] = 4;
+		this->mapDNAtoInteger["V"] = 4;		
 		//mapDNAtoInteger["N"] = 4;
 		//mapDNAtoInteger["N"] = 4;
 		//mapDNAtoInteger["N"] = 4;
@@ -800,6 +801,18 @@ void MST_tree::WriteToFile(string FileName) {
 	mstFile.close();
 }
 
+unsigned char MST_tree::ConvertDNAToChar(char dna) {
+	string dna_upper = string(1,toupper(dna));
+	unsigned char dna_char = 4;
+	if (this->mapDNAtoInteger.find(dna_upper) != this->mapDNAtoInteger.end()) {
+		dna_char = this->mapDNAtoInteger[dna_upper];
+	} else {
+		cout << "DNA character " << dna_upper << " is not in dictionary keys" << endl;
+	}	
+	return (dna_char);
+}
+
+
 void MST_tree::ComputeMST_nonACGT() {
 
 
@@ -822,7 +835,7 @@ void MST_tree::ComputeMST() {
 			if (seq != "") {
 //				sequenceNames.push_back(seqName);
 				for (char const dna: seq) {
-					dna_char = mapDNAtoInteger[string(1,toupper(dna))];
+					dna_char = this->mapDNAtoInteger[string(1,toupper(dna))];
 					if (dna_char > 3) { // FIX_AMB
 						num_amb += 1;
 						dna_char = 3;
@@ -844,7 +857,7 @@ void MST_tree::ComputeMST() {
 		}		
 	}		
 	for (char const dna: seq) {
-		dna_char = mapDNAtoInteger[string(1,toupper(dna))];
+		dna_char = this->mapDNAtoInteger[string(1,toupper(dna))];
 		if (dna_char > 3) { // FIX_AMB
 			num_amb += 1;
 			dna_char = 3;
