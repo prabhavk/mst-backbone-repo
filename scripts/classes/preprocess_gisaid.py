@@ -18,7 +18,7 @@ def ComputeSequenceCoverageForAllPos(alignment):
     sequenceLength= len(alignment.values()[0])
     sequenceCoverage = [0.0]*sequenceLength
     for seq in alignment.values():
-        for pos in xrange(sequenceLength):
+        for pos in range(sequenceLength):
             if seq[pos] in ['A','C','G','T']:
                 sequenceCoverage[pos] += 1.0/float(numberOfSequences)    
     return sequenceCoverage
@@ -56,7 +56,7 @@ if createBatchFastaFileForAligning:
 #         host_list = xlFile['Host']    
 #         location_list = xlFile['Location']
 #         collection_date_list = xlFile['Collection_Date']
-#         for i in xrange(len(host_list)):
+#         for i in range(len(host_list)):
 #             if location_list.isnull()[i]:
 #                 location_list[i] = ""
 #             if host_list[i] == 'Human':
@@ -87,7 +87,7 @@ if createBatchFastaFileForAligning:
             WriteAlignment(smallAlignment, projectPath+'data/gisaid/'+lineage+'/unaligned_sequences/HA_sequences_unaligned_part_'+str(numberOfParts)+'.fasta')
             smallAlignment = {}
             seqsRemaining -= 200
-            print 'seqs remaining is', seqsRemaining
+            print ('seqs remaining is', seqsRemaining)
     
     numberOfParts += 1
     smallAlignment.update(referenceSequence)
@@ -123,28 +123,28 @@ if concatenateMSAFiles:
         noOfPosInAlignment = len(alignedSequences.values()[0])
         posToKeep = [True]*noOfPosInAlignment
         alignedRefSeq = alignedSequences[referenceSequence.keys()[0]]
-        for pos in xrange(noOfPosInAlignment):
+        for pos in range(noOfPosInAlignment):
             if alignedRefSeq[pos]=='-':
                 posToKeep[pos] = False
         for seqid in alignedSequences.keys():
             if seqid != referenceSequence.keys()[0]:
                 trimmedSeq = ""
-                for pos in xrange(noOfPosInAlignment):
+                for pos in range(noOfPosInAlignment):
                     if posToKeep[pos]:
                         trimmedSeq += alignedSequences[seqid][pos]
                 multipleSequenceAlignment[seqid] = trimmedSeq.upper()
-        print 'part', part, 'of', numberOfParts
+        print ('part', part, 'of', numberOfParts)
     WriteAlignment(multipleSequenceAlignment, projectPath+'data/gisaid/'+lineage+'/aligned_seqs.fas', 'fasta')
 
 if filterSequences:
     alignment = ReadAlignment(projectPath+'data/gisaid/'+lineage+'/aligned_seqs.fas')
     sequenceCoverage = ComputeSequenceCoverageForAllPos(alignment)
     posToKeep = []
-    for pos in xrange(len(sequenceCoverage)):
+    for pos in range(len(sequenceCoverage)):
         if sequenceCoverage[pos] >= 0.8:
             posToKeep.append(pos)
     
-    print "Length of trimmed alignment is", len(posToKeep)        
+    print ("Length of trimmed alignment is", len(posToKeep))
     numberOfSeqsThatPassQualityCheck = 0
     seqIdAndCollectionTimesTuple = []
     for seqId in alignment.keys():
@@ -155,9 +155,9 @@ if filterSequences:
             seqIdAndCollectionTimesTuple.append((seqId,seqId.split(';')[3]))
     seqIdAndCollectionTimesTuple.sort(key=lambda x: x[1],reverse=False)
     
-    print 'Total number of sequences is', len(alignment)
-    print 'Number of sequences that pass quality check are', numberOfSeqsThatPassQualityCheck
-    print 'Sorted seqIds of interest wrt collection time'
+    print ('Total number of sequences is', len(alignment))
+    print ('Number of sequences that pass quality check are', numberOfSeqsThatPassQualityCheck)
+    print ('Sorted seqIds of interest wrt collection time')
     uniqueSeqs = set([])
     alignmentToAnalyze = {}
     for seqId, collectionTime in seqIdAndCollectionTimesTuple:
@@ -166,7 +166,7 @@ if filterSequences:
         if trimmedSeq not in uniqueSeqs:
             uniqueSeqs.update(set([trimmedSeq]))
             alignmentToAnalyze[seqId] = trimmedSeq
-    print 'Number of distinct sequences that pass quality check are', len(alignmentToAnalyze)
+    print ('Number of distinct sequences that pass quality check are', len(alignmentToAnalyze))
     WriteAlignment(alignmentToAnalyze, projectPath+'data/gisaid/'+lineage+'/H3N2_HA_seqsWithLineageCollectionTimeAndLocationInFastaHeader.fasta')
 #     print 'Alignment to use has been written to file'
 if stripAllInfoExceptEPIIds:
