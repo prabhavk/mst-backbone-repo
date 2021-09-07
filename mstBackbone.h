@@ -171,10 +171,9 @@ for (MST_vertex * v : nonLeafVertices) {
 
 		//    cout << n->name << "\t";
  	}
-	//  this->vertexMap->insert(pair<int,MST_vertex*>(id,v));
+	 this->vertexMap->insert(pair<int,MST_vertex*>(id,v));
 
 	nonLeafVertexToVertexGroup_map.insert(pair<int, vector<int>>(v->id,vertexAndNeighbors)); 	
- }
 
  // Buid local phylogeny for each vertex group
 
