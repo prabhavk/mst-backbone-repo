@@ -58,6 +58,7 @@ private:
 //	void ComputeVMST(string sequenceFileName);
 	void WriteOutputFiles();
 	bool debug;
+	bool localPhyloOnly;
 	int numberOfVerticesInSubtree;
 	string GetSequenceListToWriteToFile(map <string, vector <unsigned char>> compressedSeqMap, vector <vector <int> > sitePatternRepetitions);
 	
@@ -68,7 +69,10 @@ public:
 	void MSTBackboneWithFullSEMAndMultipleExternalVertices();
 	void MSTBackboneWithRootSEMAndMultipleExternalVertices();
 	void MSTBackboneOverlappingSets();
-	MSTBackbone(string sequenceFileNameToAdd, int subtreeSizeThresholdToset, string prefix_for_output_files_to_set) {
+	void MSTBackboneOnlyLocalPhylo();
+	MSTBackbone(string sequenceFileNameToAdd, int subtreeSizeThresholdToset, string prefix_for_output_files_to_set, bool localPhyloOnly_to_set) {
+		// bool localPhyloOnly = TRUE;
+		this->localPhyloOnly = localPhyloOnly_to_set;
 		start_time = chrono::high_resolution_clock::now();				
 		this->sequenceFileName = sequenceFileNameToAdd;
 		this->numberOfLargeEdgesThreshold = subtreeSizeThresholdToset;
@@ -86,8 +90,13 @@ public:
 		this->M = new MST_tree(this->sequenceFileName);				
 		this->M->ComputeMST();
 		this->M->WriteToFile(MSTFileName);
-		this->M->SetNumberOfLargeEdgesThreshold(this->numberOfLargeEdgesThreshold);		
-		this->MSTBackboneWithFullSEMAndMultipleExternalVertices(); // MAIN MST_BACKBONE FUNCTION
+		this->M->SetNumberOfLargeEdgesThreshold(this->numberOfLargeEdgesThreshold);
+		this->T = new SEM(1);
+		if (this->localPhyloOnly) {
+			this->MSTBackboneOnlyLocalPhylo(); // use this instead of the function above
+		} else {
+			this->MSTBackboneWithFullSEMAndMultipleExternalVertices(); // MAIN MST_BACKBONE FUNCTION		
+		}			
 //		this->MSTBackboneWithRootSEMAndMultipleExternalVertices();
 		cout << "Writing ancestral sequences to file " << endl;
 		this->mstBackboneLogFile << "Writing ancestral sequences to file " << endl;
@@ -95,8 +104,10 @@ public:
 		ancestralSequencesFile.open(this->prefix_for_output_files+".ancestralSequences");
 		ancestralSequencesFile << this->ancestralSequencesString;
 		ancestralSequencesFile.close();
-		this->T->WriteRootedTreeAsEdgeList(this->prefix_for_output_files + ".edgeList");
-		this->T->WriteRootedTreeInNewickFormat(this->prefix_for_output_files + ".newick");
+		if (! this->localPhyloOnly) {
+			this->T->WriteRootedTreeAsEdgeList(this->prefix_for_output_files + ".edgeList");
+			this->T->WriteRootedTreeInNewickFormat(this->prefix_for_output_files + ".newick");
+		}		
 //		this->MSTBackboneWithOneExternalVertex();	
 		current_time = std::chrono::high_resolution_clock::now();
 		cout << "Total CPU time used is " << chrono::duration_cast<chrono::seconds>(current_time-start_time).count() << " second(s)\n";
@@ -104,7 +115,7 @@ public:
 		this->mstBackboneLogFile.close();		
 			}
 	~MSTBackbone(){
-		delete this->T;	
+		delete this->T;
 		delete this->M;	
 	}
 };
@@ -116,6 +127,178 @@ void MSTBackbone::SetDNAMap() {
 	this->mapDNAtoInteger["T"] = 3;
 }
 
+void MSTBackbone::MSTBackboneOnlyLocalPhylo() {
+	vector <string> names;
+	vector <vector <unsigned char> > sequences;
+	vector <int> sitePatternWeights;
+	vector <vector <int> > sitePatternRepetitions;	
+	vector <int> idsOfVerticesToRemove;
+	vector <int> idsOfVerticesToKeep;
+	vector <int> idsOfExternalVertices;
+	vector <int> idsOfVerticesForSEM;
+	vector <tuple <int, string, vector <unsigned char>>> idAndNameAndSeqTupleForVerticesToAdd;	
+	//----##############################################################---//
+	//	1.	Initialize the global phylogenetic tree T as the empty graph   //
+	//----##############################################################---//
+//	cout << "Starting MST-backbone" << endl;
+//	cout << "1.	Initialize the global phylogenetic tree T as the empty graph" << endl;
+	int numberOfInputSequences = (int) this->M->vertexMap->size();		
+	current_time = chrono::high_resolution_clock::now();
+	timeTakenToComputeEdgeAndVertexLogLikelihoods = chrono::duration_cast<chrono::seconds>(current_time-current_time);
+	
+	// Initialize global phylogeny
+	// idsOfVerticesForSEM.clear();
+	// for (pair <int, MST_vertex *> vIdAndPtr : * this->M->vertexMap) {
+	// 	idsOfVerticesForSEM.push_back(vIdAndPtr.first);
+	// }
+	// tie (names, sequences, sitePatternWeights, sitePatternRepetitions) = this->M->GetCompressedSequencesSiteWeightsAndSiteRepeats(idsOfVerticesForSEM);	
+	// this->T->sequenceFileName = this->sequenceFileName;
+	// this->T->AddSequences(sequences);
+	// this->T->AddNames(names);
+	// this->T->AddSitePatternWeights(sitePatternWeights);
+	// this->T->SetNumberOfInputSequences(numberOfInputSequences);	
+	// this->T->numberOfObservedVertices = numberOfInputSequences;
+	
+	int largestIdOfVertexInMST = numberOfInputSequences;
+	
+	bool computeLocalPhylogeneticTree = 1;
+	bool numberOfNonSingletonComponentsIsGreaterThanZero = 0;	
+	
+	while (computeLocalPhylogeneticTree) {
+		cout << "Number of vertices in MST is " << this->M->vertexMap->size() << endl;
+		this->mstBackboneLogFile << "Number of vertices in MST is " << this->M->vertexMap->size() << endl;
+//		cout << "Max vertex degree in MST is " << this->M->maxDegree << endl;
+		//----####################################################################---//
+		//	2.	Compute the size of the smallest subtree ts = (Vs,Es) of M s.t.		 //
+		//		|Vs| > s. Check if |Vm\Vs| > s.								   		 //
+		// 		If yes then go to step 3 else go to step 9					   		 //
+		// 		Bootstrapped alignments may contain zero-weight edges		   		 //
+		//      If so then replace |Vs| with |{non-zero weighted edges in Es}| 		 //
+		//      Additionally replace |Vm\Vs| with |{non-zero weighted edges in Es}|  //
+		//----####################################################################---//				
+		computeLocalPhylogeneticTree = this->M->ShouldIComputeALocalPhylogeneticTree();
+//		cout << "2. Checking if local phylogenetic tree should be computed" << endl;
+		if (computeLocalPhylogeneticTree) {
+			//----####################################################################---//
+			//	3.	Extract vertices inducing subtree (Vs), and external vertices (Ve)	 //
+			//----####################################################################---//				
+//			cout << "3. Extract vertices inducing subtree (Vs), and external vertices (Ve)" << endl;
+			this->M->SetIdsOfExternalVertices();
+			idsOfExternalVertices = this->M->idsOfExternalVertices;
+			idsOfVerticesForSEM = this->M->subtree_v_ptr->idsOfVerticesInSubtree;
+			this->numberOfVerticesInSubtree = this->M->subtree_v_ptr->idsOfVerticesInSubtree.size();
+			for (int id: idsOfExternalVertices) {
+				idsOfVerticesForSEM.push_back(id);
+			}
+			tie (names, sequences, sitePatternWeights, sitePatternRepetitions) = this->M->GetCompressedSequencesSiteWeightsAndSiteRepeats(idsOfVerticesForSEM);
+			//----########################################################---//
+			//	4.	Compute local phylogeny t over (Vs U Ve) via SEM      	 //
+			//----########################################################---//
+//			cout << "4.	Compute local phylogeny t over (Vs U Ve) via SEM" << endl;			
+			this->t = new SEM(largestIdOfVertexInMST);
+			this->t->AddSequences(sequences);
+			this->t->SetNumberOfVerticesInSubtree(this->numberOfVerticesInSubtree);
+			this->t->SetNumberOfInputSequences(numberOfInputSequences);
+			this->t->AddRootVertex();
+			this->t->AddNames(names);
+			this->t->AddGlobalIds(idsOfVerticesForSEM);
+			this->t->AddSitePatternWeights(sitePatternWeights);
+			this->t->AddSitePatternRepeats(sitePatternRepetitions);			
+			this->t->OptimizeTopologyAndParametersOfGMM();			
+//			timeTakenToComputeUnrootedPhylogeny += chrono::duration_cast<chrono::seconds>(t_end_time - t_start_time);
+			//----##################################################################---//	
+			//  5.	Check if # of non-singleton components of forest f in t that       //
+			//		is induced by Vs is greater than zero.							   //
+			//		i.e., Does local phylogeny contain vertices/edges of interest?	   //
+			//----##################################################################---//
+			this->t->SelectIndsOfVerticesOfInterestAndEdgesOfInterest();
+			numberOfNonSingletonComponentsIsGreaterThanZero = this->t->IsNumberOfNonSingletonComponentsGreaterThanZero();			
+//			cout << "5. Checking if there are any vertices of interest" << endl;
+			if (!numberOfNonSingletonComponentsIsGreaterThanZero) {
+				//----####################################################---//	
+				//  6.	If no then double subtree size and go to step 2 	 //
+				//		else reset subtree size and go to to step 7		     //
+				//----####################################################---//		
+				this->M->DoubleSubtreeSizeThreshold();
+//				cout << "6. Doubling subtree size" << endl;
+			} else {
+				this->M->ResetSubtreeSizeThreshold();		
+				//----################################---//
+				//  7.	Add vertices/edges in f to T     //
+				//----################################---//
+//				cout << "7. Adding vertices/edges in f to T" << endl;
+				this->t->RenameHiddenVerticesInEdgesOfInterestAndSetIdsOfVerticesOfInterest();
+				this->t->SetWeightedEdgesToAddToGlobalPhylogeneticTree();				
+				//this->T->AddWeightedEdges(this->t->weightedEdgesToAddToGlobalPhylogeneticTree);
+				this->t->SetAncestralSequencesString();
+				this->ancestralSequencesString += this->t->ancestralSequencesString;				
+				t_start_time = chrono::high_resolution_clock::now();
+				this->t->SetEdgeAndVertexLogLikelihoods();				
+				// this->T->AddVertexLogLikelihoods(this->t->vertexLogLikelihoodsMapToAddToGlobalPhylogeneticTree);
+				// this->T->AddEdgeLogLikelihoods(this->t->edgeLogLikelihoodsToAddToGlobalPhylogeneticTree);
+				t_end_time = chrono::high_resolution_clock::now();
+				timeTakenToComputeEdgeAndVertexLogLikelihoods += chrono::duration_cast<chrono::seconds>(t_end_time - t_start_time);
+				// Add vertex logLikelihoods
+				// Add edge logLikelihoods
+				largestIdOfVertexInMST = this->t->largestIdOfVertexInMST;
+				//----##############################---//
+				//  8.	Update M and go to step 1	   //
+				//----##############################---//
+//				cout << "8. Updating MST" << endl;
+				this->t->SetInfoForVerticesToAddToMST();				
+				this->M->UpdateMSTWithMultipleExternalVertices(t->idsOfVerticesToKeepInMST, t->idsOfVerticesToRemove, t->idAndNameAndSeqTuple, idsOfExternalVertices);								
+				delete this->t;
+			}			
+			computeLocalPhylogeneticTree = this->M->ShouldIComputeALocalPhylogeneticTree();
+		}		
+		cout << "CPU time used for computing local phylogeny is " << chrono::duration_cast<chrono::seconds>(t_end_time-t_start_time).count() << " second(s)\n";
+		this->mstBackboneLogFile << "CPU time used for computing local phylogeny is " << chrono::duration_cast<chrono::seconds>(t_end_time-t_start_time).count() << " second(s)\n";			
+	}	
+	//----########################################################---//
+	//	9.	Compute phylogenetic tree t over vertices in M, and      //
+	//		add vertices/edges in t to T							 //
+	//----########################################################---//
+	cout << "Computing phylogenetic tree over all vertices in MST" << endl;
+	this->M->UpdateMaxDegree();
+	cout << "Max vertex degree in MST is " << this->M->maxDegree << endl;
+	idsOfVerticesForSEM.clear();
+	for (pair <int, MST_vertex *> idPtrPair: * this->M->vertexMap) {
+		idsOfVerticesForSEM.push_back(idPtrPair.first);
+	}
+	cout << "Number of vertices in MST is " << idsOfVerticesForSEM.size() << endl;
+	cout << "Number of edges in MST is " << this->M->edgeWeightsMap.size() << endl;
+	tie (names, sequences, sitePatternWeights, sitePatternRepetitions) = this->M->GetCompressedSequencesSiteWeightsAndSiteRepeats(idsOfVerticesForSEM);
+	this->numberOfVerticesInSubtree = sequences.size();
+	this->t = new SEM(largestIdOfVertexInMST);
+	this->t->SetFlagForFinalIterationOfSEM();
+	this->t->AddSequences(sequences);
+	this->t->SetNumberOfVerticesInSubtree(this->numberOfVerticesInSubtree);
+	this->t->SetNumberOfInputSequences(numberOfInputSequences);
+	this->t->AddRootVertex();
+	this->t->AddNames(names);
+	this->t->AddGlobalIds(idsOfVerticesForSEM);
+	this->t->AddSitePatternWeights(sitePatternWeights);
+	this->t->AddSitePatternRepeats(sitePatternRepetitions);	
+	this->t->OptimizeTopologyAndParametersOfGMM();			
+	// timeTakenToComputeUnrootedPhylogeny += chrono::duration_cast<chrono::seconds>(t_end_time - t_start_time);
+	this->t->SelectIndsOfVerticesOfInterestAndEdgesOfInterest();
+	this->t->RenameHiddenVerticesInEdgesOfInterestAndSetIdsOfVerticesOfInterest();
+	this->t->SetWeightedEdgesToAddToGlobalPhylogeneticTree();
+	this->t->SetAncestralSequencesString();
+	this->ancestralSequencesString += this->t->ancestralSequencesString;
+	this->t->WriteAncestralSequences();	
+	//this->T->AddWeightedEdges(this->t->weightedEdgesToAddToGlobalPhylogeneticTree);	
+	t_start_time = chrono::high_resolution_clock::now();
+	this->t->SetEdgeAndVertexLogLikelihoods();
+	//this->T->AddVertexLogLikelihoods(this->t->vertexLogLikelihoodsMapToAddToGlobalPhylogeneticTree);
+	//this->T->AddEdgeLogLikelihoods(this->t->edgeLogLikelihoodsToAddToGlobalPhylogeneticTree);
+	t_end_time = chrono::high_resolution_clock::now();
+	timeTakenToComputeEdgeAndVertexLogLikelihoods += chrono::duration_cast<chrono::seconds>(t_end_time - t_start_time);
+	delete this->t;	
+	this->mstBackboneLogFile << "CPU time used for computing local phylogeny is " << chrono::duration_cast<chrono::seconds>(t_end_time-t_start_time).count() << " second(s)\n";		
+	// assert that T is a tree
+
+}
 
 void MSTBackbone::MSTBackboneOverlappingSets() {
 // Implement here
@@ -164,7 +347,7 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 //	cout << "Starting MST-backbone" << endl;
 //	cout << "1.	Initialize the global phylogenetic tree T as the empty graph" << endl;
 	int numberOfInputSequences = (int) this->M->vertexMap->size();	
-	this->T = new SEM(1);
+	// this->T = new SEM(1);
 	current_time = chrono::high_resolution_clock::now();
 	timeTakenToComputeEdgeAndVertexLogLikelihoods = chrono::duration_cast<chrono::seconds>(current_time-current_time);
 	

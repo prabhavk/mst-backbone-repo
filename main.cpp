@@ -10,8 +10,6 @@ namespace fs = std::experimental::filesystem;
 
 int main(int argc, char **argv)
 {	
-	
-
 	string path_to_alignment_file;
 	fs::path alignment_file_path_obj;
 	fs::path prefix_path_obj;
@@ -22,8 +20,10 @@ int main(int argc, char **argv)
 	bool flag_alignment_file = 0;
 	bool flag_size_of_subtree = 0;
 	bool flag_prefix = 0;
+	bool localPhyloOnly = 0;
+	string arg_localPhyloOnly;
     if (argc < 2) {        
-        cerr << "Usage: " << argv[0] << " --seq sequence_alignment_file --size size_of_subtree --out prefix_for_output_files" << endl;
+        cerr << "Usage: " << argv[0] << " --seq sequence_alignment_file --size size_of_subtree --out prefix_for_output_files --localOnly " << endl;
         return (-1);
     } else {        
         // parse arguments            
@@ -50,13 +50,20 @@ int main(int argc, char **argv)
 					// prefix_for_output_files = alignment_file_path_obj.parent_path().string() + prefix_for_output_files;
 					prefix_path_obj =  alignment_file_path_obj.parent_path();
 					prefix_path_obj /= prefix_for_output_files;
-					cout << "prefix for output files is" << prefix_for_output_files << endl;					
+					cout << "prefix for output files is " << prefix_for_output_files << endl;					
                 }
         // size of subtree Vs
             } else if (strcmp(argv[i], "--size") == 0) {
                 if (i < argc -1) {
 					flag_size_of_subtree = 1;
                     size_of_subtree = stoi(argv[++i]);
+                }
+			} else if (strcmp(argv[i], "--localOnly") == 0) {
+                if (i < argc -1) {
+					arg_localPhyloOnly = argv[++i];
+					if (strcmp(arg_localPhyloOnly.c_str(), "True") == 0) {
+						localPhyloOnly = 1;
+					}
                 }
 			}        
         }
@@ -70,7 +77,7 @@ int main(int argc, char **argv)
 			prefix_path_obj /= "mst-backbone_default_output";			
 			// prefix_for_output_files = path_obj.parent_path().string() + "mst_backbone";
 		}
-		MSTBackbone MSTBackboneObj(path_to_alignment_file, size_of_subtree, prefix_path_obj.string());
+		MSTBackbone MSTBackboneObj(path_to_alignment_file, size_of_subtree, prefix_path_obj.string(),localPhyloOnly);
     }
 
 	return 0;

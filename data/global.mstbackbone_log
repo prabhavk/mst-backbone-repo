@@ -1,0 +1,21 @@
+Subtree size is set at	10
+Prefix for output files is 	data/global
+Number of vertices in MST is 156
+Number of vertices in MST is 144
+Number of vertices in MST is 128
+Number of vertices in MST is 117
+Number of vertices in MST is 104
+Number of vertices in MST is 88
+Number of vertices in MST is 65
+Number of vertices in MST is 53
+Number of vertices in MST is 39
+Number of vertices in MST is 27
+CPU time used for computing global unrooted phylogenetic tree T is 10 second(s)
+Fitting a general Markov (GM) model to T using reconstructed ancestral sequences
+CPU time used for fitting a GM model to fully labeled T is 0 second(s)
+Log likelihood of fitting a GM model to fully labeled T is -16438.9
+Rooting T by fitting a GM model using restricted SEM
+CPU time used for rooting leaf-labeled T via restricted SEM is 2 second(s)
+Log likelihood of fitting a GM model to leaf-labeled T via restricted SEM is -10415.5
+Writing ancestral sequences to file 
+Total CPU time used is 12 second(s)
