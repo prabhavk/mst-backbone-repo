@@ -3,7 +3,7 @@
     
 import math as m
 from scipy.linalg import expm, logm, eig
-
+from scipy.optimize import minimize
 from numpy.linalg import inv, eig, det, lstsq
 from numpy.random import uniform, choice
 from numpy import diag, array, matrix, append
@@ -27,8 +27,39 @@ def GetStationaryDistribution(Q):
     b.shape=(5,1)
     Q_aug = np.c_[np.ones(4),Q]
     Q_aug = Q_aug.transpose()
-    eq_dist = lstsq(Q_aug,b)[0]
+    eq_dist = lstsq(Q_aug,b,rcond=None)[0]
     return eq_dist
+
+def GenerateUnrestRateMatrix(pi):
+    # pi = [0.25, 0.4, 0.2, 0.15]
+    def penalty(rates_11):
+        A2C, A2G, A2T, C2A, C2G, C2T, G2A, G2C, G2T, T2A, T2C = rates_11
+        T2G = 1
+        Q = array([[-(A2C+A2G+A2T),A2C,A2G,A2T],
+                    [C2A,-(C2A+C2G+C2T),C2G,C2T],
+                    [G2A,G2C,-(G2A+G2C+G2T),G2T],
+                    [T2A,T2C,T2G,-(T2A+T2C+T2G)]])
+        pi_stat = GetStationaryDistribution(Q)
+        penalty = 0
+        for i in range(4):        
+            penalty += pow(pi[i] -pi_stat[i],2)
+        return (penalty)
+        
+    rates_11 = [1]*11
+    opt_res = minimize(penalty,rates_11,method='Nelder-Mead')
+    # print ("Penalty is ", penalty(opt_res.x))
+    # print(opt_res.x)
+    for i in range(11):
+        rates_11[i] = opt_res.x[i]
+    # rates_11.append(1)
+    Q = GenerateQ_11rates(rates_11)
+    # pi_stat = GetStationaryDistribution(Q)
+    # print(pi_stat[0], pi_stat[1], pi_stat[2], pi_stat[3])
+    rootProb = GetStationaryDistribution(Q)
+    # print (rootProb)
+    mu = -1*((rootProb[0]*Q[0,0])+(rootProb[1]*Q[1,1])+(rootProb[2]*Q[2,2])+(rootProb[3]*Q[3,3]))
+    Q/=mu
+    return (Q)
 
 # GTR rate matrix
 def GenerateQ_GTR(stationaryDistribution,rates):
@@ -45,6 +76,11 @@ def GenerateQ_GTR(stationaryDistribution,rates):
 # 12 parameter rate matrix 
 # [A->C,A->G,A->T,C->A,C->G,C->T,G->A,G->C,G->T,T->A,T->C,T->G]
 # [A2C,A2G,A2T,C2A,C2G,C2T,G2A,G2C,G2T,T2A,T2C,T2G]
+
+def GenerateQ_11rates(rates_11):
+    rates_11.append(1)
+    Q = GenerateQ(rates_11)
+    return(Q)
 
 def GenerateQ(rates):
     A2C, A2G, A2T, C2A, C2G, C2T, G2A, G2C, G2T, T2A, T2C, T2G = rates
