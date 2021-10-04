@@ -128,10 +128,11 @@ class Tree:
                 del self.sequences[v_name]
         else:
             return 'Error: The vertex that is to be removed is not in the graph'
-    def AddPendantEdgesToLabeledAncestors(self):
+    def AddPendantEdgesToLabeledAncestors(self): 
         for v_name in self.vertices.keys():
             v = self.vertices[v_name]:
-            if v.degree
+            if v.degree == 1:
+                pass
 
     def GetSplits(self):
         leaves = self.GetLeaves()[:]
