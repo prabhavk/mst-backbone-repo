@@ -89,6 +89,7 @@ public:
 	int GetEdgeIndex (int vertexIndex1, int vertexIndex2, int numberOfVertices);
 	int GetNumberOfVertices();
 	void ComputeMST();
+	void ComputeMST_nonACGT();
 	void ResetSubtreeSizeThreshold();
 	void DoubleSubtreeSizeThreshold();
 	int ComputeHammingDistance(vector <unsigned char> recodedSeq1, vector <unsigned char> recodedSeq2);			
@@ -100,16 +101,35 @@ public:
 	void SetIdsOfExternalVertices();
 	bool ShouldIComputeALocalPhylogeneticTree();
 	void WriteToFile(string fileName);
+	unsigned char ConvertDNAToChar(char dna);
 	MST_tree(string sequenceFileNameToSet) {
 		this->sequenceFileName = sequenceFileNameToSet;
 		this->v_ind = 0;
 		vector <unsigned char> emptySequence;
 		this->allEdgeWeights = new map <pair<int,int>,int> ; 
 		this->vertexMap = new map <int, MST_vertex *>;
-		mapDNAtoInteger["A"] = 0;
-		mapDNAtoInteger["C"] = 1;
-		mapDNAtoInteger["G"] = 2;
-		mapDNAtoInteger["T"] = 3;		
+		this->mapDNAtoInteger["A"] = 0;
+		this->mapDNAtoInteger["C"] = 1;
+		this->mapDNAtoInteger["G"] = 2;
+		this->mapDNAtoInteger["T"] = 3;		
+		this->mapDNAtoInteger["-"] = 4;
+		this->mapDNAtoInteger["N"] = 4;
+		this->mapDNAtoInteger["W"] = 4;
+		this->mapDNAtoInteger["S"] = 4;
+		this->mapDNAtoInteger["M"] = 4;
+		this->mapDNAtoInteger["K"] = 4;
+		this->mapDNAtoInteger["R"] = 4;
+		this->mapDNAtoInteger["Y"] = 4;
+		this->mapDNAtoInteger["B"] = 4;
+		this->mapDNAtoInteger["D"] = 4;
+		this->mapDNAtoInteger["H"] = 4;
+		this->mapDNAtoInteger["V"] = 4;		
+		//mapDNAtoInteger["N"] = 4;
+		//mapDNAtoInteger["N"] = 4;
+		//mapDNAtoInteger["N"] = 4;
+		//mapDNAtoInteger["N"] = 4;
+		//mapDNAtoInteger["N"] = 4;
+		//mapDNAtoInteger["N"] = 4;		
 	}
 	~MST_tree() {		
 		for (pair<int,MST_vertex*> VptrMap: *this->vertexMap){			
@@ -781,10 +801,31 @@ void MST_tree::WriteToFile(string FileName) {
 	mstFile.close();
 }
 
+unsigned char MST_tree::ConvertDNAToChar(char dna) {
+	string dna_upper = string(1,toupper(dna));
+	unsigned char dna_char = 4;
+	if (this->mapDNAtoInteger.find(dna_upper) != this->mapDNAtoInteger.end()) {
+		dna_char = this->mapDNAtoInteger[dna_upper];
+	} else {
+		cout << "DNA character " << dna_upper << " is not in dictionary keys" << endl;
+	}	
+	return (dna_char);
+}
+
+
+void MST_tree::ComputeMST_nonACGT() {
+
+
+
+}
+
 void MST_tree::ComputeMST() {
 	vector <unsigned char> recodedSequence;
 	recodedSequence.clear();
 	unsigned int site = 0;
+	unsigned char dna_char;
+	int num_amb = 0;
+	int num_non_amb = 0;
 //	cout << "Sequence file name is " << this->sequenceFileName << endl;
 	ifstream inputFile(this->sequenceFileName.c_str());
 	string seqName;
@@ -794,9 +835,17 @@ void MST_tree::ComputeMST() {
 			if (seq != "") {
 //				sequenceNames.push_back(seqName);
 				for (char const dna: seq) {
-					recodedSequence.push_back(mapDNAtoInteger[string(1,toupper(dna))]);					
-					site += 1;
+					// dna_char = this->mapDNAtoInteger[string(1,toupper(dna))];					
+					dna_char = this->ConvertDNAToChar(dna);
+					if (dna_char > 3) { // FIX_AMB
+						num_amb += 1;
+						dna_char = 3;
+					} else {
+						num_non_amb += 1;
 					}
+					recodedSequence.push_back(dna_char);					
+					site += 1;
+				}
 				this->AddVertex(seqName,recodedSequence);
 				recodedSequence.clear();
 			} 
@@ -809,14 +858,24 @@ void MST_tree::ComputeMST() {
 		}		
 	}		
 	for (char const dna: seq) {
-		recodedSequence.push_back(mapDNAtoInteger[string(1,toupper(dna))]);		
+		// dna_char = this->mapDNAtoInteger[string(1,toupper(dna))];
+		dna_char = this->ConvertDNAToChar(dna);
+		if (dna_char > 3) { // FIX_AMB
+			num_amb += 1;
+			dna_char = 3;
+		} else {
+			num_non_amb += 1;
+		}
+		recodedSequence.push_back(dna_char);
 		site += 1;
 	}
 	this->AddVertex(seqName,recodedSequence);
 	recodedSequence.clear();
 //	sequenceNames.push_back(seqName);
 	inputFile.close();
-	
+	cout << "Number of ambiguous characters is " << float(num_amb) << "\tNumber of nonambiguous characters is " << float(num_non_amb) << endl;
+	cout << "Fraction of ambiguous characters is " << float(num_amb)/float(num_amb + num_non_amb) << endl;
+
 	int numberOfVertices = (this->v_ind);		
 	const int numberOfEdges = numberOfVertices*(numberOfVertices-1)/2;		
 	

@@ -209,8 +209,8 @@ void clique::ComputeBelief() {
 	Matrix4f factor = this->initialPotential;	
 	vector <clique *> neighbors = this->children;
 	std::array <float, 4> messageFromNeighbor;
-	bool verbose = 0;	
-	if (verbose) {
+	bool debug = 0;	
+	if (debug) {
 		cout << "Computing belief for clique " << this->name << endl;
 	}
 	if (this->parent != this) {
@@ -226,7 +226,7 @@ void clique::ComputeBelief() {
 					factor(dna_x, dna_y) *= messageFromNeighbor[dna_y];					
 				}
 			}
-			if (verbose) {
+			if (debug) {
 				cout << "Performing row-wise multiplication" << endl;
 			}			
 		} else if (this->x == C_neighbor->x or this->x == C_neighbor->y) {
@@ -236,7 +236,7 @@ void clique::ComputeBelief() {
 					factor(dna_x, dna_y) *= messageFromNeighbor[dna_x];
 				}
 			}
-			if (verbose) {
+			if (debug) {
 				cout << "Performing column-wise multiplication" << endl;
 			}			
 		} else {
@@ -250,7 +250,7 @@ void clique::ComputeBelief() {
 			scalingFactor += factor(dna_x, dna_y);
 		}
 	}
-	if (scalingFactor == 0) {		
+	if (scalingFactor <= 0 || debug) {		
 		cout << "Initial potential for " << this->name << " is " << endl << initialPotential << endl;
 		for (clique * C_neighbor : neighbors) {		
 			cout << "Message from neighbor " << C_neighbor->name << " is " << endl;
@@ -1684,9 +1684,11 @@ Matrix4f SEM::GetTransitionMatrix(SEM_vertex * p, SEM_vertex * c) {
 	Matrix4f P = ArrayXXf::Zero(4,4);			
 	int dna_p; int dna_c;
 	for (int site = 0; site < this->numberOfSitePatterns; site ++) {
-		dna_p = p->compressedSequence[site];
-		dna_c = c->compressedSequence[site];
-		P(dna_p,dna_c) += this->sitePatternWeights[site];	
+		if (p->compressedSequence[site] < 4 && c->compressedSequence[site] < 4) { // FIX_AMB
+			dna_p = p->compressedSequence[site];
+			dna_c = c->compressedSequence[site];		
+			P(dna_p,dna_c) += this->sitePatternWeights[site];	
+		}		
 	}
 //	cout << "Sequence of parent: " << EncodeAsDNA(p->compressedSequence) << endl;
 //	cout << "Sequence of child: " << EncodeAsDNA(c->compressedSequence) << endl;
@@ -2018,7 +2020,7 @@ void SEM::InitializeTransitionMatricesAndRootProbability() {
 }
 
 void SEM::TestSEM() {
-	this->debug = 1;	
+	this->debug = 0;	
 	cout << "Testing structural EM" << endl;	
 	this->OptimizeTopologyAndParametersOfGMM();
 }
@@ -2230,24 +2232,45 @@ void SEM::ComputeMAPEstimateOfAncestralSequencesUsingCliques() {
 
 
 void SEM::ComputeExpectedCountsForFullStructureSearch() {
+	bool debug = 0;
 //void SEM::ComputeExpectedCounts() {
+	if (debug) {
+		cout << "Constructing sorted list of all clique pairs" << endl;	
+	}
 	this->cliqueT->ConstructSortedListOfAllCliquePairs();
 //	cout << "Initializing expected counts" << endl;
+	if (debug) {
+		cout << "Initializing expected counts for each variable" << endl;	
+	}
 	this->InitializeExpectedCountsForEachVariable();
+	if (debug) {
+		cout << "Initializing expected counts for each variable pair" << endl;	
+	}
 	this->InitializeExpectedCountsForEachVariablePair();
 //	this->ResetExpectedCounts();
 	SEM_vertex * x; SEM_vertex * y; 
 	Matrix4f P_XY;
-	int dna_x; int dna_y;
-	bool debug = 0;
+	int dna_x; int dna_y;	
 	if (debug) {
 		cout << "Debug computing expected counts" << endl;
 	}
 // Iterate over sites
-	for (int site = 0; site < this->numberOfSitePatterns; site++) {
+	for (int site = 0; site < this->numberOfSitePatterns; site++) {				
+		if (debug) {
+			cout << "Setting site" << endl;	
+		}
 		this->cliqueT->SetSite(site);		
+		if (debug) {
+			cout << "Initializing potential and beliefs" << endl;	
+		}
 		this->cliqueT->InitializePotentialAndBeliefs();		
+		if (debug) {
+			cout << "Calibrating tree" << endl;	
+		}
 		this->cliqueT->CalibrateTree();		
+		if (debug) {
+			cout << "Computing marginal probabilities for each variable pair" << endl;	
+		}
 		this->cliqueT->ComputeMarginalProbabilitesForEachVariablePair();
 		if (debug) {
 			cout << "Number of post prob is " << this->cliqueT->marginalizedProbabilitiesForVariablePair.size() << endl; 
@@ -2266,6 +2289,9 @@ void SEM::ComputeExpectedCountsForFullStructureSearch() {
 		}
 		this->AddToExpectedCountsForEachVariable();
 		this->AddToExpectedCountsForEachVariablePair();
+		// if (debug) {
+		// 	break;
+		// }
 	}
 	// Compare observed counts with expected counts (done)
 	if (debug) {
@@ -2438,7 +2464,9 @@ void SEM::InitializeExpectedCountsForEachVariablePair() {
 					for (int site = 0; site < this->numberOfSitePatterns; site++) {
 						dna_u = u->compressedSequence[site];
 						dna_v = v->compressedSequence[site];
-						countMatrix(dna_u,dna_v) += this->sitePatternWeights[site];
+						if (dna_u < 4 && dna_v < 4) { // FIX_AMB
+							countMatrix(dna_u,dna_v) += this->sitePatternWeights[site];
+						}						
 					}
 				}
 				this->expectedCountsForVertexPair.insert(make_pair(pair <SEM_vertex *, SEM_vertex *>(u,v), countMatrix));
@@ -3157,26 +3185,38 @@ void SEM::OptimizeTopologyAndParametersOfGMM() {
 //			chowLiuTreeFileName = chowLiuTreeFileNamePrefix + "_iter_" +to_string(iter);
 //			MLRootedTreeFileName = MLRootedTreeFileNamePrefix + "_iter_" +to_string(iter);						
 		// 1. Construct clique tree
-//			cout << "Construct clique tree" << endl;
+		if (debug) {
+			cout << "Construct clique tree" << endl;
+		}
 		this->ConstructCliqueTree();
 //			this->WriteCliqueTreeToFile(cliqueTreeFileName);
 		// 2. Compute expected counts
-//			cout << "Compute expected counts" << endl;
+		if (debug) {
+			cout << "Compute expected counts" << endl;
+		}
 		this->ComputeExpectedCountsForFullStructureSearch();
 		// Compare expected counts with actual counts
 		// 3. Compute posterior probabilities using expected counts
-//			cout << "Compute posterior probabilities" << endl;
+		if (debug) {
+			cout << "Compute posterior probabilities" << endl;
+		}
 		this->ComputePosteriorProbabilitiesUsingExpectedCounts();
 		// 4. Compute Chow-Liu tree
-//			cout << "Compute Chow-Liu tree" << endl;
+		if (debug) {
+			cout << "Compute Chow-Liu tree" << endl;
+		}
 		this->ComputeChowLiuTree();
 //			this->WriteUnrootedTreeAsEdgeList(chowLiuTreeFileName);
 		// 5. Transform to ML tree s.t. each the out degree of each vertex is either zero or two.
-//			cout << "Transform to ML tree" << endl;
+		if (debug) {
+			cout << "Transform to ML tree" << endl;
+		}
 		this->ComputeMLRootedTreeForFullStructureSearch();
 //			this->WriteRootedTreeAsEdgeList(MLRootedTreeFileName);
 		// 6. Repeat steps 1 through 6 till convergence		
-//			cout << "Loglikelihood for iteration " << iter << " is " << this->logLikelihood << endl;
+		if (debug) {
+			cout << "Loglikelihood for iteration " << iter << " is " << this->logLikelihood << endl;
+		}
 		if ((this->logLikelihood > logLikelihood_current and (abs(this->logLikelihood - logLikelihood_current) > this->logLikelihoodConvergenceThreshold)) or (iter < 2 and iter < maxIter)) {
 			logLikelihood_current = this->logLikelihood;
 		} else {
@@ -4533,7 +4573,9 @@ array <float, 4> SEM::GetObservedCountsForVariable(SEM_vertex * v) {
 		observedCounts[i] = 0;
  	}
 	for (int site = 0; site < this->numberOfSitePatterns; site ++) {
-		observedCounts[v->compressedSequence[site]] += this->sitePatternWeights[site];
+		if (v->compressedSequence[site] < 4) { // FIX_AMB
+			observedCounts[v->compressedSequence[site]] += this->sitePatternWeights[site];
+		}		
 	}
 	return (observedCounts);
 }
