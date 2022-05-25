@@ -26,7 +26,9 @@ int main(int argc, char **argv)
 	string arg_localPhyloOnly;
 	string arg_modelSelection;
     if (argc < 2) {        
-        cerr << "Usage: " << argv[0] << " --seq sequence_alignment_file --size size_of_subtree --out prefix_for_output_files --fast_root --slow_root" << endl;
+        cerr << "Example for denovo tree construction: " << argv[0] << " --seq sequence_alignment_file --size size_of_subtree --out prefix_for_output_files" << endl;
+		cerr << endl ;
+		cerr << "Example for rooting an unrooted tree using a fixed model (only applicable for UNREST and GMM): " << argv[0] << " --seq sequence_alignment_file --out prefix_for_output_files --input_tree input_tree_file_name_newick --model_for_rooting UNREST " << endl;
         return (-1);
     } else {        
         // parse arguments            
@@ -61,21 +63,21 @@ int main(int argc, char **argv)
 					flag_size_of_subtree = 1;
                     size_of_subtree = stoi(argv[++i]);
                 }
-			} else if (strcmp(argv[i], "--localOnly") == 0) {
+			} else if (strcmp(argv[i], "--local_only") == 0) {
                 if (i < argc -1) {
 					arg_localPhyloOnly = argv[++i];
 					if (strcmp(arg_localPhyloOnly.c_str(), "True") == 0) {
 						localPhyloOnly = 1;
 					}
                 }
-			} else if (strcmp(argv[i], "--modelSelection") == 0) {
+			} else if (strcmp(argv[i], "--model_selection") == 0) {
                 if (i < argc -1) {
 					arg_modelSelection = argv[++i];
 					if (strcmp(arg_modelSelection.c_str(), "True") == 0) {
 						modelSelection = 1;
 					}
                 }
-			} else if (strcmp(argv[i], "--modelForRooting") == 0) {
+			} else if (strcmp(argv[i], "--model_for_rooting") == 0) {
                 if (i < argc -1) {
 					modelForRooting = argv[++i];
                 }

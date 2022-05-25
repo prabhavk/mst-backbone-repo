@@ -931,7 +931,7 @@ public:
 	bool setParameters;
 	string modelForRooting;
 	map <string,unsigned char> mapDNAtoInteger;
-	map <int, SEM_vertex*> * vertexMap;
+	map <int, SEM_vertex*> * vertexMap;	 
 	vector <int> sitePatternWeights;
 	vector <vector <int> > sitePatternRepetitions;
 	vector <int> sortedDeltaGCThresholds;
@@ -1005,6 +1005,7 @@ public:
 	void AddVertex(string name, vector <unsigned char> compressedSequenceToAdd);
 	void AddWeightedEdges(vector<tuple<string,string,float>> weightedEdgesToAdd);
 	void AddEdgeLogLikelihoods(vector<tuple<string,string,float>> edgeLogLikelihoodsToAdd);
+	void AddExpectedCountMatrices(map < pair <SEM_vertex * , SEM_vertex *>, Matrix4f > expectedCountsForVertexPair);
 	void AddVertexLogLikelihoods(map <string,float> vertexLogLikelihoodsMapToAdd);
 	void SetNumberOfVerticesInSubtree(int numberOfVertices);	
 	void AddSitePatternWeights(vector <int> sitePatternWeightsToAdd);
@@ -1177,6 +1178,7 @@ public:
 		this->largestIdOfVertexInMST = largestIdOfVertexInMST_toSet;
 		this->h_ind = 1;
 		this->vertexMap = new map <int, SEM_vertex *> ;
+		// this->vertexName2IdMap = new map <string, int> ;
 		unsigned seed = chrono::system_clock::now().time_since_epoch().count();
 		this->generator = default_random_engine(seed);
 		this->I4by4 = ArrayXXf::Zero(4,4);
@@ -1197,6 +1199,7 @@ public:
 		}
 		this->vertexMap->clear();
 		delete this->vertexMap;
+		// delete this->vertexName2IdMap;
 		delete this->cliqueT;
 	}
 };
@@ -1235,7 +1238,7 @@ void SEM::ComputeVertexLogLikelihood(SEM_vertex * v) {
 }
 
 
-void SEM::ComputeEdgeLogLikelihood(SEM_vertex* x, SEM_vertex * y){	
+void SEM::ComputeEdgeLogLikelihood(SEM_vertex* x, SEM_vertex * y) {	
 	Matrix4f P_xy = this->GetPosteriorProbabilityForVariablePair(x,y);
 	Matrix4f P_yGivenx = this->GetP_yGivenx(P_xy);
 	Matrix4f Counts = this->GetExpectedCountsForVariablePair(x,y);
@@ -1269,7 +1272,7 @@ void SEM::SetWeightedEdgesToAddToGlobalPhylogeneticTree() {
 	}
 }
 
-void SEM::SetAncestralSequencesString(){
+void SEM::SetAncestralSequencesString() {
 	vector <SEM_vertex *> verticesOfInterest;
 	int u_id; int v_id;
 	vector <unsigned char> fullSeq;
@@ -2071,6 +2074,28 @@ void SEM::AddToExpectedCountsForEachVariablePair() {
 		}
 	}
 }
+
+void SEM::AddExpectedCountMatrices(map < pair <SEM_vertex * , SEM_vertex *>, Matrix4f > expectedCountsForVertexPairToAdd) {
+	string u_name;
+	string v_name;
+	SEM_vertex * u;
+	SEM_vertex * v;
+	pair <SEM_vertex *, SEM_vertex *> edge;
+	Matrix4f CountMatrix;
+	for (pair <pair <SEM_vertex * , SEM_vertex *>, Matrix4f> mapElem: expectedCountsForVertexPairToAdd) {
+		u_name = mapElem.first.first->name;
+		v_name = mapElem.first.second->name;
+		CountMatrix = mapElem.second;
+		SEM_vertex * u = (*this->vertexMap)[this->nameToIdMap[u_name]];
+		SEM_vertex * v = (*this->vertexMap)[this->nameToIdMap[v_name]];
+		if (u->id < v->id) {
+			this->expectedCountsForVertexPair[pair<SEM_vertex*,SEM_vertex*>(u,v)] = CountMatrix;
+		} else {
+			this->expectedCountsForVertexPair[pair<SEM_vertex*,SEM_vertex*>(v,u)] = CountMatrix.transpose();
+		}
+	}	//this->expectedCountsForVertexPair
+}
+
 
 Matrix4f SEM::GetExpectedCountsForVariablePair(SEM_vertex * u, SEM_vertex * v) {
 	Matrix4f C_pc;
@@ -3336,7 +3361,7 @@ void SEM::RootTreeBySumOfExpectedLogLikelihoods() {
 	this->RootTreeAtVertex(vertexForRooting);	
 }
 
-void SEM::RootTreeUsingSpecifiedModel(string modelForRooting){
+void SEM::RootTreeUsingSpecifiedModel(string modelForRooting) {
 	this->modelForRooting = modelForRooting;
 	if (modelForRooting == "GMM") {
 		this->RootTreeByFittingAGMMViaEM();
@@ -3346,7 +3371,15 @@ void SEM::RootTreeUsingSpecifiedModel(string modelForRooting){
 }
 
 void SEM::RootTreeByFittingUNREST() {
-	//
+	// Fit using expected counts
+	SEM_vertex * v;
+	// Fit for leaf-labeled tree
+	for (pair <int, SEM_vertex * > vertElem : *this->vertexMap) {
+		v = vertElem.second;
+		this->RootTreeAtVertex(v);		
+	}	
+
+	
 } 
 
 void SEM::ComputeSumOfExpectedLogLikelihoods() {

@@ -107,6 +107,9 @@ public:
 		} else {
 			this->T->modelForRooting = this->modelForRooting;
 		}
+		if (this->modelForRooting == "UNREST") {
+			this->T->RootTreeByFittingUNREST();
+		}
 //		this->MSTBackboneWithRootSEMAndMultipleExternalVertices();
 		cout << "Writing ancestral sequences to file " << endl;
 		this->mstBackboneLogFile << "Writing ancestral sequences to file " << endl;
@@ -451,6 +454,7 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 				this->t->SetEdgeAndVertexLogLikelihoods();				
 				this->T->AddVertexLogLikelihoods(this->t->vertexLogLikelihoodsMapToAddToGlobalPhylogeneticTree);
 				this->T->AddEdgeLogLikelihoods(this->t->edgeLogLikelihoodsToAddToGlobalPhylogeneticTree);
+				// this->T->AddExpectedCountMatrices(t->expectedCountsForVertexPair);
 				t_end_time = chrono::high_resolution_clock::now();
 				timeTakenToComputeEdgeAndVertexLogLikelihoods += chrono::duration_cast<chrono::seconds>(t_end_time - t_start_time);
 				// Add vertex logLikelihoods
@@ -507,13 +511,14 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 	this->t->SetEdgeAndVertexLogLikelihoods();
 	this->T->AddVertexLogLikelihoods(this->t->vertexLogLikelihoodsMapToAddToGlobalPhylogeneticTree);
 	this->T->AddEdgeLogLikelihoods(this->t->edgeLogLikelihoodsToAddToGlobalPhylogeneticTree);
+	// this->T->AddExpectedCountMatrices(this->t->expectedCountsForVertexPair);
 	t_end_time = chrono::high_resolution_clock::now();
 	timeTakenToComputeEdgeAndVertexLogLikelihoods += chrono::duration_cast<chrono::seconds>(t_end_time - t_start_time);
 	delete this->t;
 //	this->mstBackboneLogFile << "CPU time used for computing local phylogeny is " << chrono::duration_cast<chrono::seconds>(t_end_time-t_start_time).count() << " second(s)\n";		
 	// assert that T is a tree
-//	cout << "Number of vertices in T is " << this->T->vertexMap->size() << endl;
-//	cout << "Number of edges in T is " << this->T->edgeLengths.size() << endl;
+	cout << "Number of vertices in T is " << this->T->vertexMap->size() << endl;
+	cout << "Number of edges in T is " << this->T->edgeLengths.size() << endl;
 	assert(this->T->vertexMap->size() == this->T->edgeLengths.size() + 1);
 	//----##############---//		
 	//	10.	Root T via EM  //
@@ -523,9 +528,9 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 	timeTakenToComputeGlobalUnrootedPhylogeneticTree -= timeTakenToComputeEdgeAndVertexLogLikelihoods;
 	cout << "CPU time used for computing global unrooted phylogenetic tree T is " << timeTakenToComputeGlobalUnrootedPhylogeneticTree.count() << " second(s)\n";
 	this->mstBackboneLogFile << "CPU time used for computing global unrooted phylogenetic tree T is " << timeTakenToComputeGlobalUnrootedPhylogeneticTree.count() << " second(s)\n";		
-	cout << "Fitting a general Markov (GM) model to T using reconstructed ancestral sequences" << endl;
-	this->mstBackboneLogFile << "Fitting a general Markov (GM) model to T using reconstructed ancestral sequences" << endl;		
-	this->T->RootTreeBySumOfExpectedLogLikelihoods();	
+	cout << "Fitting a general Markov model GMM to T using reconstructed ancestral sequences" << endl;
+	this->mstBackboneLogFile << "Fitting a general Markov model GMM to T using reconstructed ancestral sequences" << endl;		
+	this->T->RootTreeBySumOfExpectedLogLikelihoods();
 	current_time = chrono::high_resolution_clock::now();
 	timeTakenToRootViaEdgeLoglikelihoods = chrono::duration_cast<chrono::seconds>(current_time-start_time);
 	timeTakenToRootViaEdgeLoglikelihoods -= timeTakenToComputeGlobalUnrootedPhylogeneticTree;
