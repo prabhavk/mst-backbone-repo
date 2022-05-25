@@ -59,6 +59,8 @@ private:
 	void WriteOutputFiles();
 	bool debug;
 	bool localPhyloOnly;
+	bool modelSelection;
+	string modelForRooting = "UNREST";
 	int numberOfVerticesInSubtree;
 	string GetSequenceListToWriteToFile(map <string, vector <unsigned char>> compressedSeqMap, vector <vector <int> > sitePatternRepetitions);
 	
@@ -70,9 +72,11 @@ public:
 	void MSTBackboneWithRootSEMAndMultipleExternalVertices();
 	void MSTBackboneOverlappingSets();
 	void MSTBackboneOnlyLocalPhylo();
-	MSTBackbone(string sequenceFileNameToAdd, int subtreeSizeThresholdToset, string prefix_for_output_files_to_set, bool localPhyloOnly_to_set) {
+	MSTBackbone(string sequenceFileNameToAdd, int subtreeSizeThresholdToset, string prefix_for_output_files_to_set, bool localPhyloOnly_to_set, bool modelSelection_to_set, string modelForRooting_to_set) {
 		// bool localPhyloOnly = TRUE;
 		this->localPhyloOnly = localPhyloOnly_to_set;
+		this->modelSelection = modelSelection_to_set;
+		this->modelForRooting = modelForRooting_to_set;
 		start_time = chrono::high_resolution_clock::now();				
 		this->sequenceFileName = sequenceFileNameToAdd;
 		this->numberOfLargeEdgesThreshold = subtreeSizeThresholdToset;
@@ -81,22 +85,28 @@ public:
 		this->mstBackboneLogFile.open(this->prefix_for_output_files + ".mstbackbone_log");
 		mstBackboneLogFile << "Subtree size is set at\t" << this->numberOfLargeEdgesThreshold << endl;		
 		cout << "Subtree size is set at\t" << this->numberOfLargeEdgesThreshold << endl;		
-
 		mstBackboneLogFile << "Prefix for output files is \t" << this->prefix_for_output_files << endl;		
-		cout << "Prefix for output files is \t" << this->prefix_for_output_files << endl;		
+		cout << "Prefix for output files is \t" << this->prefix_for_output_files << endl;
 		MSTFileName = prefix_for_output_files + ".initial_MST";		
 		this->SetDNAMap();	
 		this->ancestralSequencesString = "";
 		this->M = new MST_tree(this->sequenceFileName);				
-		this->M->ComputeMST();
+		this->M->ComputeMST(); // modify to incremental construction
 		this->M->WriteToFile(MSTFileName);
+	    // compute Chow-Liu tree using UNREST and get probability distribution for root position
 		this->M->SetNumberOfLargeEdgesThreshold(this->numberOfLargeEdgesThreshold);
 		this->T = new SEM(1);
 		if (this->localPhyloOnly) {
 			this->MSTBackboneOnlyLocalPhylo(); // use this instead of the function above
 		} else {
 			this->MSTBackboneWithFullSEMAndMultipleExternalVertices(); // MAIN MST_BACKBONE FUNCTION		
-		}			
+		}
+		if (this->modelSelection){
+			this->T->PerformModelSelection();
+			// create model selection object and set model for rooting
+		} else {
+			this->T->modelForRooting = this->modelForRooting;
+		}
 //		this->MSTBackboneWithRootSEMAndMultipleExternalVertices();
 		cout << "Writing ancestral sequences to file " << endl;
 		this->mstBackboneLogFile << "Writing ancestral sequences to file " << endl;

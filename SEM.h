@@ -929,6 +929,7 @@ public:
 	int largestIdOfVertexInMST = 1;
 	default_random_engine generator;
 	bool setParameters;
+	string modelForRooting;
 	map <string,unsigned char> mapDNAtoInteger;
 	map <int, SEM_vertex*> * vertexMap;
 	vector <int> sitePatternWeights;
@@ -1020,6 +1021,8 @@ public:
 	void RootTreeAlongAnEdgePickedAtRandom();
 	void RootTreeAtAVertexPickedAtRandom();
 	void RootTreeByFittingAGMMViaEM();
+	void RootTreeByFittingUNREST();
+	void RootTreeUsingSpecifiedModel(string modelForRooting);
 	void RootTreeBySumOfExpectedLogLikelihoods();
 	void ComputeSumOfExpectedLogLikelihoods();
 	void RootTreeAlongEdge(SEM_vertex * u, SEM_vertex * v);
@@ -3332,6 +3335,19 @@ void SEM::RootTreeBySumOfExpectedLogLikelihoods() {
 	}	
 	this->RootTreeAtVertex(vertexForRooting);	
 }
+
+void SEM::RootTreeUsingSpecifiedModel(string modelForRooting){
+	this->modelForRooting = modelForRooting;
+	if (modelForRooting == "GMM") {
+		this->RootTreeByFittingAGMMViaEM();
+	} else if (modelForRooting == "UNREST") {
+		this->RootTreeByFittingUNREST();
+	}
+}
+
+void SEM::RootTreeByFittingUNREST() {
+	//
+} 
 
 void SEM::ComputeSumOfExpectedLogLikelihoods() {
 	this->sumOfExpectedLogLikelihoods = 0;
