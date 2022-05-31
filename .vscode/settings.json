@@ -3,7 +3,8 @@
         "*.rmd": "markdown",
         "iostream": "cpp",
         "string": "cpp",
-        "chrono": "cpp"
+        "chrono": "cpp",
+        "cmath": "cpp"
     },
     "jupyter.jupyterServerType": "local"
 }
