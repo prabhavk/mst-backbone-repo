@@ -280,11 +280,7 @@ void clique::AddChild(clique * C) {
 	this->outDegree += 1;
 }
 
-void clique::SetInitialPotentialAndBelief(int site) {
-	for (int i = 0; i < 4; i ++) {
-		assert(this->x->rootProbability[i] > 0.00001);
-		assert(this->y->rootProbability[i] > 0.00001);
-	}	
+void clique::SetInitialPotentialAndBelief(int site) {	
 	// Initialize psi
 	// V = (X,Y) X->Y (wlog), X is always an unobserved vertex
 	int matchingCase;
