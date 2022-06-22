@@ -1,20 +1,32 @@
 # About mst-backbone
 
-mst-backbone is a phylogeny inference program that performs constrained search through tree-space. The main features of mst-backbone are
+mst-backbone is a phylogeny inference program that performs constrained search through tree-space. The main functions of mst-backbone are
 
-1) The use of a minimum spanning tree framework for constraining search through phylogenetic tree-space.
+1) Fitting the general Markov model to a fixed phylogenetic tree
+2) Performing tree search under the general Markov model via structural EM
+3) The use of a minimum spanning tree framework for constraining search through phylogenetic tree-space
+4) Performing model selection for fitting non-SRH models to a fixed phylogenetic tree
 
-2) Performing tree search under the general Markov model (GMM) using structural EM. We plan on extending the tree search operations to include NNI and SPR.
-
-Here is the link to the preprint describing the performance of mst-backbone. 
+Here is the link to the preprint describing the performance of mst-backbone 
 
 https://www.biorxiv.org/content/10.1101/2020.06.30.180315v1
 
-# Instructions for compilation
+# Instructions for compilation 
 
-Please download all the files in the repository and run make. The binary file for conducting tree search is **mst-backbone**
+
+```console
+git clone https://github.com/prabhavk/mst-backbone-repo.git 
+cd mst-backbone-repo/
+make
+
+```
 
 # Usage: 
+
+1) Fitting the general Markov model to a fixed phylogenetic tree
+3) Performing tree search under the general Markov model via structural EM
+4) The use of a minimum spanning tree framework for constraining search through phylogenetic tree-space
+5) Performing model selection for fitting non-SRH models to a fixed phylogenetic tree
 
 mst-backbone  multiple_sequence_alignment_file  size_of_subtree
 
