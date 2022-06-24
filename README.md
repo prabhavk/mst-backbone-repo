@@ -21,15 +21,19 @@ make
 Using a minimum spanning tree framework for constraining search through phylogenetic tree-space
 
 ```console
-mst-backbone --seq alignment_file.fas --size size_of_subtree --out prefix_for_output_files
+mst-backbone --seq alignment.fas --size size_of_subtree --out output_prefix
 ```
 Input file:
-alignment_file.fas: a multiple sequence alignment file in FASTA format
-Parameters:
-size_of_subtree: size contraint used to select the vertex groups $V_S$ and $V_O$ of the MST, which represent the sequences used in structural EM.
-prefix_for_output_files: prefix used for naming output files
+alignment.fas: a multiple sequence alignment file in FASTA format
 
-The position of the root as inferred under the general Markov model is not always realistic. A more realistic rooting can be obtained by fitting trees under simpler non-reversible models. The model selection procedure described in the paper can be reproduced using the following command. Please note that the model selection procedure is extremely slow!
+Parameters:
+size_of_subtree: size constraint used to select the vertex groups $V_S$ and $V_O$ of the MST.
+
+Output files:
+output_prefix: prefix used for naming output files
+
+
+The model selection procedure described in the paper can be reproduced using the following command. Please note that the model selection procedure is extremely slow!
 
 ```console
 mst-backbone --seq alignment_file.fas --out prefix_for_output_files --input_tree input_tree_file_name.nwk --perform_model_selection true 
