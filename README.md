@@ -31,6 +31,13 @@ Parameters:
 
 size_of_subtree: size constraint used to select the vertex groups $V_S$ and $V_O$ of the MST.
 
+output_prefix: prefix used for naming output files
+
+Output files:
+
+output_prefix.mst: the maximum parsimony spanning tree used for constraining search through tree-space. 
+
+output_prefix.newick_leafLabeledRooting: 
 
 
 The model selection procedure described in the paper can be reproduced using the following command. Please note that the model selection procedure is extremely slow!
