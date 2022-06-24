@@ -1,11 +1,6 @@
 # About mst-backbone
 
-mst-backbone is a phylogeny inference program that performs constrained search through tree-space. The main functions of mst-backbone are
-
-1) Fitting the general Markov model to a fixed phylogenetic tree
-2) Performing tree search under the general Markov model via structural EM
-3) The use of a minimum spanning tree framework for constraining search through phylogenetic tree-space
-4) Performing model selection for fitting non-SRH models to a fixed phylogenetic tree
+mst-backbone is a phylogeny inference program that uses minimum spanning trees to perform constrained search through tree-space. 
 
 Here is the link to the preprint describing the performance of mst-backbone 
 
@@ -23,15 +18,25 @@ make
 
 # Usage: 
 
-1) Fitting the general Markov model to a fixed phylogenetic tree
-3) Performing tree search under the general Markov model via structural EM
-4) The use of a minimum spanning tree framework for constraining search through phylogenetic tree-space
-5) Performing model selection for fitting non-SRH models to a fixed phylogenetic tree
+Using a minimum spanning tree framework for constraining search through phylogenetic tree-space
 
-mst-backbone  multiple_sequence_alignment_file  size_of_subtree
+```console
+mst-backbone --seq alignment_file.fas --size size_of_subtree --out prefix_for_output_files
+```
+Input file:
+alignment_file.fas: a multiple sequence alignment file in FASTA format
+Parameters:
+size_of_subtree: size contraint used to select the vertex groups $V_S$ and $V_O$ of the MST, which represent the sequences used in structural EM.
+prefix_for_output_files: prefix used for naming output files
+
+The position of the root as inferred under the general Markov model is not always realistic. A more realistic rooting can be obtained by fitting trees under simpler non-reversible models. The model selection procedure described in the paper can be reproduced using the following command. Please note that the model selection procedure is extremely slow!
+
+```console
+mst-backbone --seq alignment_file.fas --out prefix_for_output_files --input_tree input_tree_file_name.nwk --perform_model_selection true 
+```
+
 
 Parameters:
 
-A multiple sequence alignment file either in FASTA format or PHYLIP format
 
 size_of_subtree: the size of the vertex sets that induce a subtree and a connected graph in the MST; The sequences of the selected vertices (taxa) are used to infer local phylogenetic trees that are subsequently combined to construct a global phylogenetic tree. Default value of 10 seems adeqate and was tested on multiple empirical and simulated datasets.
