@@ -59,6 +59,7 @@ private:
 	void WriteOutputFiles();
 	bool debug;
 	bool localPhyloOnly;
+	bool useChowLiu;
 	bool modelSelection;
 	string modelForRooting = "UNREST";
 	int numberOfVerticesInSubtree;
@@ -72,11 +73,13 @@ public:
 	void MSTBackboneWithRootSEMAndMultipleExternalVertices();
 	void MSTBackboneOverlappingSets();
 	void MSTBackboneOnlyLocalPhylo();
-	MSTBackbone(string sequenceFileNameToAdd, int subtreeSizeThresholdToset, string prefix_for_output_files_to_set, bool localPhyloOnly_to_set, bool modelSelection_to_set, string modelForRooting_to_set) {
+	MSTBackbone(string sequenceFileNameToAdd, int subtreeSizeThresholdToset, string prefix_for_output_files_to_set, bool modelSelection_to_set) {
+		// MSTBackbone(string sequenceFileNameToAdd, int subtreeSizeThresholdToset, string prefix_for_output_files_to_set, bool localPhyloOnly_to_set, bool modelSelection_to_set, string modelForRooting_to_set, bool useChowLiu_toset) {
 		// bool localPhyloOnly = TRUE;
-		this->localPhyloOnly = localPhyloOnly_to_set;
+		// this->useChowLiu = useChowLiu_toset;
+		// this->localPhyloOnly = localPhyloOnly_to_set;
 		this->modelSelection = modelSelection_to_set;
-		this->modelForRooting = modelForRooting_to_set;
+		// this->modelForRooting = modelForRooting_to_set;
 		start_time = chrono::high_resolution_clock::now();				
 		this->sequenceFileName = sequenceFileNameToAdd;
 		this->numberOfLargeEdgesThreshold = subtreeSizeThresholdToset;
@@ -91,32 +94,23 @@ public:
 		this->SetDNAMap();	
 		this->ancestralSequencesString = "";
 		this->M = new MST_tree(this->sequenceFileName);				
-		this->M->ComputeMST(); // modify to incremental construction
+		this->M->ComputeMST(); // modify to compute Chow Liu tree		
 		this->M->WriteToFile(MSTFileName);
 	    // compute Chow-Liu tree using UNREST and get probability distribution for root position
 		this->M->SetNumberOfLargeEdgesThreshold(this->numberOfLargeEdgesThreshold);
-		this->T = new SEM(1);
-		if (this->localPhyloOnly) {
-			this->MSTBackboneOnlyLocalPhylo(); // use this instead of the function above
-		} else {
-			this->MSTBackboneWithFullSEMAndMultipleExternalVertices(); // MAIN MST_BACKBONE FUNCTION		
-		}
+		this->T = new SEM(1);		
+		this->MSTBackboneWithFullSEMAndMultipleExternalVertices(); // MAIN MST_BACKBONE FUNCTION
 		if (this->modelSelection){
+			// set tree topology
 			this->T->PerformModelSelection();
-			// create model selection object and set model for rooting
-		} else {
-			this->T->modelForRooting = this->modelForRooting;
-		}
-		if (this->modelForRooting == "UNREST") {
-			this->T->RootTreeByFittingUNREST();
-		}
+		}			
 //		this->MSTBackboneWithRootSEMAndMultipleExternalVertices();
-		cout << "Writing ancestral sequences to file " << endl;
-		this->mstBackboneLogFile << "Writing ancestral sequences to file " << endl;
-		ofstream ancestralSequencesFile;		
-		ancestralSequencesFile.open(this->prefix_for_output_files+".ancestralSequences");
-		ancestralSequencesFile << this->ancestralSequencesString;
-		ancestralSequencesFile.close();
+		// cout << "Writing ancestral sequences to file " << endl;
+		// this->mstBackboneLogFile << "Writing ancestral sequences to file " << endl;
+		// ofstream ancestralSequencesFile;		
+		// ancestralSequencesFile.open(this->prefix_for_output_files+".ancestralSequences");
+		// ancestralSequencesFile << this->ancestralSequencesString;
+		// ancestralSequencesFile.close();
 		if (! this->localPhyloOnly) {
 			this->T->WriteRootedTreeAsEdgeList(this->prefix_for_output_files + ".edgeList");
 			this->T->WriteRootedTreeInNewickFormat(this->prefix_for_output_files + ".newick");
@@ -538,6 +532,10 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 	this->mstBackboneLogFile << "CPU time used for fitting a GM model to fully labeled T is " << timeTakenToRootViaEdgeLoglikelihoods.count() << " second(s)\n";
 	cout << "Log likelihood of fitting a GM model to fully labeled T is " << this->T->maxSumOfExpectedLogLikelihoods << endl;
 	this->mstBackboneLogFile << "Log likelihood of fitting a GM model to fully labeled T is " << this->T->maxSumOfExpectedLogLikelihoods << endl;
+	double BIC_full_labeled = -2 * this->T->maxSumOfExpectedLogLikelihoods ;
+	BIC_full_labeled += (3 + 12 * (this->T->numberOfInputSequences -1) * log2(this->T->sequenceLength));
+	cout << "BIC of fitting a GM model to fully labeled T is " << BIC_full_labeled << endl;
+	this->mstBackboneLogFile << "Log likelihood of fitting a GM model to fully labeled T is " << BIC_full_labeled << endl;
 	cout << "Writing rooted tree in edge list format and newick format" << endl;
 	this->T->WriteRootedTreeAsEdgeList(sequenceFileName + ".edgeList_fullyLabeledRooting");
 	this->T->WriteRootedTreeInNewickFormat(sequenceFileName + ".newick_fullyLabeledRooting");
@@ -552,6 +550,9 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 	this->mstBackboneLogFile << "CPU time used for rooting leaf-labeled T via restricted SEM is " << timeTakenToRootViaRestrictedSEM.count() << " second(s)\n";	
 	cout << "Log likelihood of fitting a GM model to leaf-labeled T via restricted SEM is " << this->T->logLikelihood << endl;
 	this->mstBackboneLogFile << "Log likelihood of fitting a GM model to leaf-labeled T via restricted SEM is " << this->T->logLikelihood << endl;
+	double BIC = -2 * this->T->logLikelihood + (3 + 12 * (this->T->numberOfInputSequences -1) * log2(this->T->sequenceLength));	
+	cout << "BIC of fitting a GM model to leaf-labeled T via restricted SEM is " << BIC << endl;
+	this->mstBackboneLogFile << "BIC of fitting a GM model to leaf-labeled T via restricted SEM is " << BIC << endl;
 	cout << "Writing rooted tree in edge list format and newick format" << endl;
 	this->T->WriteRootedTreeAsEdgeList(sequenceFileName + ".edgeList_leafLabeledRooting");
 	this->T->WriteRootedTreeInNewickFormat(sequenceFileName + ".newick_leafLabeledRooting");

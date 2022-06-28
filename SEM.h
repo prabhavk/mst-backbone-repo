@@ -7,6 +7,7 @@
 #include <eigen3/unsupported/Eigen/MatrixFunctions>
 #include <boost/algorithm/string.hpp>
 #include <fstream>
+#include <math.h>
 //#include <boost/math/tools/minima.hpp>
 using namespace Eigen;
 
@@ -206,12 +207,14 @@ std::array <float, 4> clique::MarginalizeOverVariable(SEM_vertex * v) {
 }
 
 void clique::ComputeBelief() {
-	Matrix4f factor = this->initialPotential;	
+	Matrix4f factor = this->initialPotential;
 	vector <clique *> neighbors = this->children;
 	std::array <float, 4> messageFromNeighbor;
 	bool debug = 0;	
 	if (debug) {
 		cout << "Computing belief for clique " << this->name << endl;
+		cout << "Factor before multiplying with belief" << endl;
+		cout << factor << endl;		
 	}
 	if (this->parent != this) {
 		neighbors.push_back(this->parent);
@@ -243,13 +246,14 @@ void clique::ComputeBelief() {
 			cout << "Check product step" << endl;
 			exit (-1);
 		}
-	}
+	}	
 	float scalingFactor = 0;
 	for (int dna_x = 0 ; dna_x < 4; dna_x ++) {
 		for (int dna_y = 0 ; dna_y < 4; dna_y ++) {
 			scalingFactor += factor(dna_x, dna_y);
 		}
-	}
+	}	
+	
 	if (scalingFactor <= 0 || debug) {		
 		cout << "Initial potential for " << this->name << " is " << endl << initialPotential << endl;
 		for (clique * C_neighbor : neighbors) {		
@@ -261,6 +265,7 @@ void clique::ComputeBelief() {
 		}
 		cout << "========================" << endl;
 	}
+	// cout << "scalingFactor is " << scalingFactor << endl;
 	assert(scalingFactor > 0);
 	for (int dna_x = 0 ; dna_x < 4; dna_x ++) {
 		for (int dna_y = 0 ; dna_y < 4; dna_y ++) {
@@ -334,9 +339,15 @@ void clique::SetInitialPotentialAndBelief(int site) {
 				maxValue = this->initialPotential(i, j);
 			}
 		}
-	}
+	}	
 	if (maxValue < 0.001) {
 		cout << "Matching case is " << matchingCase << endl;
+		cout << "is x observed? " << x->observed << endl;
+		cout << x->name << endl;
+		cout << "is y observed? " << y->observed << endl;
+		cout << y->name << endl;
+		cout << "character at y is " << y->compressedSequence[site] << endl;
+		cout << "char pos is " << site << endl;
 		cout << this->name << endl;
 		cout << this->x->name << "\t" << this->y->name << endl;
 		cout << "Transition matrix is " << endl;
@@ -345,6 +356,7 @@ void clique::SetInitialPotentialAndBelief(int site) {
 			cout << this->x->rootProbability[i] << endl;
 		}
 	}
+	assert(maxValue > 0.001);
 	this->belief = this->initialPotential;
 	this->logScalingFactorForClique = 0;
 	this->logScalingFactorForMessages.clear();
@@ -886,10 +898,11 @@ void cliqueTree::SendMessage(clique * C_from, clique * C_to) {
 	}
 	logScalingFactor += log(largestElement);
 	if (verbose) {
-		cout << "Sending the following message send from " << C_from->name << " to " ;
+		cout << "Sending the following message from " << C_from->name << " to " ;
 		cout << C_to->name << " is " << endl;
 		for (int dna = 0; dna < 4; dna ++) {
 			cout << messageToNeighbor[dna] << "\t";
+			assert(!isnan(messageToNeighbor[dna]));
 		}
 	}	
 	// TRANSMIT
@@ -2086,8 +2099,8 @@ void SEM::AddExpectedCountMatrices(map < pair <SEM_vertex * , SEM_vertex *>, Mat
 		u_name = mapElem.first.first->name;
 		v_name = mapElem.first.second->name;
 		CountMatrix = mapElem.second;
-		SEM_vertex * u = (*this->vertexMap)[this->nameToIdMap[u_name]];
-		SEM_vertex * v = (*this->vertexMap)[this->nameToIdMap[v_name]];
+		u = (*this->vertexMap)[this->nameToIdMap[u_name]];
+		v = (*this->vertexMap)[this->nameToIdMap[v_name]];
 		if (u->id < v->id) {
 			this->expectedCountsForVertexPair[pair<SEM_vertex*,SEM_vertex*>(u,v)] = CountMatrix;
 		} else {
@@ -3377,9 +3390,7 @@ void SEM::RootTreeByFittingUNREST() {
 	for (pair <int, SEM_vertex * > vertElem : *this->vertexMap) {
 		v = vertElem.second;
 		this->RootTreeAtVertex(v);		
-	}	
-
-	
+	}		
 } 
 
 void SEM::ComputeSumOfExpectedLogLikelihoods() {

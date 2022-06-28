@@ -89,6 +89,7 @@ public:
 	int GetEdgeIndex (int vertexIndex1, int vertexIndex2, int numberOfVertices);
 	int GetNumberOfVertices();
 	void ComputeMST();
+	void ComputeChowLiuTree();
 	void ComputeMST_nonACGT();
 	void ResetSubtreeSizeThreshold();
 	void DoubleSubtreeSizeThreshold();
@@ -924,6 +925,16 @@ void MST_tree::ComputeMST() {
 	this->UpdateMaxDegree();
 //	MSTFile.close();
 	delete[] weights;
+}
+
+void MST_tree::ComputeChowLiuTree() {
+// UNREST
+// Fit Q
+// Fit Q
+
+
+
+
 }
 
 
