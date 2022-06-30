@@ -73,12 +73,11 @@ public:
 	void MSTBackboneWithRootSEMAndMultipleExternalVertices();
 	void MSTBackboneOverlappingSets();
 	void MSTBackboneOnlyLocalPhylo();
-	MSTBackbone(string sequenceFileNameToAdd, int subtreeSizeThresholdToset, string prefix_for_output_files_to_set, bool modelSelection_to_set) {
+	MSTBackbone(string sequenceFileNameToAdd, int subtreeSizeThresholdToset, string prefix_for_output_files_to_set) {
 		// MSTBackbone(string sequenceFileNameToAdd, int subtreeSizeThresholdToset, string prefix_for_output_files_to_set, bool localPhyloOnly_to_set, bool modelSelection_to_set, string modelForRooting_to_set, bool useChowLiu_toset) {
 		// bool localPhyloOnly = TRUE;
 		// this->useChowLiu = useChowLiu_toset;
-		// this->localPhyloOnly = localPhyloOnly_to_set;
-		this->modelSelection = modelSelection_to_set;
+		// this->localPhyloOnly = localPhyloOnly_to_set;		
 		// this->modelForRooting = modelForRooting_to_set;
 		start_time = chrono::high_resolution_clock::now();				
 		this->sequenceFileName = sequenceFileNameToAdd;
@@ -88,7 +87,7 @@ public:
 		this->mstBackboneLogFile.open(this->prefix_for_output_files + ".mstbackbone_log");
 		mstBackboneLogFile << "Subtree size is set at\t" << this->numberOfLargeEdgesThreshold << endl;		
 		cout << "Subtree size is set at\t" << this->numberOfLargeEdgesThreshold << endl;		
-		mstBackboneLogFile << "Prefix for output files is \t" << this->prefix_for_output_files << endl;		
+		mstBackboneLogFile << "Prefix for output files is \t" << this->prefix_for_output_files << endl;	
 		cout << "Prefix for output files is \t" << this->prefix_for_output_files << endl;
 		MSTFileName = prefix_for_output_files + ".initial_MST";		
 		this->SetDNAMap();	
@@ -100,10 +99,10 @@ public:
 		this->M->SetNumberOfLargeEdgesThreshold(this->numberOfLargeEdgesThreshold);
 		this->T = new SEM(1);		
 		this->MSTBackboneWithFullSEMAndMultipleExternalVertices(); // MAIN MST_BACKBONE FUNCTION
-		if (this->modelSelection){
-			// set tree topology
-			this->T->PerformModelSelection();
-		}			
+		// if (this->modelSelection){
+		// 	// set tree topology
+		// 	this->T->PerformModelSelection();
+		// }			
 //		this->MSTBackboneWithRootSEMAndMultipleExternalVertices();
 		// cout << "Writing ancestral sequences to file " << endl;
 		// this->mstBackboneLogFile << "Writing ancestral sequences to file " << endl;

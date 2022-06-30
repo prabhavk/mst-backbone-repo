@@ -6,8 +6,8 @@
 #include <eigen3/Eigen/Dense>
 #include <eigen3/unsupported/Eigen/MatrixFunctions>
 #include <boost/algorithm/string.hpp>
-#include "SEM.h"
-#include "rootedPhylogeny.h"
+#include "SEM_MS.h"
+#include "rootedPhylogeny_MS.h"
 using namespace std;
 class ModelSelector {
 public:
@@ -32,7 +32,7 @@ public:
 		outputFilePrefix = this->sequenceFileName + ".rootedAt_"+u_name + "_"+v_name;
 		start_time = std::chrono::high_resolution_clock::now();		
 		RT = new rootedPhylogeny_tree();
-		this->logFile.open(outputFilePrefix + ".log");
+		this->logFile.open(outputFilePrefix + ".log");		
 	}
 	~ ModelSelector() {
 		delete RT;
@@ -55,8 +55,9 @@ void ModelSelector::PerformModelSelection(){
 	RT->RootTreeAtEdge(edge.first, edge.second);		
 	RT->ReadSequenceFile(this->sequenceFileName);
 	RT->PerformModelSelectionUsingNelderMead();
-	cout << "BIC: "<< "\t" << RT->minimum_BIC_for_rooted_tree << endl;	
-	this->logFile << "BIC: "<< "\t" << RT->minimum_BIC_for_rooted_tree << endl;	
+	this->logFile << RT->optimizationLogString;
+	cout << "BIC: "<< "\t" << setprecision(10) << RT->minimum_BIC_for_rooted_tree << endl;	
+	this->logFile << "BIC: "<< "\t" << setprecision(10) << RT->minimum_BIC_for_rooted_tree << endl;	
 //	RT->StoreGloballyOptimalEdgeLengths();
 //	RT->StoreGloballyOptimalRateMatrices();
 //	RT->StoreGloballyOptimalRateCategories();
