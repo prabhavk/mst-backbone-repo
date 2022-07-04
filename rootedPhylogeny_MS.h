@@ -63,7 +63,7 @@ public:
 	void AddChild(int c_id);
 	void AddNeighbor(int n_id);
 	void AddNumberOfObservedSequences(int numberOfObservedSequencesToAdd);
-	rootedPhylogeny_vertex(int idToAdd, string nameToAdd, vector <unsigned char> sequenceToAdd){
+	rootedPhylogeny_vertex(int idToAdd, string nameToAdd, vector <unsigned char> sequenceToAdd) {
 		this->id = idToAdd;
 		this->parent_id = this->id;
 		this->name = nameToAdd;
@@ -73,7 +73,7 @@ public:
 		}
 		this->newickLabel = "";
 	}
-	~rootedPhylogeny_vertex(){
+	~rootedPhylogeny_vertex() {
 		
 	}
 };
@@ -208,6 +208,7 @@ public:
 	tuple <vector<vector<unsigned char>>,vector<int>> GetCompressedSequencesAndSiteWeights(vector<vector<unsigned char>> fullSequences);
 	void ReadDirectedEdgeListForBifurcatingTree(string treeFileName);
 	void ReadUndirectedEdgeList(string treeFileName);
+	void ReadNewickFile(string treeFileName);
 	void ReadSequenceFile(string sequenceFileName);
 	void SetRootProbabilityUsingAncestralSequence(); 
 	void SetParameters(VectorXd x);
@@ -311,7 +312,7 @@ public:
 	void SetVerticesForPreOrderTreeTraversal();
 	void SetParametersForRateMatrixForBFGS(MatrixXd parameters, int rateCat);
 	void SetRateCategories(float baseFreqThreshold);	
-	void WriteRateCategoryPerVertexAndModelParameters(string sequenceFileName);
+	void WriteRateCategoryPerVertexAndModelParameters(string outputFilePrefix);
 	void OptimizeModelParametersUsingNelderMead();
 	void OptimizeModelParametersUsingMultiThreadedNelderMead();
 	void OptimizeModelParametersUsingNelderMeadViaEM();
@@ -906,9 +907,9 @@ void rootedPhylogeny_tree::SetLeaves(){
 	}
 }
 
-void rootedPhylogeny_tree::WriteRateCategoryPerVertexAndModelParameters(string fileNamePrefix){
+void rootedPhylogeny_tree::WriteRateCategoryPerVertexAndModelParameters(string outputFilePrefix){
 	ofstream modelParametersFile;
-	modelParametersFile.open(fileNamePrefix+".modelParameters");
+	modelParametersFile.open(outputFilePrefix+".modelParameters");
 	modelParametersFile << "Vertex name" << "\t" << "Rate category" << endl;
 	rootedPhylogeny_vertex * v;
 	for (pair<int,rootedPhylogeny_vertex *> idPtrPair : (*this->vertexMap)){
@@ -6388,7 +6389,7 @@ void rootedPhylogeny_tree::ReadSequenceFile(string sequenceFileName){
 //	cout << "number of sequences is " << fullSequencesMap.size() << endl;
 	vector<vector<unsigned char>> fullSequences;
 	vector <string> sequenceNames;
-	for (pair<string,vector<unsigned char>> seqNameAndSeq : fullSequencesMap){
+	for (pair<string,vector<unsigned char>> seqNameAndSeq : fullSequencesMap) {
 		fullSequences.push_back(seqNameAndSeq.second);
 		sequenceNames.push_back(seqNameAndSeq.first);
 	}	
@@ -6396,7 +6397,7 @@ void rootedPhylogeny_tree::ReadSequenceFile(string sequenceFileName){
 	vector <unsigned char> compressedSequence;
 	int v_id;
 	tie (compressedSequences, this->siteWeights) = this->GetCompressedSequencesAndSiteWeights(fullSequences);	
-	for (unsigned int v_num = 0; v_num < fullSequences.size(); v_num ++){
+	for (unsigned int v_num = 0; v_num < fullSequences.size(); v_num ++) {
 		compressedSequence = compressedSequences[v_num];
 		v_name = sequenceNames[v_num];		
 		v_id = this->GetVertexId(v_name);
@@ -6406,6 +6407,83 @@ void rootedPhylogeny_tree::ReadSequenceFile(string sequenceFileName){
 	}	
 }
 
+void rootedPhylogeny_tree::ReadNewickFile(string treeFileName) {
+    // default value for rooted is true
+    // this->leaves.clear();
+    // if (this->verbose) {
+    //     std::cout << "Tree file name is " << tree_file_name << std::endl;    
+    // }
+    // std::string node_name; std::string h_name;
+    // node * h; node * n; node * l;
+    // float length; float v_length;
+    // std::string newick_string;
+    // std::string sibling_string;
+    // std::string sibling_string_without_parenthesis;
+    // std::string newick_string_split;
+    // std::vector <std::string> split_sibling_string;
+    // std::vector <std::string> node_name_and_length;
+    // std::ifstream inputFile(this->tree_file_name.c_str());
+    // getline(inputFile, newick_string);    
+    // if (this->verbose) {
+    //     std::cout << "Newick string is " << newick_string << std::endl;
+    // }
+    // std::regex sibling_pattern ("\\([^\\(\\)]+\\)");
+    // std::smatch cherry_matches;
+    // bool continue_search = true;
+    // float min_length = pow(10,-8);
+    // while (continue_search) {
+    //     if (regex_search(newick_string, cherry_matches, sibling_pattern)) {
+    //         h_name = "h_" + std::to_string(this->h_ind);
+    //         this->Add_node(h_name);
+    //         h = this->Get_node(h_name);
+    //         this->h_ind++;
+    //         sibling_string = cherry_matches[0];
+    //         sibling_string_without_parenthesis = "";
+    //         for (int i = 1; i < sibling_string.size() -1; i++) {
+    //             sibling_string_without_parenthesis += sibling_string[i];
+    //         }
+    //         boost::split(split_sibling_string, sibling_string_without_parenthesis, [](char c){return c == ',';});
+    //         if (split_sibling_string.size() == 2 || split_sibling_string.size() == 3) {
+    //             for (std::string sibling_string : split_sibling_string) {
+    //                 boost::split(node_name_and_length, sibling_string, [](char c){return c == ':';});
+    //                 node_name = node_name_and_length[0];
+    //                 length = std::stof(node_name_and_length[1]);
+    //                 if (length < min_length) {
+    //                     length = min_length;
+    //                 }
+    //                 if (!this->Contains_node(node_name)) {
+    //                     this->Add_node(node_name);                        
+    //                     this->leaves.push_back(this->Get_node(node_name));
+    //                 }
+    //                 n = this->Get_node(node_name);
+    //                 this->Add_directed_edge(h, n, length);
+    //                 this->Add_undirected_edge(n, h, length);
+    //             }
+    //         } else {
+    //             std::cerr << "sibling string has not been properly parsed" << std::endl;
+    //             // exit(-1);
+    //         }
+    //         newick_string = std::regex_replace(newick_string, sibling_pattern, h_name, std::regex_constants::format_first_only);
+    //     } else {
+    //         continue_search = false;
+    //     }        
+    // }
+    // unsigned int num_leaves = this->leaves.size();
+    // unsigned int num_nodes = this->node_list.size();
+    // if (this->verbose) {
+    //     std::cout << "Number of edges is " << this->undirected_edge_length_map.size() << std::endl;
+    //     std::cout << "Number of leaves is " << num_leaves << std::endl;
+    //     std::cout << "Number of nodes is " << num_nodes << std::endl;    
+    // }    
+    // if (num_nodes == 2*(num_leaves) -2) {
+    //     this->rooted = false;
+    //     // std::cout << "Input tree is unrooted" << std::endl;
+    // } else {
+    //     assert(num_nodes == 2*(num_leaves) -1);
+    //     this->rooted = true;
+    //     // std::cout << "Input tree is rooted" << std::endl;
+    // }
+}
 
 void rootedPhylogeny_tree::ReadUndirectedEdgeList(string treeFileName) {
 	string u_name;

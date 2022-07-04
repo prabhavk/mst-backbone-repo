@@ -110,14 +110,14 @@ public:
 		// ancestralSequencesFile.open(this->prefix_for_output_files+".ancestralSequences");
 		// ancestralSequencesFile << this->ancestralSequencesString;
 		// ancestralSequencesFile.close();
-		if (! this->localPhyloOnly) {
-			this->T->WriteRootedTreeAsEdgeList(this->prefix_for_output_files + ".edgeList");
-			this->T->WriteRootedTreeInNewickFormat(this->prefix_for_output_files + ".newick");
-		}		
+		// if (! this->localPhyloOnly) {
+		// this->T->WriteRootedTreeAsEdgeList(this->prefix_for_output_files + ".edges");
+		// this->T->WriteRootedTreeInNewickFormat(this->prefix_for_output_files + ".nwk");
+		// }		
 //		this->MSTBackboneWithOneExternalVertex();	
-		current_time = std::chrono::high_resolution_clock::now();
-		cout << "Total CPU time used is " << chrono::duration_cast<chrono::seconds>(current_time-start_time).count() << " second(s)\n";
-		this->mstBackboneLogFile << "Total CPU time used is " << chrono::duration_cast<chrono::seconds>(current_time-start_time).count() << " second(s)\n";
+		this->current_time = std::chrono::high_resolution_clock::now();
+		cout << "Total CPU time used is " << chrono::duration_cast<chrono::seconds>(this->current_time-this->start_time).count() << " second(s)\n";
+		this->mstBackboneLogFile << "Total CPU time used is " << chrono::duration_cast<chrono::seconds>(this->current_time-this->start_time).count() << " second(s)\n";
 		this->mstBackboneLogFile.close();		
 			}
 	~MSTBackbone(){
@@ -521,23 +521,23 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 	timeTakenToComputeGlobalUnrootedPhylogeneticTree -= timeTakenToComputeEdgeAndVertexLogLikelihoods;
 	cout << "CPU time used for computing global unrooted phylogenetic tree T is " << timeTakenToComputeGlobalUnrootedPhylogeneticTree.count() << " second(s)\n";
 	this->mstBackboneLogFile << "CPU time used for computing global unrooted phylogenetic tree T is " << timeTakenToComputeGlobalUnrootedPhylogeneticTree.count() << " second(s)\n";		
-	cout << "Fitting a general Markov model GMM to T using reconstructed ancestral sequences" << endl;
-	this->mstBackboneLogFile << "Fitting a general Markov model GMM to T using reconstructed ancestral sequences" << endl;		
-	this->T->RootTreeBySumOfExpectedLogLikelihoods();
-	current_time = chrono::high_resolution_clock::now();
-	timeTakenToRootViaEdgeLoglikelihoods = chrono::duration_cast<chrono::seconds>(current_time-start_time);
-	timeTakenToRootViaEdgeLoglikelihoods -= timeTakenToComputeGlobalUnrootedPhylogeneticTree;
-	cout << "CPU time used for fitting a GM model to fully labeled T is " << timeTakenToRootViaEdgeLoglikelihoods.count() << " second(s)\n";
-	this->mstBackboneLogFile << "CPU time used for fitting a GM model to fully labeled T is " << timeTakenToRootViaEdgeLoglikelihoods.count() << " second(s)\n";
-	cout << "Log likelihood of fitting a GM model to fully labeled T is " << this->T->maxSumOfExpectedLogLikelihoods << endl;
-	this->mstBackboneLogFile << "Log likelihood of fitting a GM model to fully labeled T is " << this->T->maxSumOfExpectedLogLikelihoods << endl;
-	double BIC_full_labeled = -2 * this->T->maxSumOfExpectedLogLikelihoods ;
-	BIC_full_labeled += (3 + 12 * (this->T->numberOfInputSequences -1) * log2(this->T->sequenceLength));
-	cout << "BIC of fitting a GM model to fully labeled T is " << BIC_full_labeled << endl;
-	this->mstBackboneLogFile << "Log likelihood of fitting a GM model to fully labeled T is " << BIC_full_labeled << endl;
-	cout << "Writing rooted tree in edge list format and newick format" << endl;
-	this->T->WriteRootedTreeAsEdgeList(sequenceFileName + ".edgeList_fullyLabeledRooting");
-	this->T->WriteRootedTreeInNewickFormat(sequenceFileName + ".newick_fullyLabeledRooting");
+	// cout << "Fitting a general Markov model GMM to T using reconstructed ancestral sequences" << endl;
+	// this->mstBackboneLogFile << "Fitting a general Markov model GMM to T using reconstructed ancestral sequences" << endl;		
+	// this->T->RootTreeBySumOfExpectedLogLikelihoods();
+	// current_time = chrono::high_resolution_clock::now();
+	// timeTakenToRootViaEdgeLoglikelihoods = chrono::duration_cast<chrono::seconds>(current_time-start_time);
+	// timeTakenToRootViaEdgeLoglikelihoods -= timeTakenToComputeGlobalUnrootedPhylogeneticTree;
+	// cout << "CPU time used for fitting a GM model to fully labeled T is " << timeTakenToRootViaEdgeLoglikelihoods.count() << " second(s)\n";
+	// this->mstBackboneLogFile << "CPU time used for fitting a GM model to fully labeled T is " << timeTakenToRootViaEdgeLoglikelihoods.count() << " second(s)\n";
+	// cout << "Log likelihood of fitting a GM model to fully labeled T is " << this->T->maxSumOfExpectedLogLikelihoods << endl;
+	// this->mstBackboneLogFile << "Log likelihood of fitting a GM model to fully labeled T is " << this->T->maxSumOfExpectedLogLikelihoods << endl;
+	// double BIC_full_labeled = -2 * this->T->maxSumOfExpectedLogLikelihoods ;
+	// BIC_full_labeled += (3 + 12 * (this->T->numberOfInputSequences -1) * log2(this->T->sequenceLength));
+	// cout << "BIC of fitting a GM model to fully labeled T is " << BIC_full_labeled << endl;
+	// this->mstBackboneLogFile << "BIC of fitting a GM model to fully labeled T is " << BIC_full_labeled << endl;
+	// cout << "Writing rooted tree in edge list format and newick format" << endl;
+	// this->T->WriteRootedTreeAsEdgeList(sequenceFileName + ".edgeList_fullyLabeledRooting");
+	// this->T->WriteRootedTreeInNewickFormat(sequenceFileName + ".newick_fullyLabeledRooting");
 	cout << "Rooting T by fitting a GM model using restricted SEM" << endl;
 	this->mstBackboneLogFile << "Rooting T by fitting a GM model using restricted SEM" << endl;
 	this->T->RootTreeByFittingAGMMViaEM();
@@ -545,16 +545,16 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 	timeTakenToRootViaRestrictedSEM = chrono::duration_cast<chrono::seconds>(current_time-start_time);	
 	timeTakenToRootViaRestrictedSEM -= timeTakenToComputeGlobalUnrootedPhylogeneticTree;
 	timeTakenToRootViaRestrictedSEM -= timeTakenToRootViaEdgeLoglikelihoods;
-	cout << "CPU time used for rooting leaf-labeled T via restricted SEM is " << timeTakenToRootViaRestrictedSEM.count() << " second(s)\n";
-	this->mstBackboneLogFile << "CPU time used for rooting leaf-labeled T via restricted SEM is " << timeTakenToRootViaRestrictedSEM.count() << " second(s)\n";	
-	cout << "Log likelihood of fitting a GM model to leaf-labeled T via restricted SEM is " << this->T->logLikelihood << endl;
-	this->mstBackboneLogFile << "Log likelihood of fitting a GM model to leaf-labeled T via restricted SEM is " << this->T->logLikelihood << endl;
+	cout << "CPU time used for rooting T via restricted SEM is " << timeTakenToRootViaRestrictedSEM.count() << " second(s)\n";
+	this->mstBackboneLogFile << "CPU time used for rooting T via restricted SEM is " << timeTakenToRootViaRestrictedSEM.count() << " second(s)\n";	
+	cout << "Log likelihood under the general Markov model is " << this->T->logLikelihood << endl;
+	this->mstBackboneLogFile << "Log likelihood is " << this->T->logLikelihood << endl;
 	double BIC = -2 * this->T->logLikelihood + (3 + 12 * (this->T->numberOfInputSequences -1) * log2(this->T->sequenceLength));	
-	cout << "BIC of fitting a GM model to leaf-labeled T via restricted SEM is " << BIC << endl;
-	this->mstBackboneLogFile << "BIC of fitting a GM model to leaf-labeled T via restricted SEM is " << BIC << endl;
+	cout << "BIC under the general Markov model is " << BIC << endl;
+	this->mstBackboneLogFile << "BIC under the general Markov model is " << BIC << endl;
 	cout << "Writing rooted tree in edge list format and newick format" << endl;
-	this->T->WriteRootedTreeAsEdgeList(sequenceFileName + ".edgeList_leafLabeledRooting");
-	this->T->WriteRootedTreeInNewickFormat(sequenceFileName + ".newick_leafLabeledRooting");
+	this->T->WriteRootedTreeAsEdgeList(this->prefix_for_output_files + ".directed_edges");
+	this->T->WriteRootedTreeInNewickFormat(this->prefix_for_output_files + ".rooted_newick");
 }
 
 void MSTBackbone::MSTBackboneWithRootSEMAndMultipleExternalVertices() {

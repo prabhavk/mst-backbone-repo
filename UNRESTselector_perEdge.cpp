@@ -10,15 +10,19 @@
 
 using namespace std;
 int main(int argc, char **argv) {
-	
+	string undirectedEdgeListFileName;
+	string sequenceFileName;
+	string u_name;
+	string v_name;
 	
 	if (argc < 2) {
 		cout << "Input files are not specified" << endl;
-		cout << "Default syntax is: markovModelSelector <tab> ";
-		cout << "undirectedEdgeListFileName <tab> ";
+		cout << "Default syntax is: UNRESTselector_perEdge <tab> ";
+		cout << "directedEdgeListFileName <tab> ";
 		cout << "sequenceFileName <tab> ";
 		cout << "u_name <tab> ";
 		cout << "v_name" << endl;
+        return (-1);
 	} else {		
 		string undirectedEdgeListFileName = argv[1];
 		string sequenceFileName = argv[2];
@@ -37,5 +41,10 @@ int main(int argc, char **argv) {
 			delete MS;
 		}
 	}
+
+	
+
+
+
 	return 0;
 }

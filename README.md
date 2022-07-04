@@ -12,15 +12,14 @@ https://www.biorxiv.org/content/10.1101/2020.06.30.180315v1
 ```console
 git clone https://github.com/prabhavk/mst-backbone-repo.git 
 cd mst-backbone-repo/
-make
+make all
 
 ```
 
-Running make will create two programs mst-backbone and UNRESTselector. 
-
 mst-backbone constructs phylogenetic trees by constraining the search through tree-space. Tree search is performed under the general Markov model using structural EM. 
 
-UNRESTselector performs model selection by fitting non-stationary non-reversible non-homogeneous CT-HMM to phylogenetic trees inferred using mst-backbone.
+ 
+UNRESTselector.py performs model selection by fitting non-stationary non-reversible non-homogeneous CT-HMM to phylogenetic trees. 
 
 # Using mst-backbone
 
@@ -33,17 +32,17 @@ alignment.fas: a multiple sequence alignment file in FASTA format
 
 Parameters:
 
-subtree_size: specifies the minimum number of non-zero weighted edges in the subgraphs induced by vertex sets $V_S$ and $V_O$. 
+subtree_size: constraint on the minimum number of non-zero weighted edges in the subgraphs induced by vertex sets $V_S$ and $V_O$ 
 
-output_prefix: used for naming output files. Default prefix is input_alignment_mstbackbone.
+output_prefix: used for naming output files. Default prefix is alignment_mstbackbone
 
 Output files:
 
-output_prefix.mst: the maximum parsimony (minimum evolution) spanning tree used for constraining search through tree-space. 
+output_prefix.mst: the maximum parsimony spanning tree used for constraining search through tree-space 
 
 output_prefix.nwk: the output tree in NEWICK format
 
-output_prefix.edges: the output tree in edge list format
+output_prefix.edges: the output tree in EDGE LIST format
 
 output_prefix.mstbackbone_log: contains all the messages that is printed to terminal
 
@@ -52,18 +51,18 @@ output_prefix.mstbackbone_log: contains all the messages that is printed to term
 The model selection procedure described in the paper can be reproduced as follows.
 
 ```console
-UNRESTselector --seq alignment.fas --out output_prefix --input_tree tree.[nwk|edges]
+python3 UNRESTselector.py --seq alignment.fas --out output_prefix --input_tree tree.nwk
 ```
 
 Input files:
 
 alignment.fas: a multiple sequence alignment file in FASTA format
 
-tree.[nwk|edges]: an unrooted phylogenetic tree in NEWICK format or edge list format. The location of the root is re-estimated using model selection if the input tree is rooted. 
+tree.edges: an unrooted phylogenetic tree in EDGE LIST OR NEWICK format. The location of the root is re-estimated using BIC if the input tree is rooted
 
 Parameters:
 
-output_prefix: prefix used for naming output files. Default prefix is alignment_UNRESTselector.
+output_prefix: prefix used for naming output files. Default prefix is alignment_UNRESTselector
 
 Output files:
 
@@ -73,9 +72,4 @@ output_prefix.edges: the output tree in edge list format
 
 output_prefix.params: the parameters of the selected model
 
-output_prefix.UNRESTselector_log: contains all the messages that is printed to terminal
-
-# Trouble-shooting
-
-mst-backbone should work without issues on any UNIX-based system. Please contact kalaghatgi@molgen.mpg.de if you face issues using mst-backbone.
-
+output_prefix.BIC: BIC of the selected model 

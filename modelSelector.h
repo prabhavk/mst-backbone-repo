@@ -21,6 +21,7 @@ public:
 	ofstream logFile;
 	vector <pair<int, int>> edgesForRooting; 
 	void PerformModelSelection();
+	// void PerformModelSelectionForRootedTree();
 	void PerformModelSelectionTest();
 	void WriteTotalComputeTime();
 	rootedPhylogeny_tree * RT;
@@ -29,17 +30,24 @@ public:
 		this->undirectedEdgeListFileName = undirectedEdgeListFileNameToSet;
 		this->u_name = u_nameToSet;
 		this->v_name = v_nameToSet;
-		outputFilePrefix = this->sequenceFileName + ".rootedAt_"+u_name + "_"+v_name;
+		outputFilePrefix = this->sequenceFileName + ".rootedAt_" + u_name + "_" + v_name;
 		start_time = std::chrono::high_resolution_clock::now();		
-		RT = new rootedPhylogeny_tree();
+		this->RT = new rootedPhylogeny_tree();
 		this->logFile.open(outputFilePrefix + ".log");		
+
 	}
 	~ ModelSelector() {
 		delete RT;
 	}
 };
 
-void ModelSelector::PerformModelSelection(){
+// void ModelSelector::PerformModelSelection() {
+// 	this->RT->ReadUndirectedEdgeList(this->undirectedEdgeListFileName);
+// 	this->RT->SetSequenceFileName(this->sequenceFileName);
+// 	// iterate over edges, root at each edge, and perform model selection for rooted tree
+// }
+
+void ModelSelector::PerformModelSelection() {
 	int u_id; int v_id;
 	RT->ReadUndirectedEdgeList(this->undirectedEdgeListFileName);	
 //	RT->ReadDirectedEdgeListForBifurcatingTree(this->directedEdgeListFileName);
@@ -67,7 +75,7 @@ void ModelSelector::PerformModelSelection(){
 }
 
 
-void ModelSelector::PerformModelSelectionTest(){
+void ModelSelector::PerformModelSelectionTest() {
 	int u_id; int v_id;
 	RT->ReadUndirectedEdgeList(this->undirectedEdgeListFileName);	
 //	RT->ReadDirectedEdgeListForBifurcatingTree(this->directedEdgeListFileName);

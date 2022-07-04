@@ -1,11 +1,12 @@
 import re
 import subprocess as sub
 import os
-from classDeclarationsAndFunctions_Mar6 import Tree, RootedTree
+from classDeclarationsAndFunctions import Tree, RootedTree
 from numpy import array
 from MarkovModels import DNA
 from config import projectPath, scriptPath
 import numpy as np
+import ete3
 ################################### ALIGNMENT I/O #####################################
 
 def ReadFasta(fileName):    
@@ -18,10 +19,10 @@ def ReadFasta(fileName):
             if seq != '':
                 seq = seq.upper()
                 sequenceAlignment[name] = seq
-                seq=''
+                seq = ''
             name = line.strip().split('>')[1]
         else:
-            seq+=line.strip()
+            seq += line.strip()
 
     sequenceAlignment[name] = seq
     fastaFile.close()
@@ -137,7 +138,7 @@ def WriteBatchScriptForSEMGMForBootstrapAlignments(sequenceFileName,expName,numb
     
 def WriteBatchScriptForModelSelection(sequenceFileName,expName,type="w",groupId=""):
     edgeListFileName = sequenceFileName + ".edgeList"
-    edgeListFile = open(edgeListFileName,"r")
+    edgeListFile = open(edgeListFileName, "r")
     edges = []
     for line in edgeListFile:
         (u_name, v_name, t) = line.strip().split("\t")
@@ -381,7 +382,6 @@ def ReadTree(treeFileName,treeFormat='edgeList',experimentName='py'):
             u_name, v_name, length = line.strip().split('\t')
             T.AddEdge(u_name, v_name, float(length))
         edgeListFile.close()
-        T.SetLeaves()
     elif treeFormat =='newick':
         devnull=open(os.devnull,'w')
         if os.path.isdir('/TL/euresist_phylodynamics/work/Projects/MSTBasedForests/scripts/'):
@@ -390,6 +390,12 @@ def ReadTree(treeFileName,treeFormat='edgeList',experimentName='py'):
             pathForRscript = '/TL/euresist_phylodynamics/work/Projects/MSTBasedForests/scripts/Rscript'
         elif os.path.isdir('/local/home/pk/Projects/MSTBasedForests/scripts/'):
             pathForNewickParserInR = '/local/home/pk/Projects/MSTBasedForests/scripts/parseNewickTree.R'
+            pathForRscript = '/usr/local/bin/Rscript'
+        elif os.path.isdir('/project/exaptation/Projects/MSTBasedForests/scripts/'):
+            pathForNewickParserInR = '/project/exaptation/Projects/MSTBasedForests/scripts/parseNewickTree.R'
+            pathForRscript = '/usr/local/package/bin/Rscript'            
+        elif os.path.isdir('/home/kalaghat/exaptation/Projects/MSTBasedForests/scripts/'):
+            pathForNewickParserInR = '/home/kalaghat/exaptation/Projects/MSTBasedForests/scripts/parseNewickTree.R'
             pathForRscript = '/usr/local/bin/Rscript'
         
         tempTreeFileName=treeFileName+'.tempTree'
@@ -424,7 +430,7 @@ def WriteConsensusTreeToFile(originalTreeFileName,minCladeFreq=0.7,numberOfBoots
  
 
 def ReadRootedTree(treeFileName,treeFormat='edgeList'):
-    if treeFormat == 'edgeList':
+    if treeFormat == 'edgeList' or treeFormat == 'edge_list':
         RT = RootedTree()
         treeFile = open(treeFileName,"r")
         for line in treeFile:
@@ -434,22 +440,44 @@ def ReadRootedTree(treeFileName,treeFormat='edgeList'):
         treeFile.close()
         RT.SetRoot()
     elif treeFormat == 'newick':
-        if os.path.isdir('/TL/euresist_phylodynamics/work/Projects/MSTBasedForests/scripts/'):
-            pathForNewickParserInR = '/TL/euresist_phylodynamics/work/Projects/MSTBasedForests/scripts/parseNewickTree.R'
-            pathForRscript = '/TL/opt/bin/Rscript'
-        elif os.path.isdir('/local/home/pk/Projects/MSTBasedForests/scripts/'):
-            pathForNewickParserInR = '/home/pk/workspace/MSTBasedForests/parseNewickTree.R'
-            pathForRscript = '/usr/local/bin/Rscript'
+        tree_ete3 = ete3.Tree(treeFileName)
+        RT = RootedTree()
+        h_ind = 0
+        for node in tree_ete3.traverse('preorder'):
+            if node.name == '':
+                node.name = 'h_'+str(h_ind)
+                h_ind += 1
+        for parent in tree_ete3.traverse('preorder'):
+            for child in node.children:
+                branch_length = float(child.dist)
+                RT.AddDirectedEdge(parent.name, child.name, branch_length)
+        RT.SetRoot()
+        # RT = RootedTree()
+
+        # if os.path.isdir('/TL/euresist_phylodynamics/work/Projects/MSTBasedForests/scripts/'):
+        #     pathForNewickParserInR = '/TL/euresist_phylodynamics/work/Projects/MSTBasedForests/scripts/parseNewickTree.R'
+        #     pathForRscript = '/TL/opt/bin/Rscript'
+        # elif os.path.isdir('/local/home/pk/Projects/MSTBasedForests/scripts/'):
+        #     pathForNewickParserInR = '/home/pk/workspace/MSTBasedForests/parseNewickTree.R'
+        #     pathForRscript = '/usr/local/bin/Rscript'
+        # elif os.path.isdir('/project/exaptation/Projects/MSTBasedForests/scripts/'):
+        #     pathForNewickParserInR = '/project/exaptation/Projects/MSTBasedForests/scripts/parseNewickTree.R'
+        #     pathForRscript = '/usr/local/package/bin/Rscript'
+        # elif os.path.isdir('/home/kalaghat/exaptation/Projects/MSTBasedForests/scripts/'):
+        #     pathForNewickParserInR = '/home/kalaghat/exaptation/Projects/MSTBasedForests/scripts/parseNewickTree.R'
+        #     pathForRscript = '/usr/local/bin/Rscript'
         
-        tempTreeFileName=treeFileName+'.tempTree'
+        # tempTreeFileName=treeFileName+'.tempTree'
         
-        RCommandForParsingTrees= pathForRscript+'\t'+pathForNewickParserInR+'\t'+treeFileName+'\t'+tempTreeFileName
-        devnull=open(os.devnull,'w')        
-        sub.call(RCommandForParsingTrees,stdout=devnull,shell=True)
-        RT = ReadRootedTree(tempTreeFileName,'edgeList')
-        sub.call('rm '+tempTreeFileName,stdout=devnull,shell=True)
-        devnull.close()
+        # RCommandForParsingTrees= pathForRscript+'\t'+pathForNewickParserInR+'\t'+treeFileName+'\t'+tempTreeFileName
+        # devnull=open(os.devnull,'w')        
+        # # sub.call(RCommandForParsingTrees,shell=True)
+        # sub.call(RCommandForParsingTrees,stdout=devnull,shell=True)
+        # RT = ReadRootedTree(tempTreeFileName,'edgeList')
+        # sub.call('rm '+tempTreeFileName,stdout=devnull,shell=True)
+        # devnull.close()
     return RT
+
 
 def ComputeMST(alignmentFileName):
     from config import scriptPath
@@ -700,7 +728,7 @@ def WriteVectorDicWithEdgeKeyToFile(vectorDictionary,fileName):
 # Write matrix dictionary to file
 def WriteMatrixDicWithEdgeKeyToFile(matrixDictionary,fileName):
     matricesFile = open(fileName,"w")
-    matrixDimension = matrixDictionary.values()[0].shape[0]
+    matrixDimension = list(matrixDictionary.values())[0].shape[0]
     for edge in matrixDictionary.keys():
         matricesFile.write(edge[0]+'\t'+edge[1]+'\t')
         for i in range(matrixDimension):
