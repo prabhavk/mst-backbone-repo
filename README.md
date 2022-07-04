@@ -40,7 +40,7 @@ Output files:
 
 output_prefix.mst: the maximum parsimony spanning tree used for constraining search through tree-space 
 
-output_prefix.nwk: the output tree in NEWICK format
+output_prefix.newick: the output tree in NEWICK format
 
 output_prefix.edges: the output tree in EDGE LIST format
 
@@ -58,7 +58,7 @@ Input files:
 
 alignment.fas: a multiple sequence alignment file in FASTA format
 
-tree.edges: an unrooted phylogenetic tree in EDGE LIST OR NEWICK format. The location of the root is re-estimated using BIC if the input tree is rooted
+tree.edges: a phylogenetic tree in EDGE LIST OR NEWICK format. The input tree is rooted at the node that minimizes BIC.
 
 Parameters:
 
@@ -66,7 +66,7 @@ output_prefix: prefix used for naming output files. Default prefix is alignment_
 
 Output files:
 
-output_prefix.nwk: the output tree in newick format
+output_prefix.newick: the output tree in newick format
 
 output_prefix.edges: the output tree in edge list format
 
