@@ -429,7 +429,7 @@ def WriteConsensusTreeToFile(originalTreeFileName,minCladeFreq=0.7,numberOfBoots
     sub.call(sumtreeScript,shell=True)
  
 
-def ReadRootedTree(treeFileName,treeFormat='edgeList'):
+def     ReadRootedTree(treeFileName,treeFormat='edgeList'):
     if treeFormat == 'edgeList' or treeFormat == 'edge_list':
         RT = RootedTree()
         treeFile = open(treeFileName,"r")
@@ -443,13 +443,14 @@ def ReadRootedTree(treeFileName,treeFormat='edgeList'):
         tree_ete3 = ete3.Tree(treeFileName)
         RT = RootedTree()
         h_ind = 0
-        for node in tree_ete3.traverse('preorder'):
+        for node in tree_ete3.traverse('preorder'):            
             if node.name == '':
                 node.name = 'h_'+str(h_ind)
                 h_ind += 1
         for parent in tree_ete3.traverse('preorder'):
-            for child in node.children:
+            for child in parent.children:
                 branch_length = float(child.dist)
+                print(parent.name, child.name, branch_length)
                 RT.AddDirectedEdge(parent.name, child.name, branch_length)
         RT.SetRoot()
         # RT = RootedTree()

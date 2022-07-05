@@ -1,9 +1,0 @@
-Subtree size is set at	10
-Prefix for output files is 	test_data
-Number of vertices in MST is 16
-CPU time used for computing global unrooted phylogenetic tree T is 0 second(s)
-Rooting T by fitting a GM model using restricted SEM
-CPU time used for rooting T via restricted SEM is -68719476742 second(s)
-Log likelihood is -4094.41
-BIC under the general Markov model is 10192.1
-Total CPU time used is 0 second(s)

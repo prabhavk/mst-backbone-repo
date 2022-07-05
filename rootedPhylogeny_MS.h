@@ -6499,18 +6499,26 @@ void rootedPhylogeny_tree::ReadUndirectedEdgeList(string treeFileName) {
 	vector <unsigned char> emptySequence;
 	v_id = 0;
 	ifstream edgeListFile(treeFileName.c_str());
-	for (string line; getline(edgeListFile, line);){		
-		boost::split(splitLine, line, [](char c){return c == '\t';});		
+	for (string line; getline(edgeListFile, line);){
+		cout << 1 << endl;
+		cout << "line before splitting is " << line << endl;
+		boost::split(splitLine, line, [](char c){return c == '\t';});
+		cout << treeFileName << endl;	
+		cout << 2 << endl;	
 		u_name = splitLine[0];		
 		v_name = splitLine[1];
+		cout << u_name << "\t" << v_name << endl;
 		if (find(nonRootVertexNames.begin(),nonRootVertexNames.end(),v_name) == nonRootVertexNames.end()){
+			cout << 3 << endl;
 			nonRootVertexNames.push_back(v_name);
 		}		
 		if (find(ancestorNames.begin(),ancestorNames.end(),u_name)==ancestorNames.end()){
+			cout << 4 << endl;
 			ancestorNames.push_back(u_name);
 		}
 		if (find(leafNames.begin(),leafNames.end(),v_name)==leafNames.end()){
 			if(!boost::starts_with(v_name, "h_")){
+				cout << 5 << endl;
 				leafNames.push_back(v_name);
 			}
 		}

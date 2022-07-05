@@ -72,8 +72,8 @@ int main(int argc, char **argv)
 
 		if (!flag_prefix) {
 			prefix_path_obj =  alignment_file_path_obj.parent_path();
-			// prefix_path_obj /= "mstbackbone_default_output";			
-			prefix_for_output_files = alignment_file_path_obj.parent_path().string() + "_mstbackbone";
+			prefix_path_obj /= "mstbackbone_output";
+			// prefix_for_output_files = alignment_file_path_obj.parent_path().string() + "_mstbackbone";
 		}
 		MSTBackbone MSTBackboneObj(path_to_alignment_file, size_of_subtree, prefix_path_obj.string());
 		// MSTBackbone MSTBackboneObj(path_to_alignment_file, size_of_subtree, prefix_path_obj.string(),localPhyloOnly,modelSelection,modelForRooting,useChowLiu);

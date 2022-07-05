@@ -16,10 +16,10 @@ public:
 	string u_name;
 	string v_name;
 	string outputFilePrefix;
-	std::chrono::system_clock::time_point start_time;	
+	std::chrono::system_clock::time_point start_time;
 	std::chrono::system_clock::time_point current_time;
 	ofstream logFile;
-	vector <pair<int, int>> edgesForRooting; 
+	vector <pair<int, int>> edgesForRooting;
 	void PerformModelSelection();
 	// void PerformModelSelectionForRootedTree();
 	void PerformModelSelectionTest();
@@ -49,9 +49,12 @@ public:
 
 void ModelSelector::PerformModelSelection() {
 	int u_id; int v_id;
+	cout << "1" << endl;
 	RT->ReadUndirectedEdgeList(this->undirectedEdgeListFileName);	
+	cout << "2" << endl;
 //	RT->ReadDirectedEdgeListForBifurcatingTree(this->directedEdgeListFileName);
 	RT->SetSequenceFileName(this->sequenceFileName);
+	cout << "3" << endl;
 	u_id = RT->GetVertexId(this->u_name);
 	v_id = RT->GetVertexId(this->v_name);
 	pair <int, int> edge;
@@ -60,9 +63,13 @@ void ModelSelector::PerformModelSelection() {
 	} else {
 		edge = pair<int,int>(v_id,u_id);
 	}
-	RT->RootTreeAtEdge(edge.first, edge.second);		
+	cout << "4" << endl;
+	RT->RootTreeAtEdge(edge.first, edge.second);
+	cout << "5" << endl;
 	RT->ReadSequenceFile(this->sequenceFileName);
+	cout << "6" << endl;
 	RT->PerformModelSelectionUsingNelderMead();
+	cout << "7" << endl;
 	this->logFile << RT->optimizationLogString;
 	cout << "BIC: "<< "\t" << setprecision(10) << RT->minimum_BIC_for_rooted_tree << endl;	
 	this->logFile << "BIC: "<< "\t" << setprecision(10) << RT->minimum_BIC_for_rooted_tree << endl;	
