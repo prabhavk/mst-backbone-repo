@@ -58,7 +58,7 @@ Input files:
 
 alignment.fas: a multiple sequence alignment file in FASTA format
 
-tree.edges: a phylogenetic tree in EDGE LIST OR NEWICK format. The input tree is rooted at the node that minimizes BIC.
+tree.newick: a phylogenetic tree in NEWICK format. 
 
 Parameters:
 
@@ -66,9 +66,9 @@ output_prefix: prefix used for naming output files. Default prefix is alignment_
 
 Output files:
 
-output_prefix.newick: the output tree in newick format
+output_prefix.newick: the output tree in newick format. The output tree is rooted such that BIC is minimized.
 
-output_prefix.edges: the output tree in edge list format
+output_prefix.edges: the output tree in edge list format. 
 
 output_prefix.params: the parameters of the selected model
 
