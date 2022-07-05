@@ -3197,6 +3197,7 @@ void SEM::OptimizeTopologyAndParametersOfGMM() {
 //		}
 //	}	
 //		cout << "Rooting tree along an edge picked at random" << endl;
+	// perform tree search under ME/BME 
 	this->RootTreeAlongAnEdgePickedAtRandom();
 	// check is number of hidden vertices equals number of observed vertices -1;
 	int nL = 0;

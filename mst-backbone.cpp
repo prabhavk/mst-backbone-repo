@@ -29,7 +29,7 @@ int main(int argc, char **argv)
 	string arg_chowliu;
     if (argc < 2) {        
         cerr << "Usage: " << argv[0] << " --seq alignment.fas --constraint_size size_of_subtree --out prefix_for_output" << endl;
-		cerr << endl ;
+		cerr << endl;
         return (-1);
     } else {        
         // parse arguments            
