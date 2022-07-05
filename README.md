@@ -46,7 +46,7 @@ output_prefix.edges: the output tree in EDGE LIST format
 
 output_prefix.mstbackbone_log: contains all the messages that is printed to terminal
 
-# Using UNRESTselector
+# Using UNRESTselector.py
 
 The model selection procedure described in the paper can be reproduced as follows.
 
@@ -58,7 +58,7 @@ Input files:
 
 alignment.fas: a multiple sequence alignment file in FASTA format
 
-tree.newick: a phylogenetic tree in NEWICK format. 
+tree.newick: a phylogenetic tree in NEWICK format. The input tree is re-rooted such that BIC is minimized.
 
 Parameters:
 
@@ -66,7 +66,7 @@ output_prefix: prefix used for naming output files. Default prefix is alignment_
 
 Output files:
 
-output_prefix.newick: the output tree in newick format. The output tree is rooted such that BIC is minimized.
+output_prefix.newick: the output tree in newick format. 
 
 output_prefix.edges: the output tree in edge list format. 
 
