@@ -449,8 +449,7 @@ def     ReadRootedTree(treeFileName,treeFormat='edgeList'):
                 h_ind += 1
         for parent in tree_ete3.traverse('preorder'):
             for child in parent.children:
-                branch_length = float(child.dist)
-                print(parent.name, child.name, branch_length)
+                branch_length = float(child.dist)                
                 RT.AddDirectedEdge(parent.name, child.name, branch_length)
         RT.SetRoot()
         # RT = RootedTree()

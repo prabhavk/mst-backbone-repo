@@ -22,7 +22,7 @@ cwd = os.getcwd()
 if (os.path.exists(alignment_file_name)):
     pass
 else:
-    alignment_file_name = str(cwd) + '/' + str(alignment_file_name)[1:-1]
+    alignment_file_name = str(cwd) + '/' + str(alignment_file_name)
     # alignment_file_name = os.path.join(cwd,alignment_file_name)
     print("alignment_file_name",alignment_file_name)
     assert(os.path.exists(alignment_file_name))
@@ -93,6 +93,7 @@ else:
     sub.call(modelSelectionFileName, shell=True)
 
 BIC_list = []
+total_time_for_ms = 0
 for edge in edges:
     BIC_file_name = alignment_file_name+".rootedAt_"+edge[0]+"_"+edge[1]+".log"
     BIC_file = open(BIC_file_name,"r")
@@ -100,11 +101,13 @@ for edge in edges:
         if line.startswith("BIC"):
             BIC = float(line.split("BIC:")[1].strip())
             BIC_list.append((BIC,edge))
+        if line.startswith("Total CPU time used is"):
+            total_time_for_ms += float(line.split("Total CPU time used is")[1].strip().split("second")[0].strip())
     BIC_file.close()
 
 # Select rooted tree/model with minimum BIC
 BIC_list.sort(key=lambda x: x[0])
-print ("Minimum BIC is ", BIC_list[0])
+print ("Minimum BIC is ", BIC_list[0][0])
 BIC = BIC_list[0][0]
 edge = BIC_list[0][1]
 file_prefix = alignment_file_name + ".rootedAt_" + edge[0] + "_" + edge[1]
@@ -113,9 +116,13 @@ model_parameters_file_name_best_edge = file_prefix + ".modelParameters"
 model_parameters_file_name_to_store = cwd+"/"+output_prefix+".params"
 sub.call('cp '+model_parameters_file_name_best_edge+"\t"+model_parameters_file_name_to_store,shell=True)
 # log file
-log_file_name_best_edge = file_prefix + ".log"
+# log_file_name_best_edge = file_prefix + ".log"
 log_file_name_to_store = cwd+"/"+output_prefix+".log"
-sub.call('cp '+log_file_name_best_edge+"\t"+log_file_name_to_store,shell=True)
+log_file = open(log_file_name_to_store,"w")
+log_file.write("Minimum BIC is " + str(BIC) + "\n")
+log_file.write("Total time for performing model selection is "+ str(total_time_for_ms) + " seconds")
+log_file.close()
+# sub.call('cp '+log_file_name_best_edge+"\t"+log_file_name_to_store,shell=True)
 # rooted tree newick
 newick_tree_file_name_best_edge = file_prefix + ".newick"
 newick_tree_file_name_to_store = cwd+"/"+output_prefix+".newick"
