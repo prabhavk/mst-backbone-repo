@@ -1,9 +1,0 @@
-Trying threshold 1	Number of rate categories is 1
-Current BIC is 8630.2324218750
-Trying threshold 2	Number of rate categories is 2
-Current BIC is 8591.4726562500
-Trying threshold 3	Number of rate categories is 3
-Current BIC is 8733.4628906250
-Optimal number of rate categories is more than one
-BIC: 	8591.472656
-Total CPU time used is 14 second(s)
