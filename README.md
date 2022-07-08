@@ -51,7 +51,7 @@ output_prefix.mstbackbone_log: contains all the messages that is printed to term
 The model selection procedure described in the paper can be reproduced as follows.
 
 ```console
-python3 UNRESTselector.py --seq alignment.fas --out output_prefix --input_tree tree.nwk
+python3 UNRESTselector.py --seq alignment.fas --out output_prefix --input_tree tree.newick
 ```
 
 Input files:
