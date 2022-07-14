@@ -28,7 +28,7 @@ mst-backbone --seq alignment.fas --size subtree_size --out output_prefix
 ```
 Input file:
 
-alignment.fas: a multiple sequence alignment file in FASTA format
+alignment.fas: a multiple sequence alignment file in fasta format
 
 Parameters:
 
@@ -56,9 +56,9 @@ python3 UNRESTselector.py --seq alignment.fas --out output_prefix --input_tree t
 
 Input files:
 
-alignment.fas: a multiple sequence alignment file in FASTA format
+alignment.fas: a multiple sequence alignment file in fasta format
 
-tree.newick: a phylogenetic tree in NEWICK format. The input tree is re-rooted such that BIC is minimized.
+tree.newick: a phylogenetic tree in newick format. The input tree is re-rooted such that BIC is minimized.
 
 Parameters:
 
