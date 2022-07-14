@@ -40,9 +40,9 @@ Output files:
 
 output_prefix.mst: the maximum parsimony spanning tree used for constraining search through tree-space 
 
-output_prefix.newick: the output tree in NEWICK format
+output_prefix.newick: the output tree in newick format
 
-output_prefix.edges: the output tree in EDGE LIST format
+output_prefix.edges: the output tree in edge list format
 
 output_prefix.mstbackbone_log: contains all the messages that is printed to terminal
 
