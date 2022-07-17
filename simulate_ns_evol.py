@@ -107,12 +107,15 @@ selected_tree_ids_file.close()
 # print (tree_ids[0:5])
 
 tree_ids_num_taxa.sort(key = lambda x: x[1])
+tree_ids_selected = [tree_ids_num_taxa[i] for i in range(1,19400,100)]
+print (len(tree_ids_selected))
 
-print(tree_ids_num_taxa[0][0])
+
+print(tree_ids_selected[0][0])
 
 sequence_length_range = [1000, 2000, 4000, 8000, 16000]
 gc_diff_range = [0, 0.1, 0.2, 0.3]
-Simulate_ns_evol(tree_ids_num_taxa[0][0], sequence_length = 1000, gc_diff = 0.3)
+Simulate_ns_evol(tree_ids_selected[0][0], sequence_length = 1000, gc_diff = 0.3)
 # run tools
 # quantify accuracy
 
