@@ -839,16 +839,18 @@ void MST_tree::ComputeMST() {
 			if (seq != "") {
 //				sequenceNames.push_back(seqName);
 				for (char const dna: seq) {
-					// dna_char = this->mapDNAtoInteger[string(1,toupper(dna))];					
-					dna_char = this->ConvertDNAToChar(dna);
-					if (dna_char > 3) { // FIX_AMB
-						num_amb += 1;
-						dna_char = 3;
-					} else {
-						num_non_amb += 1;
-					}
-					recodedSequence.push_back(dna_char);					
-					site += 1;
+					if (!isspace(dna)) {
+						dna_char = this->ConvertDNAToChar(dna);
+						if (dna_char > 3) { // FIX_AMB
+							num_amb += 1;
+							dna_char = 3;
+						} else {
+							num_non_amb += 1;
+						}
+						recodedSequence.push_back(dna_char);					
+						site += 1;							
+						}						
+					// dna_char = this->mapDNAtoInteger[string(1,toupper(dna))];										
 				}
 				this->AddVertex(seqName,recodedSequence);
 				recodedSequence.clear();
@@ -862,16 +864,18 @@ void MST_tree::ComputeMST() {
 		}		
 	}		
 	for (char const dna: seq) {
-		// dna_char = this->mapDNAtoInteger[string(1,toupper(dna))];
-		dna_char = this->ConvertDNAToChar(dna);
-		if (dna_char > 3) { // FIX_AMB
-			num_amb += 1;
-			dna_char = 3;
-		} else {
-			num_non_amb += 1;
+		if (!isspace(dna)) {
+			// dna_char = this->mapDNAtoInteger[string(1,toupper(dna))];
+			dna_char = this->ConvertDNAToChar(dna);
+			if (dna_char > 3) { // FIX_AMB
+				num_amb += 1;
+				dna_char = 3;
+			} else {
+				num_non_amb += 1;
+			}
+			recodedSequence.push_back(dna_char);
+			site += 1;
 		}
-		recodedSequence.push_back(dna_char);
-		site += 1;
 	}
 	this->AddVertex(seqName,recodedSequence);
 	recodedSequence.clear();
