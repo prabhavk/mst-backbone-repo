@@ -808,6 +808,9 @@ unsigned char MST_tree::ConvertDNAToChar(char dna) {
 	if (this->mapDNAtoInteger.find(dna_upper) != this->mapDNAtoInteger.end()) {
 		dna_char = this->mapDNAtoInteger[dna_upper];
 	} else {
+		if (isspace(dna)) {
+			cout << "DNA character is a whitespace" << endl;
+		}
 		cout << "DNA character " << dna_upper << " is not in dictionary keys" << endl;
 	}	
 	return (dna_char);
