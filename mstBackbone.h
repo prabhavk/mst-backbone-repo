@@ -544,9 +544,9 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 	current_time = chrono::high_resolution_clock::now();
 	timeTakenToRootViaRestrictedSEM = chrono::duration_cast<chrono::seconds>(current_time-start_time);	
 	timeTakenToRootViaRestrictedSEM -= timeTakenToComputeGlobalUnrootedPhylogeneticTree;
-	timeTakenToRootViaRestrictedSEM -= timeTakenToRootViaEdgeLoglikelihoods;
-	cout << "CPU time used for rooting T using topology-fixed EM " << timeTakenToRootViaRestrictedSEM.count() << " second(s)\n";
-	this->mstBackboneLogFile << "CPU time used for rooting T using topology-fixed EM " << timeTakenToRootViaRestrictedSEM.count() << " second(s)\n";	
+	// timeTakenToRootViaRestrictedSEM -= timeTakenToRootViaEdgeLoglikelihoods;
+	cout << "CPU time used for rooting T using restriced SEM " << timeTakenToRootViaRestrictedSEM.count() << " second(s)\n";
+	this->mstBackboneLogFile << "CPU time used for rooting T using restriced SEM " << timeTakenToRootViaRestrictedSEM.count() << " second(s)\n";	
 	cout << "Log likelihood under the GM model is " << this->T->logLikelihood << endl;
 	this->mstBackboneLogFile << "Log likelihood is " << this->T->logLikelihood << endl;
 	double BIC = -2 * this->T->logLikelihood + (3 + 12 * (this->T->numberOfInputSequences -1) * log2(this->T->sequenceLength));	
