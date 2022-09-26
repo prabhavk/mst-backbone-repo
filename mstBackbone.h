@@ -355,7 +355,7 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 	int numberOfInputSequences = (int) this->M->vertexMap->size();	
 	// this->T = new SEM(1);
 	current_time = chrono::high_resolution_clock::now();
-	timeTakenToComputeEdgeAndVertexLogLikelihoods = chrono::duration_cast<chrono::seconds>(current_time-current_time);
+	// timeTakenToComputeEdgeAndVertexLogLikelihoods = chrono::duration_cast<chrono::seconds>(current_time-current_time);
 	
 	// Initialize global phylogeny
 	idsOfVerticesForSEM.clear();
@@ -443,13 +443,13 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 				this->T->AddWeightedEdges(this->t->weightedEdgesToAddToGlobalPhylogeneticTree);
 				this->t->SetAncestralSequencesString();
 				this->ancestralSequencesString += this->t->ancestralSequencesString;				
-				t_start_time = chrono::high_resolution_clock::now();
-				this->t->SetEdgeAndVertexLogLikelihoods();				
-				this->T->AddVertexLogLikelihoods(this->t->vertexLogLikelihoodsMapToAddToGlobalPhylogeneticTree);
-				this->T->AddEdgeLogLikelihoods(this->t->edgeLogLikelihoodsToAddToGlobalPhylogeneticTree);
-				// this->T->AddExpectedCountMatrices(t->expectedCountsForVertexPair);
-				t_end_time = chrono::high_resolution_clock::now();
-				timeTakenToComputeEdgeAndVertexLogLikelihoods += chrono::duration_cast<chrono::seconds>(t_end_time - t_start_time);
+				// t_start_time = chrono::high_resolution_clock::now();
+				// this->t->SetEdgeAndVertexLogLikelihoods();				
+				// this->T->AddVertexLogLikelihoods(this->t->vertexLogLikelihoodsMapToAddToGlobalPhylogeneticTree);
+				// this->T->AddEdgeLogLikelihoods(this->t->edgeLogLikelihoodsToAddToGlobalPhylogeneticTree);
+				// // this->T->AddExpectedCountMatrices(t->expectedCountsForVertexPair);
+				// t_end_time = chrono::high_resolution_clock::now();
+				// timeTakenToComputeEdgeAndVertexLogLikelihoods += chrono::duration_cast<chrono::seconds>(t_end_time - t_start_time);
 				// Add vertex logLikelihoods
 				// Add edge logLikelihoods
 				largestIdOfVertexInMST = this->t->largestIdOfVertexInMST;
@@ -491,7 +491,7 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 	this->t->AddGlobalIds(idsOfVerticesForSEM);
 	this->t->AddSitePatternWeights(sitePatternWeights);
 	this->t->AddSitePatternRepeats(sitePatternRepetitions);	
-	this->t->OptimizeTopologyAndParametersOfGMM();			
+	this->t->OptimizeTopologyAndParametersOfGMM();		
 //	timeTakenToComputeUnrootedPhylogeny += chrono::duration_cast<chrono::seconds>(t_end_time - t_start_time);
 	this->t->SelectIndsOfVerticesOfInterestAndEdgesOfInterest();
 	this->t->RenameHiddenVerticesInEdgesOfInterestAndSetIdsOfVerticesOfInterest();
@@ -500,15 +500,15 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 	this->ancestralSequencesString += this->t->ancestralSequencesString;
 	this->t->WriteAncestralSequences();	
 	this->T->AddWeightedEdges(this->t->weightedEdgesToAddToGlobalPhylogeneticTree);	
-	t_start_time = chrono::high_resolution_clock::now();
-	this->t->SetEdgeAndVertexLogLikelihoods();
-	this->T->AddVertexLogLikelihoods(this->t->vertexLogLikelihoodsMapToAddToGlobalPhylogeneticTree);
-	this->T->AddEdgeLogLikelihoods(this->t->edgeLogLikelihoodsToAddToGlobalPhylogeneticTree);
-	// this->T->AddExpectedCountMatrices(this->t->expectedCountsForVertexPair);
-	t_end_time = chrono::high_resolution_clock::now();
-	timeTakenToComputeEdgeAndVertexLogLikelihoods += chrono::duration_cast<chrono::seconds>(t_end_time - t_start_time);
+	// t_start_time = chrono::high_resolution_clock::now();
+	// this->t->SetEdgeAndVertexLogLikelihoods();
+	// this->T->AddVertexLogLikelihoods(this->t->vertexLogLikelihoodsMapToAddToGlobalPhylogeneticTree);
+	// this->T->AddEdgeLogLikelihoods(this->t->edgeLogLikelihoodsToAddToGlobalPhylogeneticTree);
+	// // this->T->AddExpectedCountMatrices(this->t->expectedCountsForVertexPair);
+	// t_end_time = chrono::high_resolution_clock::now();
+	// timeTakenToComputeEdgeAndVertexLogLikelihoods += chrono::duration_cast<chrono::seconds>(t_end_time - t_start_time);
 	delete this->t;
-//	this->mstBackboneLogFile << "CPU time used for computing local phylogeny is " << chrono::duration_cast<chrono::seconds>(t_end_time-t_start_time).count() << " second(s)\n";		
+	//	this->mstBackboneLogFile << "CPU time used for computing local phylogeny is " << chrono::duration_cast<chrono::seconds>(t_end_time-t_start_time).count() << " second(s)\n";		
 	// assert that T is a tree
 	cout << "Number of vertices in T is " << this->T->vertexMap->size() << endl;
 	cout << "Number of edges in T is " << this->T->edgeLengths.size() << endl;
@@ -518,7 +518,7 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 	//----##############---//
 	current_time = chrono::high_resolution_clock::now();
 	timeTakenToComputeGlobalUnrootedPhylogeneticTree = chrono::duration_cast<chrono::seconds>(current_time-start_time);
-	timeTakenToComputeGlobalUnrootedPhylogeneticTree -= timeTakenToComputeEdgeAndVertexLogLikelihoods;
+	// timeTakenToComputeGlobalUnrootedPhylogeneticTree -= timeTakenToComputeEdgeAndVertexLogLikelihoods;
 	cout << "CPU time used for computing global unrooted phylogenetic tree T is " << timeTakenToComputeGlobalUnrootedPhylogeneticTree.count() << " second(s)\n";
 	this->mstBackboneLogFile << "CPU time used for computing global unrooted phylogenetic tree T is " << timeTakenToComputeGlobalUnrootedPhylogeneticTree.count() << " second(s)\n";		
 	// cout << "Fitting a general Markov model GMM to T using reconstructed ancestral sequences" << endl;
@@ -539,14 +539,14 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 	// this->T->WriteRootedTreeAsEdgeList(sequenceFileName + ".edgeList_fullyLabeledRooting");
 	// this->T->WriteRootedTreeInNewickFormat(sequenceFileName + ".newick_fullyLabeledRooting");
 	cout << "Root T at a node by fitting a GM model using restricted SEM" << endl;
-	this->mstBackboneLogFile << "Root T at a node by fitting a GM model using restriced SEM" << endl;
+	this->mstBackboneLogFile << "Root T at a node by fitting a GM model using restriced SEM" << endl;	
 	this->T->RootTreeByFittingAGMMViaEM();
 	current_time = chrono::high_resolution_clock::now();
 	timeTakenToRootViaRestrictedSEM = chrono::duration_cast<chrono::seconds>(current_time-start_time);	
 	timeTakenToRootViaRestrictedSEM -= timeTakenToComputeGlobalUnrootedPhylogeneticTree;
 	// timeTakenToRootViaRestrictedSEM -= timeTakenToRootViaEdgeLoglikelihoods;
-	cout << "CPU time used for rooting T using restriced SEM " << timeTakenToRootViaRestrictedSEM.count() << " second(s)\n";
-	this->mstBackboneLogFile << "CPU time used for rooting T using restriced SEM " << timeTakenToRootViaRestrictedSEM.count() << " second(s)\n";	
+	cout << "CPU time used for rooting T using restriced SEM is" << timeTakenToRootViaRestrictedSEM.count() << " second(s)\n";
+	this->mstBackboneLogFile << "CPU time used for rooting T using restriced SEM is" << timeTakenToRootViaRestrictedSEM.count() << " second(s)\n";	
 	cout << "Log likelihood under the GM model is " << this->T->logLikelihood << endl;
 	this->mstBackboneLogFile << "Log likelihood is " << this->T->logLikelihood << endl;
 	double BIC = -2 * this->T->logLikelihood + (3 + 12 * (this->T->numberOfInputSequences -1) * log2(this->T->sequenceLength));	

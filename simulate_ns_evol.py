@@ -76,7 +76,7 @@ def Simulate_ns_evol(tree_id,sequence_length,gc_diff):
     for node_name in T.vertices:
         node = T.GetVertex(node_name)
         if node_name not in excluded_names:        
-            T.rateCategoryForVertex[node_name] = T.rateCategoryForVertex[node.parent.name]        
+            T.rateCategoryForVertex[node_name] = T.rateCategoryForVertex[node.parent.name]
 
     T.sequenceLength = sequence_length
     # p_change = 0.5

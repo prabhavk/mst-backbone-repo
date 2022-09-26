@@ -21,7 +21,7 @@ elif os.path.isdir('/project/exaptation/Projects/MSTBasedForests/scripts/'):
     tempPath = '/project/exaptation/Projects/MSTBasedForests/temp/'
     debugPath = '/project/exaptation/Projects/MSTBasedForests/debug/'
 elif os.path.isdir('/home/kalaghat/exaptation/Projects/MSTBasedForests/scripts/'):
-    projectPath='/home/kalaghat/exaptation/Projects/MSTBasedForests/'    
+    projectPath = '/home/kalaghat/exaptation/Projects/MSTBasedForests/'
     toolPath = '/home/kalaghat/exaptation/Tools/'
     scriptPath = '/home/kalaghat/exaptation/Projects/MSTBasedForests/scripts/'
     tempPath = '/home/kalaghat/exaptation/Projects/MSTBasedForests/temp/'
