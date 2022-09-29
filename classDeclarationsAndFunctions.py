@@ -1484,14 +1484,13 @@ class RootedTree():
                 distancesFromRoot[leaf] += self.GetEdgeLength(c.parent.name, c.name)
                 c = c.parent
         return distancesFromRoot
-            
-        
+                    
     def GetAllNonTrivialClusters(self):
         clusters = set([])
         orderedVertices = self.GetPreOrderTraversalWithoutLeaves()[1:]
         for v in orderedVertices:
             clusters.update([','.join(sorted(self.GetDescendants(v.name)))])
-        return clusters
+        return clusters    
     
     def GetAllNonTrivialClustersForFullyLabeledTree(self):
         clusters = set([])
