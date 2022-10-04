@@ -402,7 +402,7 @@ def ReadTree(treeFileName,treeFormat='edgeList',experimentName='py'):
         
         RCommandForParsingTrees= pathForRscript+'\t'+pathForNewickParserInR+'\t'+treeFileName+'\t'+tempTreeFileName
         print (RCommandForParsingTrees)
-        sub.call(RCommandForParsingTrees,stdout=devnull,shell=True)
+        sub.call(RCommandForParsingTrees,stdout=devnull,stderr=devnull,shell=True)
 #         sub.call(RCommandForParsingTrees,shell=True)
         T = ReadTree(tempTreeFileName,'edgeList')
         sub.call('rm '+tempTreeFileName,stdout=devnull,shell=True)
@@ -429,7 +429,7 @@ def WriteConsensusTreeToFile(originalTreeFileName,minCladeFreq=0.7,numberOfBoots
     sub.call(sumtreeScript,shell=True)
  
 
-def     ReadRootedTree(treeFileName,treeFormat='edgeList'):
+def ReadRootedTree(treeFileName,treeFormat='edgeList'):
     if treeFormat == 'edgeList' or treeFormat == 'edge_list':
         RT = RootedTree()
         treeFile = open(treeFileName,"r")
