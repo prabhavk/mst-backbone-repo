@@ -422,8 +422,8 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 			this->t->OptimizeTopologyAndParametersOfGMM();
 			t_end_time = chrono::high_resolution_clock::now();
 			timeTakenToComputeSubtree = chrono::duration_cast<chrono::seconds>(t_end_time - t_start_time);			
-			cout << "CPU time used for computing subtree with " << this->t->numberOfInputSequences << " leaves is " << timeTakenToComputeSubtree.count() << " seconds\n";
-			this->mstBackboneLogFile << "CPU time used for computing subtree with " << this->t->numberOfInputSequences << " leaves is " << timeTakenToComputeSubtree.count() << " seconds\n";
+			cout << "CPU time used for computing subtree with " << this->t->numberOfObservedVertices << " leaves is " << timeTakenToComputeSubtree.count() << " seconds\n";
+			this->mstBackboneLogFile << "CPU time used for computing subtree with " << this->t->numberOfObservedVertices << " leaves is " << timeTakenToComputeSubtree.count() << " seconds\n";
 //			timeTakenToComputeUnrootedPhylogeny += chrono::duration_cast<chrono::seconds>(t_end_time - t_start_time);
 			//----##################################################################---//	
 			//  5.	Check if # of non-singleton components of forest f in t that       //
@@ -503,8 +503,8 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 	this->t->OptimizeTopologyAndParametersOfGMM();
 	t_end_time = chrono::high_resolution_clock::now();
 	timeTakenToComputeSubtree = chrono::duration_cast<chrono::seconds>(t_end_time - t_start_time);
-	cout << "CPU time used for computing subtree with " << this->t->numberOfInputSequences << " leaves is " << timeTakenToComputeSubtree.count() << " seconds\n";
-	this->mstBackboneLogFile << "CPU time used for computing subtree with " << this->t->numberOfInputSequences << " leaves is " << timeTakenToComputeSubtree.count() << " seconds\n";
+	cout << "CPU time used for computing subtree with " << this->t->numberOfObservedVertices << " leaves is " << timeTakenToComputeSubtree.count() << " seconds\n";
+	this->mstBackboneLogFile << "CPU time used for computing subtree with " << this->t->numberOfObservedVertices << " leaves is " << timeTakenToComputeSubtree.count() << " seconds\n";
 	// timeTakenToComputeUnrootedPhylogeny += chrono::duration_cast<chrono::seconds>(t_end_time - t_start_time);
 	this->t->SelectIndsOfVerticesOfInterestAndEdgesOfInterest();
 	this->t->RenameHiddenVerticesInEdgesOfInterestAndSetIdsOfVerticesOfInterest();
