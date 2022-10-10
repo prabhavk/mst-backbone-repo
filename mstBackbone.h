@@ -379,7 +379,7 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 	
 	while (computeLocalPhylogeneticTree) {
 		// current_time = chrono::high_resolution_clock::now();
-		cout << "Number of vertices in MST is " << this->M->vertexMap->size() << endl;		
+		cout << "Number of vertices in MST is " << this->M->vertexMap->size() << endl;				
 		this->mstBackboneLogFile << "Number of vertices in MST is " << this->M->vertexMap->size() << endl;
 //		cout << "Max vertex degree in MST is " << this->M->maxDegree << endl;
 		//----####################################################################---//
@@ -560,8 +560,8 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 	timeTakenToRootViaRestrictedSEM = chrono::duration_cast<chrono::seconds>(t_end_time-t_start_time);
 	// timeTakenToRootViaRestrictedSEM -= timeTakenToComputeGlobalUnrootedPhylogeneticTree;
 	// timeTakenToRootViaRestrictedSEM -= timeTakenToRootViaEdgeLoglikelihoods;
-	cout << "CPU time used for rooting T using EM is" << timeTakenToRootViaRestrictedSEM.count() << " second(s)\n";
-	this->mstBackboneLogFile << "CPU time used for rooting T using EM is" << timeTakenToRootViaRestrictedSEM.count() << " second(s)\n";
+	cout << "CPU time used for rooting T using EM is " << timeTakenToRootViaRestrictedSEM.count() << " second(s)\n";
+	this->mstBackboneLogFile << "CPU time used for rooting T using EM is " << timeTakenToRootViaRestrictedSEM.count() << " second(s)\n";
 	cout << "Log likelihood under the GM model is " << this->T->logLikelihood << endl;
 	this->mstBackboneLogFile << "Log likelihood is " << this->T->logLikelihood << endl;
 	double BIC = -2 * this->T->logLikelihood + (3 + 12 * (this->T->numberOfInputSequences -1) * log2(this->T->sequenceLength));	
