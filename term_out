@@ -1,0 +1,1 @@
+g++ -c mst-backbone.cpp -o mst-backbone.o -O3 -Ieigen3 -Iboost -I. -std=c++17

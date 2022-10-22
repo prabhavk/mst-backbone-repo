@@ -45,6 +45,9 @@ private:
 	string prefix_for_output_files;
 	string ancestralSequencesString;
 	string MSTFileName;
+	string patch_name;
+	bool apply_patch = false;
+	bool grow_tree_incrementally = false;
 	// Remove this
 	int ComputeHammingDistance(string seq1, string seq2);
 //	float ComputeVertexOrderPerturbedDistance(vector<unsigned char> recodedSeq1, vector<unsigned char> recodedSeq2);	
@@ -66,7 +69,8 @@ private:
 	string modelForRooting = "UNREST";
 	int numberOfVerticesInSubtree;
 	string GetSequenceListToWriteToFile(map <string, vector <unsigned char>> compressedSeqMap, vector <vector <int> > sitePatternRepetitions);
-	
+	vector <string> must_have;
+	vector <string> may_have;
 public:
 	void SetDNAMap();
 	void SetThresholds();
@@ -75,14 +79,16 @@ public:
 	void MSTBackboneWithRootSEMAndMultipleExternalVertices();
 	void MSTBackboneOverlappingSets();
 	void MSTBackboneOnlyLocalPhylo();
-	MSTBackbone(string sequenceFileNameToAdd, int subtreeSizeThresholdToset, string prefix_for_output_files_to_set) {
+	void Apply_patch(string patch_name_to_apply);
+	MSTBackbone(string sequenceFileNameToAdd, int subtreeSizeThresholdToset, string prefix_for_output_files_to_set, string patch_name_to_apply) {
 		// MSTBackbone(string sequenceFileNameToAdd, int subtreeSizeThresholdToset, string prefix_for_output_files_to_set, bool localPhyloOnly_to_set, bool modelSelection_to_set, string modelForRooting_to_set, bool useChowLiu_toset) {
 		// bool localPhyloOnly = TRUE;
 		// this->useChowLiu = useChowLiu_toset;
 		// this->localPhyloOnly = localPhyloOnly_to_set;		
 		// this->modelForRooting = modelForRooting_to_set;
 		start_time = chrono::high_resolution_clock::now();				
-		this->sequenceFileName = sequenceFileNameToAdd;
+		this->sequenceFileName = sequenceFileNameToAdd;		
+		this->patch_name = patch_name_to_apply;
 		this->numberOfLargeEdgesThreshold = subtreeSizeThresholdToset;
 		this->prefix_for_output_files = prefix_for_output_files_to_set;
 		// output files		
@@ -94,7 +100,28 @@ public:
 		MSTFileName = prefix_for_output_files + ".initial_MST";
 		this->SetDNAMap();
 		this->ancestralSequencesString = "";
-		this->M = new MST_tree(this->sequenceFileName);
+		if (patch_name_to_apply.length() > 0){
+			this->patch_name = patch_name_to_apply;
+			this->apply_patch = true;
+		}				
+		if (apply_patch) {
+			bool tasks_completed = false;
+			bool task_current = false;
+			this->must_have = vector <string> {"map_mut_id_2_fasta_list","vec_dup_seq_mut_id_list","Filter_duplicate_seqs()","Place_duplicate_seqs()"};
+			if (this->must_have.size() > 0) {
+				string current_task = this->must_have[0];
+				cout << "Perfoming task " << current_task << " for patch " << this->patch_name << endl;
+
+				cout << "All tasks for " << this->patch_name << " patch not complete" << endl;
+				cout << "Exiting to terminal" << endl;
+				exit(-1);
+			} else {
+				cout << "All tasks for " << this->patch_name << " patch complete" << endl;
+				cout << "Applying patch " << this->patch_name << " now" << endl;
+			}
+		}		
+		this->M = new MST_tree();
+		this->M->ReadSequences(this->sequenceFileName);
 		this->M->ComputeMST(); // modify to compute Chow Liu tree
 		this->M->WriteToFile(MSTFileName);
 	    // compute Chow-Liu tree using UNREST and get probability distribution for root position
@@ -127,6 +154,10 @@ public:
 		delete this->M;	
 	}
 };
+
+void MSTBackbone::Apply_patch(string patch_name_to_apply){
+	this->patch_name = patch_name_to_apply;
+}
 
 void MSTBackbone::SetDNAMap() {
 	this->mapDNAtoInteger["A"] = 0;

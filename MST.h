@@ -13,7 +13,7 @@
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/prim_minimum_spanning_tree.hpp>
-
+#include <chrono>
 using namespace std;
 
 class MST_vertex {
@@ -54,6 +54,10 @@ private:
 	vector <MST_vertex*> verticesToVisit;
 	bool ContainsVertex(int vertex_id);
 	map <pair<int,int>,int> * allEdgeWeights;
+	chrono::system_clock::time_point current_time;
+	chrono::system_clock::time_point start_time;
+	chrono::system_clock::time_point time_to_compute_MST;
+	bool build_MST_incrementally = false;
 public:
 	int maxDegree;
 	vector <int> siteWeights;
@@ -88,6 +92,7 @@ public:
 	int GetEdgeWeight(int u_id, int v_id);	
 	int GetEdgeIndex (int vertexIndex1, int vertexIndex2, int numberOfVertices);
 	int GetNumberOfVertices();
+	void ReadSequences(string sequenceFileNameToSet);
 	void ComputeMST();
 	void ComputeChowLiuTree();
 	void ComputeMST_nonACGT();
@@ -103,8 +108,7 @@ public:
 	bool ShouldIComputeALocalPhylogeneticTree();
 	void WriteToFile(string fileName);
 	unsigned char ConvertDNAToChar(char dna);
-	MST_tree(string sequenceFileNameToSet) {
-		this->sequenceFileName = sequenceFileNameToSet;
+	MST_tree() {		
 		this->v_ind = 0;
 		vector <unsigned char> emptySequence;
 		this->allEdgeWeights = new map <pair<int,int>,int> ; 
@@ -823,7 +827,8 @@ void MST_tree::ComputeMST_nonACGT() {
 
 }
 
-void MST_tree::ComputeMST() {
+void MST_tree::ReadSequences(string sequenceFileNameToSet){
+	this->sequenceFileName = sequenceFileNameToSet;
 	vector <unsigned char> recodedSequence;
 	recodedSequence.clear();
 	unsigned int site = 0;
@@ -883,6 +888,12 @@ void MST_tree::ComputeMST() {
 	inputFile.close();
 	cout << "Number of ambiguous characters is " << float(num_amb) << "\tNumber of nonambiguous characters is " << float(num_non_amb) << endl;
 	cout << "Fraction of ambiguous characters is " << float(num_amb)/float(num_amb + num_non_amb) << endl;
+}
+
+void MST_tree::ComputeMST() {	
+
+// Construct MST incrementally
+// Create distance matrix 
 
 	int numberOfVertices = (this->v_ind);		
 	const int numberOfEdges = numberOfVertices*(numberOfVertices-1)/2;		
@@ -893,7 +904,7 @@ void MST_tree::ComputeMST() {
 	int edgeIndex = 0;
 	for (int i=0; i<numberOfVertices; i++) {
 		for (int j=i+1; j<numberOfVertices; j++) {			
-			weights[edgeIndex] = ComputeHammingDistance((*this->vertexMap)[i]->sequence,(*this->vertexMap)[j]->sequence);
+			weights[edgeIndex] = ComputeHammingDistance((*this->vertexMap)[i]->seque nce,(*this->vertexMap)[j]->sequence);
 			edgeIndex += 1;
 		}
 	}

@@ -11,6 +11,14 @@ namespace fs = std::experimental::filesystem;
 int main(int argc, char **argv)
 {	
 	string path_to_alignment_file;
+	string patch_name;
+		// duplicate_sequences
+		// incremental construction		
+		// genotype-recombination network
+		// Select subset of vertices based on phenotypes
+		// Amino acid/Drug resistance/Phenotype network
+		// Network layout
+		// Dynamic network layout?		
 	fs::path alignment_file_path_obj;
 	fs::path prefix_path_obj;
     string prefix_for_output_files;
@@ -27,6 +35,7 @@ int main(int argc, char **argv)
 	string arg_localPhyloOnly;
 	string arg_modelSelection;
 	string arg_chowliu;
+	MSTBackbone * MSTBackboneObj;
     if (argc < 2) {        
         cerr << "Usage: " << argv[0] << " --seq alignment.fas --constraint_size size_of_subtree --out prefix_for_output" << endl;
 		cerr << endl;
@@ -35,7 +44,12 @@ int main(int argc, char **argv)
         // parse arguments            
         for (int i = 1; i < argc ; i++) {
         // path to multiple sequence alignment file
-            if (strcmp(argv[i], "--seq") == 0) {				
+			if (strcmp(argv[i], "--patch") == 0) {				
+                if (i < argc -1) {					
+                    patch_name = argv[++i];
+					cout << "Applying patch " << patch_name << endl;					
+                }        
+            } else if (strcmp(argv[i], "--seq") == 0) {				
                 if (i < argc -1) {					
                     path_to_alignment_file = argv[++i];
 					cout << "alignment file name is " << path_to_alignment_file << endl;
@@ -74,8 +88,9 @@ int main(int argc, char **argv)
 			prefix_path_obj =  alignment_file_path_obj.parent_path();
 			prefix_path_obj /= "mstbackbone_output";
 			// prefix_for_output_files = alignment_file_path_obj.parent_path().string() + "_mstbackbone";
-		}
-		MSTBackbone MSTBackboneObj(path_to_alignment_file, size_of_subtree, prefix_path_obj.string());
+		}		
+		MSTBackboneObj = new MSTBackbone(path_to_alignment_file, size_of_subtree, prefix_path_obj.string(),patch_name);		
+		delete MSTBackboneObj;
 		// MSTBackbone MSTBackboneObj(path_to_alignment_file, size_of_subtree, prefix_path_obj.string(),localPhyloOnly,modelSelection,modelForRooting,useChowLiu);
     }
 
