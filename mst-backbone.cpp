@@ -13,6 +13,7 @@ int main(int argc, char **argv)
 	string path_to_alignment_file;
 	string patch_name;
 		// duplicate_sequences
+		// highly similar sequnces (Hamming distance of 1; try upto 5)
 		// incremental construction		
 		// genotype-recombination network
 		// Select subset of vertices based on phenotypes

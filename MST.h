@@ -16,6 +16,17 @@
 #include <chrono>
 using namespace std;
 
+enum dna {a,c,g,t,n};
+enum aa {A, R, N, D, C, Q, E, G, H, I, L, K, M, F, P, S, T, W, Y, V};
+class mut {
+public:
+	int id;
+	string dna_mut_id;
+	string full_mut_id;
+	vector <pair <int,dna>> dna_mut_list; // store pos and DNA substitution
+	vector <pair <int,aa>> aa_mut_list; // store pos and AA substitution
+	vector <pair<int,int>> gap_list; // count ambiguous and N as gap store start and end pos
+};
 class MST_vertex {
 public:
 	string name;
@@ -25,11 +36,13 @@ public:
 	int id;
 	int idOfExternalVertex;
 	int rank = 0;
+	map <int,mut> mut_id_2_mut_obj;
 	vector <unsigned char> sequence;
 	vector <unsigned char> globallyCompressedSequence;
 	vector <int> idsOfVerticesInSubtree;
 	vector <MST_vertex *> neighbors;
 	void AddNeighbor(MST_vertex * v_ptr);
+	void Get_mut_id(vector <pair<int,dna>> mut_list);
 	MST_vertex(int idToAdd, string nameToAdd, vector<unsigned char> sequenceToAdd) {
 		id = idToAdd;
 		sequence = sequenceToAdd;
@@ -838,6 +851,7 @@ void MST_tree::ReadSequences(string sequenceFileNameToSet){
 //	cout << "Sequence file name is " << this->sequenceFileName << endl;
 	ifstream inputFile(this->sequenceFileName.c_str());
 	string seqName;
+	// vector mut_list;
 	string seq = "";	
 	for(string line; getline(inputFile, line );) {
 		if (line[0]=='>') {
@@ -904,7 +918,7 @@ void MST_tree::ComputeMST() {
 	int edgeIndex = 0;
 	for (int i=0; i<numberOfVertices; i++) {
 		for (int j=i+1; j<numberOfVertices; j++) {			
-			weights[edgeIndex] = ComputeHammingDistance((*this->vertexMap)[i]->seque nce,(*this->vertexMap)[j]->sequence);
+			weights[edgeIndex] = ComputeHammingDistance((*this->vertexMap)[i]->sequence,(*this->vertexMap)[j]->sequence);
 			edgeIndex += 1;
 		}
 	}
