@@ -48,7 +48,7 @@ output_prefix.mstbackbone_log: contains all the messages that is printed to term
 
 # Using UNRESTselector.py
 
-The model selection procedure described in the paper can be reproduced as follows.
+The model selection procedure described in the paper can be reproduced using the following command
 
 ```console
 python3 UNRESTselector.py --seq alignment.fas --out output_prefix --input_tree tree.newick
@@ -62,13 +62,13 @@ tree.newick: a phylogenetic tree in newick format. The input tree is re-rooted s
 
 Parameters:
 
-output_prefix: prefix used for naming output files. Default prefix is alignment_UNRESTselector
+output_prefix: prefix used for naming output files. Default prefix is alignment_UNRESTselector.
 
 Output files:
 
-output_prefix.newick: the output tree in newick format. 
+output_prefix.newick: the output tree in newick format 
 
-output_prefix.edges: the output tree in edge list format. 
+output_prefix.edges: the output tree in edge list format 
 
 output_prefix.params: the parameters of the selected model
 
@@ -76,4 +76,4 @@ output_prefix.log: log file containing BIC and time elapsed for performing model
 
 # Data for reproducing results in the paper
 
-All empirical datasets can be found in the folder empirical_data
+All of the empirical data and the simulated data that are analyzed in the paper can be found in the files empirical_data.tar.gz and simulated_data.tar.gz, respectively.
