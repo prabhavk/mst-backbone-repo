@@ -73,3 +73,7 @@ output_prefix.edges: the output tree in edge list format.
 output_prefix.params: the parameters of the selected model
 
 output_prefix.log: log file containing BIC and time elapsed for performing model selection
+
+# Data for reproducing results in the paper
+
+All empirical datasets can be found in the folder empirical_data
