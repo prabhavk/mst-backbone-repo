@@ -106,8 +106,8 @@ void ModelSelector::PerformModelSelectionTest() {
 
 void ModelSelector::WriteTotalComputeTime() {	
 	this->current_time = std::chrono::high_resolution_clock::now();
-	cout << "Total CPU time used is " << chrono::duration_cast<chrono::seconds>(this->current_time - this->start_time).count() << " second(s)\n";
-	this->logFile << "Total CPU time used is " << chrono::duration_cast<chrono::seconds>(this->current_time - this->start_time).count() << " second(s)\n";
+	cout << "Total CPU time used is " << chrono::duration<double>(this->current_time - this->start_time).count() << " seconds\n";
+	this->logFile << "Total CPU time used is " << chrono::duration<double>(this->current_time - this->start_time).count() << " seconds\n";
 	this->logFile.close();
 }
 

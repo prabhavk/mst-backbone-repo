@@ -18,7 +18,7 @@
 
 using namespace Eigen;
 using namespace std;
-using namespace std::chrono;
+// using namespace std::chrono;
 class MSTBackbone
 {
 private:
@@ -35,12 +35,18 @@ private:
 	chrono::system_clock::time_point t_end_time;
 	chrono::system_clock::time_point m_start_time;
 	chrono::system_clock::time_point m_end_time;
-	chrono::seconds timeTakenToComputeEdgeAndVertexLogLikelihoods;
-	chrono::seconds timeTakenToComputeGlobalUnrootedPhylogeneticTree;
-	chrono::seconds timeTakenToComputeSubtree;
-	chrono::seconds timeTakenToComputeSupertree;
-	chrono::seconds timeTakenToRootViaEdgeLoglikelihoods;
-	chrono::seconds timeTakenToRootViaRestrictedSEM;
+	// chrono::seconds timeTakenToComputeEdgeAndVertexLogLikelihoods;
+	chrono::duration<double> timeTakenToComputeEdgeAndVertexLogLikelihoods;
+	// chrono::seconds timeTakenToComputeGlobalUnrootedPhylogeneticTree;
+	chrono::duration<double> timeTakenToComputeGlobalUnrootedPhylogeneticTree;
+	// chrono::seconds timeTakenToComputeSubtree;
+	chrono::duration<double> timeTakenToComputeSubtree;
+	// chrono::seconds timeTakenToComputeSupertree;
+	chrono::duration<double> timeTakenToComputeSupertree;
+	// chrono::seconds timeTakenToRootViaEdgeLoglikelihoods;
+	chrono::duration<double> timeTakenToRootViaEdgeLoglikelihoods;
+	// chrono::seconds timeTakenToRootViaRestrictedSEM;
+	chrono::duration<double> timeTakenToRootViaRestrictedSEM;
 	string sequenceFileName;	
 	string prefix_for_output_files;
 	string ancestralSequencesString;
@@ -145,8 +151,8 @@ public:
 		// }		
 //		this->MSTBackboneWithOneExternalVertex();	
 		this->current_time = std::chrono::high_resolution_clock::now();
-		cout << "Total CPU time used is " << chrono::duration_cast<chrono::seconds>(this->current_time-this->start_time).count() << " second(s)\n";
-		this->mstBackboneLogFile << "Total CPU time used is " << chrono::duration_cast<chrono::seconds>(this->current_time-this->start_time).count() << " second(s)\n";
+		cout << "Total CPU time used is " << chrono::duration<double>(this->current_time-this->start_time).count() << " second(s)\n";
+		this->mstBackboneLogFile << "Total CPU time used is " << chrono::duration<double>(this->current_time-this->start_time).count() << " second(s)\n";
 		this->mstBackboneLogFile.close();		
 			}
 	~MSTBackbone(){
@@ -183,7 +189,7 @@ void MSTBackbone::MSTBackboneOnlyLocalPhylo() {
 //	cout << "1.	Initialize the global phylogenetic tree T as the empty graph" << endl;
 	int numberOfInputSequences = (int) this->M->vertexMap->size();		
 	current_time = chrono::high_resolution_clock::now();
-	timeTakenToComputeEdgeAndVertexLogLikelihoods = chrono::duration_cast<chrono::seconds>(current_time-current_time);
+	timeTakenToComputeEdgeAndVertexLogLikelihoods = chrono::duration<double>(current_time-current_time);
 	
 	// Initialize global phylogeny
 	// idsOfVerticesForSEM.clear();
@@ -276,7 +282,7 @@ void MSTBackbone::MSTBackboneOnlyLocalPhylo() {
 				// this->T->AddVertexLogLikelihoods(this->t->vertexLogLikelihoodsMapToAddToGlobalPhylogeneticTree);
 				// this->T->AddEdgeLogLikelihoods(this->t->edgeLogLikelihoodsToAddToGlobalPhylogeneticTree);
 				t_end_time = chrono::high_resolution_clock::now();
-				timeTakenToComputeEdgeAndVertexLogLikelihoods += chrono::duration_cast<chrono::seconds>(t_end_time - t_start_time);
+				timeTakenToComputeEdgeAndVertexLogLikelihoods += t_end_time - t_start_time;
 				// Add vertex logLikelihoods
 				// Add edge logLikelihoods
 				largestIdOfVertexInMST = this->t->largestIdOfVertexInMST;
@@ -290,8 +296,8 @@ void MSTBackbone::MSTBackboneOnlyLocalPhylo() {
 			}			
 			computeLocalPhylogeneticTree = this->M->ShouldIComputeALocalPhylogeneticTree();
 		}		
-		cout << "CPU time used for computing local phylogeny is " << chrono::duration_cast<chrono::seconds>(t_end_time-t_start_time).count() << " second(s)\n";
-		this->mstBackboneLogFile << "CPU time used for computing local phylogeny is " << chrono::duration_cast<chrono::seconds>(t_end_time-t_start_time).count() << " second(s)\n";			
+		cout << "CPU time used for computing local phylogeny is " << chrono::duration<double>(t_end_time-t_start_time).count() << " second(s)\n";
+		this->mstBackboneLogFile << "CPU time used for computing local phylogeny is " << chrono::duration<double>(t_end_time-t_start_time).count() << " second(s)\n";			
 	}	
 	//----########################################################---//
 	//	9.	Compute phylogenetic tree t over vertices in M, and      //
@@ -332,9 +338,9 @@ void MSTBackbone::MSTBackboneOnlyLocalPhylo() {
 	//this->T->AddVertexLogLikelihoods(this->t->vertexLogLikelihoodsMapToAddToGlobalPhylogeneticTree);
 	//this->T->AddEdgeLogLikelihoods(this->t->edgeLogLikelihoodsToAddToGlobalPhylogeneticTree);
 	t_end_time = chrono::high_resolution_clock::now();
-	timeTakenToComputeEdgeAndVertexLogLikelihoods += chrono::duration_cast<chrono::seconds>(t_end_time - t_start_time);
+	timeTakenToComputeEdgeAndVertexLogLikelihoods += t_end_time - t_start_time;
 	delete this->t;	
-	this->mstBackboneLogFile << "CPU time used for computing local phylogeny is " << chrono::duration_cast<chrono::seconds>(t_end_time-t_start_time).count() << " second(s)\n";		
+	this->mstBackboneLogFile << "CPU time used for computing local phylogeny is " << chrono::duration<double>(t_end_time-t_start_time).count() << " second(s)\n";		
 	// assert that T is a tree
 
 }
@@ -452,7 +458,8 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 			t_start_time = chrono::high_resolution_clock::now();
 			this->t->OptimizeTopologyAndParametersOfGMM();
 			t_end_time = chrono::high_resolution_clock::now();
-			timeTakenToComputeSubtree = chrono::duration_cast<chrono::seconds>(t_end_time - t_start_time);			
+			// timeTakenToComputeSubtree = chrono::duration_cast<chrono::seconds>(t_end_time - t_start_time);
+			timeTakenToComputeSubtree = t_end_time - t_start_time;
 			cout << "CPU time used for computing subtree with " << this->t->numberOfObservedVertices << " leaves is " << timeTakenToComputeSubtree.count() << " seconds\n";
 			this->mstBackboneLogFile << "CPU time used for computing subtree with " << this->t->numberOfObservedVertices << " leaves is " << timeTakenToComputeSubtree.count() << " seconds\n";
 //			timeTakenToComputeUnrootedPhylogeny += chrono::duration_cast<chrono::seconds>(t_end_time - t_start_time);
@@ -533,7 +540,8 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 	t_start_time = chrono::high_resolution_clock::now();
 	this->t->OptimizeTopologyAndParametersOfGMM();
 	t_end_time = chrono::high_resolution_clock::now();
-	timeTakenToComputeSubtree = chrono::duration_cast<chrono::seconds>(t_end_time - t_start_time);
+	// timeTakenToComputeSubtree = chrono::duration_cast<chrono::seconds>(t_end_time - t_start_time);
+	timeTakenToComputeSubtree = t_end_time - t_start_time;
 	cout << "CPU time used for computing subtree with " << this->t->numberOfObservedVertices << " leaves is " << timeTakenToComputeSubtree.count() << " seconds\n";
 	this->mstBackboneLogFile << "CPU time used for computing subtree with " << this->t->numberOfObservedVertices << " leaves is " << timeTakenToComputeSubtree.count() << " seconds\n";
 	// timeTakenToComputeUnrootedPhylogeny += chrono::duration_cast<chrono::seconds>(t_end_time - t_start_time);
@@ -561,10 +569,11 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 	//	10.	Root T via EM  //
 	//----##############---//
 	current_time = chrono::high_resolution_clock::now();
-	timeTakenToComputeGlobalUnrootedPhylogeneticTree = chrono::duration_cast<chrono::seconds>(current_time-start_time);
+	// timeTakenToComputeGlobalUnrootedPhylogeneticTree = chrono::duration_cast<chrono::seconds>(current_time-start_time);
+	timeTakenToComputeGlobalUnrootedPhylogeneticTree = current_time-start_time;
 	// timeTakenToComputeGlobalUnrootedPhylogeneticTree -= timeTakenToComputeEdgeAndVertexLogLikelihoods;
-	cout << "CPU time used for computing unrooted supertree tree T is " << timeTakenToComputeGlobalUnrootedPhylogeneticTree.count() << " second(s)\n";
-	this->mstBackboneLogFile << "CPU time used for computing unrooted supertree T is " << timeTakenToComputeGlobalUnrootedPhylogeneticTree.count() << " second(s)\n";
+	cout << "CPU time used for computing unrooted supertree tree T is " << timeTakenToComputeGlobalUnrootedPhylogeneticTree.count() << " seconds\n";
+	this->mstBackboneLogFile << "CPU time used for computing unrooted supertree T is " << timeTakenToComputeGlobalUnrootedPhylogeneticTree.count() << " seconds\n";
 	// cout << "Fitting a general Markov model GMM to T using reconstructed ancestral sequences" << endl;
 	// this->mstBackboneLogFile << "Fitting a general Markov model GMM to T using reconstructed ancestral sequences" << endl;		
 	// this->T->RootTreeBySumOfExpectedLogLikelihoods();
@@ -588,7 +597,8 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 	this->T->RootTreeByFittingAGMMViaEM();
 	t_end_time = chrono::high_resolution_clock::now();
 	// current_time = chrono::high_resolution_clock::now();
-	timeTakenToRootViaRestrictedSEM = chrono::duration_cast<chrono::seconds>(t_end_time-t_start_time);
+	timeTakenToRootViaRestrictedSEM = t_end_time-t_start_time;
+	// timeTakenToRootViaRestrictedSEM = chrono::duration_cast<chrono::seconds>(t_end_time-t_start_time);
 	// timeTakenToRootViaRestrictedSEM -= timeTakenToComputeGlobalUnrootedPhylogeneticTree;
 	// timeTakenToRootViaRestrictedSEM -= timeTakenToRootViaEdgeLoglikelihoods;
 	cout << "CPU time used for rooting T using EM is " << timeTakenToRootViaRestrictedSEM.count() << " second(s)\n";
@@ -724,8 +734,8 @@ void MSTBackbone::MSTBackboneWithRootSEMAndMultipleExternalVertices() {
 				this->M->UpdateMSTWithMultipleExternalVertices(t->idsOfVerticesToKeepInMST, t->idsOfVerticesToRemove, t->idAndNameAndSeqTuple, idsOfExternalVertices);				
 			}			
 			computeLocalPhylogeneticTree = this->M->ShouldIComputeALocalPhylogeneticTree();
-			cout << "CPU time used for computing local phylogeny is " << chrono::duration_cast<chrono::seconds>(t_end_time-t_start_time).count() << " second(s)\n";
-			this->mstBackboneLogFile << "CPU time used for computing local phylogeny is " << chrono::duration_cast<chrono::seconds>(t_end_time-t_start_time).count() << " second(s)\n";			
+			cout << "CPU time used for computing local phylogeny is " << chrono::duration<double>(t_end_time-t_start_time).count() << " second(s)\n";
+			this->mstBackboneLogFile << "CPU time used for computing local phylogeny is " << chrono::duration<double>(t_end_time-t_start_time).count() << " second(s)\n";			
 		}
 	}	
 	//----########################################################---//
@@ -767,8 +777,8 @@ void MSTBackbone::MSTBackboneWithRootSEMAndMultipleExternalVertices() {
 	this->t->SetEdgeAndVertexLogLikelihoods();
 	this->T->AddVertexLogLikelihoods(this->t->vertexLogLikelihoodsMapToAddToGlobalPhylogeneticTree);
 	this->T->AddEdgeLogLikelihoods(this->t->edgeLogLikelihoodsToAddToGlobalPhylogeneticTree);
-	cout << "CPU time used for computing local phylogeny is " << chrono::duration_cast<chrono::seconds>(t_end_time-t_start_time).count() << " second(s)\n";
-	this->mstBackboneLogFile << "CPU time used for computing local phylogeny is " << chrono::duration_cast<chrono::seconds>(t_end_time-t_start_time).count() << " second(s)\n";			
+	cout << "CPU time used for computing local phylogeny is " << chrono::duration<double>(t_end_time-t_start_time).count() << " second(s)\n";
+	this->mstBackboneLogFile << "CPU time used for computing local phylogeny is " << chrono::duration<double>(t_end_time-t_start_time).count() << " second(s)\n";			
 	// assert that T is a tree
 //	cout << "Number of vertices in T is " << this->T->vertexMap->size() << endl;
 //	cout << "Number of edges in T is " << this->T->edgeLengths.size() << endl;
@@ -777,8 +787,8 @@ void MSTBackbone::MSTBackboneWithRootSEMAndMultipleExternalVertices() {
 	//	10.	Root T via EM  //
 	//----##############---//
 	current_time = std::chrono::high_resolution_clock::now();
-	cout << "CPU time used for computing unrooted topology is " << chrono::duration_cast<chrono::seconds>(current_time-start_time).count() << " second(s)\n";
-	this->mstBackboneLogFile << "CPU time used for computing unrooted topology is " << chrono::duration_cast<chrono::seconds>(current_time-start_time).count() << " second(s)\n";
+	cout << "CPU time used for computing unrooted topology is " << chrono::duration<double>(current_time-start_time).count() << " second(s)\n";
+	this->mstBackboneLogFile << "CPU time used for computing unrooted topology is " << chrono::duration<double>(current_time-start_time).count() << " second(s)\n";
 //	cout << "Rooting T via EM" << endl;
 //	this->T->RootTreeByFittingAGMMViaEM();
 	cout << "Rooting T by maximizing expected log likelihood" << endl;

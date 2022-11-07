@@ -1784,7 +1784,7 @@ void rootedPhylogeny_tree::OptimizeModelParametersUsingNelderMead() {
 					currentLogLikelihood = this->logLikelihood;
 					auto time_B = std::chrono::high_resolution_clock::now();
 					if (verbose) {					
-						cout << "CPU time used for optimizing rate matrix is " << chrono::duration_cast<chrono::seconds>(time_B-time_A).count() << " second(s)\n";	
+						cout << "CPU time used for optimizing rate matrix is " << chrono::duration<double>(time_B-time_A).count() << " second(s)\n";	
 						cout << "Optimizing edge lengths" << endl;
 					}					
 //					this->OptimizeEdgeLengthsForRateCat(rateCat);
@@ -1792,7 +1792,7 @@ void rootedPhylogeny_tree::OptimizeModelParametersUsingNelderMead() {
 					this->OptimizeEdgeLengthsForRateCatUsingNRWithScalers(rateCat);
 					auto time_C = std::chrono::high_resolution_clock::now();
 					if (verbose) {					
-						cout << "CPU time used for optimizing edge lengths is " << chrono::duration_cast<chrono::seconds>(time_C-time_B).count() << " second(s)\n";			
+						cout << "CPU time used for optimizing edge lengths is " << chrono::duration<double>(time_C-time_B).count() << " second(s)\n";			
 					}
 					this->ComputeLogLikelihood();
 					updatedLogLikelihood = this->logLikelihood;
@@ -1928,7 +1928,7 @@ void rootedPhylogeny_tree::OptimizeModelParametersUsingMultiThreadedNelderMead()
 					currentLogLikelihood = this->logLikelihood;
 					auto time_B = std::chrono::high_resolution_clock::now();
 					if (verbose) {					
-						cout << "CPU time used for optimizing rate matrix is " << chrono::duration_cast<chrono::seconds>(time_B-time_A).count() << " second(s)\n";	
+						cout << "CPU time used for optimizing rate matrix is " << chrono::duration<double>(time_B-time_A).count() << " second(s)\n";	
 						cout << "Optimizing edge lengths" << endl;
 					}					
 //					this->OptimizeEdgeLengthsForRateCat(rateCat);
@@ -1936,7 +1936,7 @@ void rootedPhylogeny_tree::OptimizeModelParametersUsingMultiThreadedNelderMead()
 					this->OptimizeEdgeLengthsForRateCatUsingNRWithScalers(rateCat);
 					auto time_C = std::chrono::high_resolution_clock::now();
 					if (verbose) {					
-						cout << "CPU time used for optimizing edge lengths is " << chrono::duration_cast<chrono::seconds>(time_C-time_B).count() << " second(s)\n";			
+						cout << "CPU time used for optimizing edge lengths is " << chrono::duration<double>(time_C-time_B).count() << " second(s)\n";			
 					}
 					this->ComputeLogLikelihood();
 					updatedLogLikelihood = this->logLikelihood;
