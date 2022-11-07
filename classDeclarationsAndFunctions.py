@@ -13,7 +13,7 @@ from MarkovModels import GenerateProbabilityDistributionWithMinVal, GenerateQFor
     ComputeQMatrixFromVectorOfOffDiagonalElements,\
     ComputeProbabilityMatrixUsingMatrixExponentiation,\
     ComputeQVectorOfOffDiagonalElementsFromQMatrix,\
-    GetMaxLikEstimateOfTransitionMatrix, GetSubstitutionCountMatrix, GetStationaryDistribution
+    GetMaxLikEstimateOfTransitionMatrix, GetSubstitutionCountMatrix, GetStationaryDistribution, Generate_pi_from_Dirichlet, Evolve_pi
 # from config import tempPath
 from itertools import repeat
 from numpy.random import uniform
@@ -1408,7 +1408,14 @@ class RootedTree():
                 labelAtVertex[p] += ")"
         labelAtRoot = labelAtVertex[self.GetRoot()]+"#M" + str(self.rateCategoryForVertex[self.root.name]) + ";"
         return(labelAtRoot)        
-    
+    def Write_control_file_for_GC_diff(self,control_file_name,rate_vector_root, rate_vector_tree):                
+        self.rateCategoryForVertex = {v_name:2 for v_name in self.vertices.keys()}
+        self.rateCategoryForVertex[self.root.name] = 1
+        self.rateVectorForCat[1] = rate_vector_root
+        self.rateVectorForCat[2] = rate_vector_tree
+        self.control_file_name = control_file_name
+        self.WriteControlFile()
+
     def WriteControlFile(self):
         controlFile = open(self.control_file_name,"w")
         sequence_file_suffix = self.sequence_file_suffix
@@ -1423,7 +1430,7 @@ class RootedTree():
             controlFile.write('\n[MODEL] ' + model_name + '\n')
             controlFile.write(' [submodel] UNREST ')
             for rate in rateVector:
-                controlFile.write(str(rate) + " ")
+                controlFile.write(f"{rate:8f}" + " ")
             controlFile.write("\n")
         
         # Tree block
@@ -1444,6 +1451,7 @@ class RootedTree():
         controlFile.write('\n[EVOLVE] P '+ str(self.indelible_replicates) + '\t' + sequence_file_suffix + '\n')
 
         controlFile.close()
+    
     def SimulateEvolutionUsingIndelible(self):
         devnull=open(os.devnull,'w')
         self.WriteControlFile()

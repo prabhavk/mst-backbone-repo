@@ -5,14 +5,38 @@ import math as m
 from scipy.linalg import expm, logm, eig
 from scipy.optimize import minimize
 from numpy.linalg import inv, eig, det, lstsq
-from numpy.random import uniform, choice
+from numpy.random import uniform, choice, dirichlet
 from numpy import diag, array, matrix, append
 import numpy as np
 from math import exp, log
 from decimal import Decimal
 import cmath as cm
-DNA=["A","C","G","T"]
+# DNA=["A","C","G","T"]
+DNA = ["T","C","A","G"] # INDELIBLE INDEX
 
+
+def Generate_rate_vectors(gc_diff):
+    pi_root = Generate_pi_from_Dirichlet(concentration=[0.25, 0.25, 0.25, 0.25])
+    # Generate Q_root from pi
+    Q_root = GenerateQForStationaryDistribution(pi_root)
+    # Generate pi_tree based on GC diff
+    pi_tree = Evolve_pi(pi_root,gc_diff)
+    # Generate Q_tree from pi_tree
+    Q_tree = GenerateQForStationaryDistribution(pi_tree)
+    free_rates_root = Get11FreeRates(Q_root)
+    free_rates_tree = Get11FreeRates(Q_tree)
+    return([free_rates_root,free_rates_tree])
+
+
+def Generate_pi_from_Dirichlet(concentration=[0.25,0.25,0.25,0.25]):
+    return(dirichlet(concentration,1)[0])
+
+def Evolve_pi(pi,gc_diff):    
+    delta_pi = [-0.5 * gc_diff, 0.5 * gc_diff, - 0.5 * gc_diff, 0.5 * gc_diff]
+    pi_evolved = pi[:]
+    for i in range(4):
+        pi_evolved[i] += delta_pi[i]  
+    return(pi_evolved)
 
 def GenerateProbabilityDistribution():
     p = map(lambda x: uniform(size=1)[0],range(4))
@@ -326,7 +350,6 @@ def GenerateRandomQWithAribitrayPrecisionArithmetic():
         Q[i,i] = -sum(Q[i,:])    
         
     return NormalizeQMatrix(Q)
-
 
 
 # Generates a rate matrix by computing the matrix logarithm of a randomly set 
