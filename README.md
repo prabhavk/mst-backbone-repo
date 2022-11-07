@@ -76,4 +76,4 @@ output_prefix.log: log file containing BIC and time elapsed for performing model
 
 # Data for reproducing results in the paper
 
-All of the empirical data and the simulated data that are analyzed in the paper can be found in the files empirical_data.tar.gz and simulated_data.tar.gz, respectively.
+All of the empirical data that are analyzed in the paper can be found in empirical_data.tar.gz. Tree identfiers for RAxML Grove database are stored in simulated_data.tar.gz.
