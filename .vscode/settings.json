@@ -6,7 +6,8 @@
         "chrono": "cpp",
         "cmath": "cpp",
         "ostream": "cpp",
-        "matrixfunctions": "cpp"
+        "matrixfunctions": "cpp",
+        "dense": "cpp"
     },
     "jupyter.jupyterServerType": "local"
 }
