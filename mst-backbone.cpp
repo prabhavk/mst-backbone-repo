@@ -36,16 +36,17 @@ int main(int argc, char **argv)
 	string arg_localPhyloOnly;
 	string arg_modelSelection;
 	string arg_chowliu;
+	string distance_measure_for_NJ = "Hamming";
 	MSTBackbone * MSTBackboneObj;
     if (argc < 2) {        
-        cerr << "Usage: " << argv[0] << " --seq alignment.fas --constraint_size size_of_subtree --out prefix_for_output" << endl;
+        cerr << "Usage: " << argv[0] << " --seq alignment.fas distance_measure_for_NJ logDet --constraint_size size_of_subtree --out prefix_for_output" << endl;
 		cerr << endl;
         return (-1);
     } else {        
         // parse arguments            
         for (int i = 1; i < argc ; i++) {
         // path to multiple sequence alignment file
-			if (strcmp(argv[i], "--patch") == 0) {				
+			if (strcmp(argv[i], "--patch") == 0) {		
                 if (i < argc -1) {					
                     patch_name = argv[++i];
 					cout << "Applying patch " << patch_name << endl;					
@@ -53,12 +54,23 @@ int main(int argc, char **argv)
             } else if (strcmp(argv[i], "--seq") == 0) {				
                 if (i < argc -1) {					
                     path_to_alignment_file = argv[++i];
-					cout << "alignment file name is " << path_to_alignment_file << endl;
+					cout << "Alignment file name is " << path_to_alignment_file << endl;
 					if (stat (path_to_alignment_file.c_str(), &buffer) != 0) { // check if input file exists
 						cout << "Please check if the input filename is correct" << endl;
 						exit (-1);
 					}
 					alignment_file_path_obj = path_to_alignment_file;
+                }
+        // prefix_to_output_files (e.g. prefix is "covid-19_size_42" and the alignment is in directory "/foo/bar/data/")		
+            } else if (strcmp(argv[i], "--distance_measure_for_NJ") == 0) {
+                if (i < argc -1) {
+					distance_measure_for_NJ = argv[++i];
+					if (distance_measure_for_NJ == "logDet" || distance_measure_for_NJ == "Jukes-Cantor" ||distance_measure_for_NJ == "Hamming") {
+						continue;
+					} else {
+						cout << "Enter one of the following distance measures: logDet, Jukes-Cantor and Hamming" << endl;
+						exit (-1);
+					}
                 }
         // prefix_to_output_files (e.g. prefix is "covid-19_size_42" and the alignment is in directory "/foo/bar/data/")		
             } else if (strcmp(argv[i], "--out") == 0) {
@@ -90,7 +102,7 @@ int main(int argc, char **argv)
 			prefix_path_obj /= "mstbackbone_output";
 			// prefix_for_output_files = alignment_file_path_obj.parent_path().string() + "_mstbackbone";
 		}		
-		MSTBackboneObj = new MSTBackbone(path_to_alignment_file, size_of_subtree, prefix_path_obj.string(),patch_name);		
+		MSTBackboneObj = new MSTBackbone(path_to_alignment_file, size_of_subtree, prefix_path_obj.string(),patch_name,distance_measure_for_NJ);		
 		delete MSTBackboneObj;
 		// MSTBackbone MSTBackboneObj(path_to_alignment_file, size_of_subtree, prefix_path_obj.string(),localPhyloOnly,modelSelection,modelForRooting,useChowLiu);
     }

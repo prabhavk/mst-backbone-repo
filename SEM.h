@@ -979,6 +979,9 @@ public:
 	cliqueTree * cliqueT;
 	bool debug;
 	bool finalIterationOfSEM;
+	bool flag_logDet = 0;
+	bool flag_Hamming = 0;
+	bool flag_JC = 0;
 	map <string, int> nameToIdMap;
 	string sequenceFileName;
 	string ancestralSequencesString = "";
@@ -1023,15 +1026,16 @@ public:
 	void SetNumberOfVerticesInSubtree(int numberOfVertices);	
 	void AddSitePatternWeights(vector <int> sitePatternWeightsToAdd);
 	void AddSitePatternRepeats(vector <vector <int> > sitePatternRepetitionsToAdd);
-	void AddSequences(vector <vector <unsigned char>> sequencesToAdd);
+	void AddSequences(vector <vector <unsigned char>> sequencesToAdd);	
 	void OpenAncestralSequencesFile();
 	void AddRootVertex();
 //	void AddCompressedSequencesAndNames(map<string,vector<unsigned char>> sequencesList, vector <vector <int>> sitePatternRepeats);
 	void AddAllSequences(string sequencesFileName);
 	void AddNames(vector <string> namesToAdd);
 	void AddGlobalIds(vector <int> idsToAdd);
-	void ComputeNJTree(); // default Hamming distance	
-	void ComputeNJTreeUsingLogDetDistances(); // LogDet distance
+	// void ComputeNJTreeUsingHammingDistances(); 
+	void ComputeNJTree(); // Hamming (default) or LogDet distance
+	float ComputeDistance(int v_i, int v_j);
 	void RootedTreeAlongAnEdgeIncidentToCentralVertex();
 	void RootTreeAlongAnEdgePickedAtRandom();
 	void RootTreeAtAVertexPickedAtRandom();
@@ -1078,6 +1082,7 @@ public:
 	array <float, 4> GetBaseComposition(SEM_vertex * v);
 	array <float, 4> GetObservedCountsForVariable(SEM_vertex * v);
 	string modelSelectionCriterion;
+	string distance_measure_for_NJ = "Hamming";
 	void SetModelSelectionCriterion(string modelSelectionCriterionToSet);
 	void RootTreeAtVertex(SEM_vertex * r);
 	void StoreEdgeListForChowLiuTree();
@@ -1149,7 +1154,7 @@ public:
 	// P(X,Y), P(X), and P(Y), which in turn are computed using
 	// A calibrated clique tree
 	// using P(X,Y) = Sum_{H\{X,Y}}{P(X,Y|H\{X,Y},O)}
-	// where H is the set of hidden variables and O is the set of observed variables		
+	// where H is the set of hidden variables and O is the set of observed variables	
 	void RootTreeUsingEstimatedParametersViaML();
 	void SetFlagForFinalIterationOfSEM();
 	void OptimizeTopologyAndParametersOfGMM();	
@@ -1186,9 +1191,17 @@ public:
 	void WriteUnrootedTreeAsEdgeList(string fileName);
 	void ResetData();
 	// Select vertex for rooting Chow-Liu tree and update edges in T
-	// Modify T such that T is a bifurcating tree and marginal likelihood of updated
-	// tree is equivalent to the marginal likelihood of T
-	SEM (int largestIdOfVertexInMST_toSet) {
+	// Modify T such that T is a bifurcating tree and likelihood of updated
+	// tree is equivalent to the likelihood of T
+	SEM (int largestIdOfVertexInMST_toSet, string distance_measure_for_NJ_to_set) {
+		this->distance_measure_for_NJ = distance_measure_for_NJ_to_set;
+		if (this->distance_measure_for_NJ == "logDet") {
+			this->flag_logDet = 1;
+		} else if (this->distance_measure_for_NJ == "Hamming") {
+			this->flag_Hamming = 1;
+		} else if (this->distance_measure_for_NJ == "Jukes-Cantor") {
+			this->flag_JC = 1;
+		}
 		this->largestIdOfVertexInMST = largestIdOfVertexInMST_toSet;
 		this->h_ind = 1;
 		this->vertexMap = new map <int, SEM_vertex *> ;
@@ -3181,24 +3194,7 @@ void SEM::OptimizeTopologyAndParametersOfGMM() {
 	int maxIter = 100;	
 	bool continueIterations = 1;
 	this->debug = 0;
-//	string chowLiuTreeFileNamePrefix = "/home/pk/Projects/MSTBasedForests/data/trees/chowLiuTree_test_numberOfLeaves_16_replicate_1";
-//	string MLRootedTreeFileNamePrefix = "/home/pk/Projects/MSTBasedForests/data/trees/MLRootedTree_test_numberOfLeaves_16_replicate_1";
-//	string cliqueTreeFileNamePrefix = "/home/pk/Projects/MSTBasedForests/data/trees/cliqueTree_test_numberOfLeaves_16_replicate_1";
-//	string chowLiuTreeFileName;
-//	string MLRootedTreeFileName;
-//	string cliqueTreeFileName;	
-//	cout << "Computing NJ tree" << endl;
-	// this->ComputeNJTree();
-	this->ComputeNJTreeUsingLogDetDistances();
-//    for (pair<int,SEM_vertex *> idPtrPair : *this->vertexMap) {
-//		cout << idPtrPair.second->name << "\t degree :" << idPtrPair.second->degree << endl;
-//		for (SEM_vertex * n : idPtrPair.second->neighbors){
-//			if (n->id < idPtrPair.second->id) {
-//				cout << n->name << "\t" << idPtrPair.second->name << endl;
-//			}
-//		}
-//	}	
-//		cout << "Rooting tree along an edge picked at random" << endl;
+	this->ComputeNJTree();	
 	// perform tree search under ME/BME 
 	this->RootTreeAlongAnEdgePickedAtRandom();
 	// check is number of hidden vertices equals number of observed vertices -1;
@@ -5661,62 +5657,87 @@ bool SEM::ContainsVertex(string v_name) {
 //	}
 //}
 
-void SEM::ComputeNJTreeUsingLogDetDistances() {
+float SEM::ComputeDistance(int v_i, int v_j) {
+	vector <unsigned char> seq_i; vector <unsigned char> seq_j;	
+	seq_i = (*this->vertexMap)[v_i]->compressedSequence;
+	seq_j = (*this->vertexMap)[v_j]->compressedSequence;
 	float sequence_length = 0;
 	for (int site = 0; site < numberOfSitePatterns; site++) {
 		sequence_length += float(this->sitePatternWeights[site]);
 	}
+	// logDet_distance
+	float distance;
+	if (flag_logDet) {
+		float logDet;
+		float det_of_count_frequency_matrix;
+		array <float, 4> f_i;
+		array <float, 4> f_j;
+		Matrix4f F = ArrayXXf::Zero(4,4);
+		f_i[0] = 0.0;
+		f_i[1] = 0.0;
+		f_i[2] = 0.0;
+		f_i[3] = 0.0;
+		f_j[0] = 0.0;
+		f_j[1] = 0.0;
+		f_j[2] = 0.0;
+		f_j[3] = 0.0;
+		for (int site = 0; site < numberOfSitePatterns; site++) {
+			// cout << seq_i[site] << "\t" << seq_j[site] << endl;
+			F(seq_i[site],seq_j[site]) += float(this->sitePatternWeights[site])/sequence_length;
+			f_i[seq_i[site]] += float(this->sitePatternWeights[site])/sequence_length;
+			f_j[seq_j[site]] += float(this->sitePatternWeights[site])/sequence_length;
+		}
+		det_of_count_frequency_matrix = F.determinant();
+		assert (det_of_count_frequency_matrix > 0);
+		distance = log(det_of_count_frequency_matrix);
+		for (int dna = 0; dna < 4; dna ++) {
+			distance -= 0.5 * log(f_i[dna]);
+			distance -= 0.5 * log(f_j[dna]);
+		}
+		distance *= -0.25;
+	} else if (flag_Hamming) {
+		distance = 0;
+		for (int site = 0; site < numberOfSitePatterns; site++) {
+			if (seq_i[site] != seq_j[site]) {
+			distance += float(this->sitePatternWeights[site])/sequence_length;
+			}						
+		}				
+	} else if (flag_JC) {
+		float p_distance;
+		p_distance = 0;
+		for (int site = 0; site < numberOfSitePatterns; site++) {
+			if (seq_i[site] != seq_j[site]) {
+			p_distance += float(this->sitePatternWeights[site])/sequence_length;
+			}						
+		}
+		distance = -0.75 * log(1 - p_distance/0.75);
+	}
+	return (distance);
+}
+
+void SEM::ComputeNJTree() {
+	
 	// cout << "Computing NJ tree using LogDet distances" << endl;
-	Matrix4f D;
-	float Hamming = 0;
-	array <float, 4> freq_i;
-	array <float, 4> freq_j;
+	// Compute distances	
 	map <pair <int,int>, float> distanceMap;
 	map <int,float> R;
 	vector <int> vertexIndsForIterating;
 	vector <unsigned char> emptySequence;
-	unsigned int n = this->numberOfObservedVertices;
+	unsigned int n = this->numberOfObservedVertices;			
+	float distance;		
 	for (unsigned int i = 0; i < n; i++) {
 		R[i] = 0.0;
-		vertexIndsForIterating.push_back(i);
-	}	
-	float logDet;	
-	float det_of_divergence_matrix;
-	cout << "log of 2 is " << log(2.0) << endl;
-	vector <unsigned char> seq_i; vector <unsigned char> seq_j;
-	for (unsigned int i = 0; i < n; i++) {		
-		seq_i = (*this->vertexMap)[i]->compressedSequence;
-		for (unsigned int j = i+1; j < n; j++) {
-			// cout << (*this->vertexMap)[i]->name << (*this->vertexMap)[j]->name << endl;
-			D = ArrayXXf::Zero(4,4);
-			Hamming = 0;
-			// logDet_distance
-			seq_j = (*this->vertexMap)[j]->compressedSequence;
-			for (int site=0; site < numberOfSitePatterns; site++) {
-				// cout << seq_i[site] << "\t" << seq_j[site] << endl;
-				D(seq_i[site],seq_j[site]) += float(this->sitePatternWeights[site])/sequence_length;
-				freq_i[seq_i[site]] += float(this->sitePatternWeights[site])/sequence_length;
-				freq_j[seq_j[site]] += float(this->sitePatternWeights[site])/sequence_length;
-				if (seq_i[site] != seq_j[site]) {
-					Hamming += float(this->sitePatternWeights[site])/sequence_length;
-				}
-			}
-			// cout << "Divergence matrix is" << endl << D << endl;
-			// cout << "Determinant of divergence matrix is " << D.determinant() << endl;
-			det_of_divergence_matrix = D.determinant();
-			assert (det_of_divergence_matrix > 0);
-			logDet = log(det_of_divergence_matrix);	
-			for (int dna = 0; dna < 4; dna ++) {
-				logDet -= 0.5 * log(freq_i[dna]);
-				logDet -= 0.5 * log(freq_j[dna]);
-			}
-			logDet *= -0.25;
-			cout << (*this->vertexMap)[i]->name << (*this->vertexMap)[j]->name << "logDet: " << logDet << "\tHamming:\t" << Hamming << endl;
-			distanceMap[pair<int,int>(i,j)] = logDet;
-			R[i] += logDet;
-			R[j] += logDet;
+		vertexIndsForIterating.push_back(i);			
+		for (unsigned int j = i+1; j < n; j++) {	
+			distance = this->ComputeDistance(i,j);
+			cout << "Distance measure for " << (*this->vertexMap)[i]->name <<"\t" << (*this->vertexMap)[j]->name << "\t"<<this->distance_measure_for_NJ << "\t" << distance << endl;
+			distanceMap[pair<int,int>(i,j)] = distance;
+			R[i] += distance;
+			R[j] += distance;
 		}
 	}
+
+	// NJ algorithm
 	for (unsigned int i = 0; i < n; i++){R[i] /= (n-2);}
 	float neighborDist;
 	float neighborDist_current;
@@ -5744,18 +5765,13 @@ void SEM::ComputeNJTreeUsingLogDetDistances() {
 		vertexIndsForIterating.push_back(h);
 		SEM_vertex* h_ptr = new SEM_vertex (h,emptySequence);
 		h_ptr->name = "h_" + to_string(this->h_ind);
-//		h_ptr->name = "h_" + to_string(h);		
 		this->h_ind += 1;
 		this->vertexMap->insert(pair<int,SEM_vertex*>(h,h_ptr));
 		(*this->vertexMap)[i_selected]->AddNeighbor((*this->vertexMap)[h]);
 		(*this->vertexMap)[j_selected]->AddNeighbor((*this->vertexMap)[h]);
 		(*this->vertexMap)[h]->AddNeighbor((*this->vertexMap)[i_selected]);
 		(*this->vertexMap)[h]->AddNeighbor((*this->vertexMap)[j_selected]);
-//		vertices.push_back(vertex_h_ptr);
-//		vertices[i_selected]->AddNeighbor(vertices[h]);
-//		vertices[j_selected]->AddNeighbor(vertices[h]);
-//		vertices[h]->AddNeighbor(vertices[i_selected]);
-//		vertices[h]->AddNeighbor(vertices[j_selected]);
+
         R.erase(i_selected);
         R.erase(j_selected);
         R[h] = 0.0;
@@ -5793,7 +5809,6 @@ void SEM::ComputeNJTreeUsingLogDetDistances() {
 	}
 	SEM_vertex* h_ptr = new SEM_vertex (h,emptySequence);
 	h_ptr->name = "h_" + to_string(this->h_ind);
-//	h_ptr->name = "h_" + to_string(h);
 	this->h_ind += 1;
 	this->vertexMap->insert(pair<int,SEM_vertex*>(h,h_ptr));
 	for (int v:vertexIndsForIterating) {
@@ -5802,116 +5817,116 @@ void SEM::ComputeNJTreeUsingLogDetDistances() {
 	}
 }
 
-void SEM::ComputeNJTree() {
-	map <pair <int,int>, float> distanceMap;
-	map <int,float> R;
-	vector <int> vertexIndsForIterating;
-	vector <unsigned char> emptySequence;
-	unsigned int n = this->numberOfObservedVertices;
-	for (unsigned int i = 0; i < n; i++) {
-		R[i] = 0.0;
-		vertexIndsForIterating.push_back(i);
-	}
-	float distance;
-	vector <unsigned char> seq_i; vector <unsigned char> seq_j;
-	for (unsigned int i = 0; i < n; i++) {
-		seq_i = (*this->vertexMap)[i]->compressedSequence;
-		for (unsigned int j = i+1; j < n; j++) {
-			distance = 0.0;
-			seq_j = (*this->vertexMap)[j]->compressedSequence;
-			for (int site=0; site < numberOfSitePatterns; site++) {
-				if (seq_i[site] != seq_j[site]) {
-					distance += float(this->sitePatternWeights[site]);
-				}
-			}
-			distanceMap[pair<int,int>(i,j)] = distance;
-			R[i] += distance;
-			R[j] += distance;
-		}
-	}
-	for (unsigned int i = 0; i < n; i++){R[i] /= (n-2);}
-	float neighborDist;
-	float neighborDist_current;
-	float newDist;
-	int i; int j; int k;
-	int i_selected; int j_selected;
-	int h = n;
+// void SEM::ComputeNJTreeUsingHammingDistances() {
+// 	map <pair <int,int>, float> distanceMap;
+// 	map <int,float> R;
+// 	vector <int> vertexIndsForIterating;
+// 	vector <unsigned char> emptySequence;
+// 	unsigned int n = this->numberOfObservedVertices;
+// 	for (unsigned int i = 0; i < n; i++) {
+// 		R[i] = 0.0;
+// 		vertexIndsForIterating.push_back(i);
+// 	}
+// 	float distance;
+// 	vector <unsigned char> seq_i; vector <unsigned char> seq_j;
+// 	for (unsigned int i = 0; i < n; i++) {
+// 		seq_i = (*this->vertexMap)[i]->compressedSequence;
+// 		for (unsigned int j = i+1; j < n; j++) {
+// 			distance = 0.0;
+// 			seq_j = (*this->vertexMap)[j]->compressedSequence;
+// 			for (int site=0; site < numberOfSitePatterns; site++) {
+// 				if (seq_i[site] != seq_j[site]) {
+// 					distance += float(this->sitePatternWeights[site]);
+// 				}
+// 			}
+// 			distanceMap[pair<int,int>(i,j)] = distance;
+// 			R[i] += distance;
+// 			R[j] += distance;
+// 		}
+// 	}
+// 	for (unsigned int i = 0; i < n; i++){R[i] /= (n-2);}
+// 	float neighborDist;
+// 	float neighborDist_current;
+// 	float newDist;
+// 	int i; int j; int k;
+// 	int i_selected; int j_selected;
+// 	int h = n;
 	
-	while (R.size() > 3) {
-		neighborDist = float(this->sequenceLength+1);
-        for (unsigned int i_ind = 0; i_ind < n; i_ind++) {
-			for (unsigned int j_ind = i_ind+1; j_ind < n; j_ind++) {
-				i = vertexIndsForIterating[i_ind];
-				j = vertexIndsForIterating[j_ind];
-				neighborDist_current = distanceMap[pair<int,int>(i,j)]-R[i]-R[j];
-				if (neighborDist_current < neighborDist){
-					neighborDist = neighborDist_current;
-                    i_selected = i;
-                    j_selected = j;
-				}
-			}
-		}
-		vertexIndsForIterating.erase(remove(vertexIndsForIterating.begin(),vertexIndsForIterating.end(),i_selected),vertexIndsForIterating.end());
-		vertexIndsForIterating.erase(remove(vertexIndsForIterating.begin(),vertexIndsForIterating.end(),j_selected),vertexIndsForIterating.end());		
-		vertexIndsForIterating.push_back(h);
-		SEM_vertex* h_ptr = new SEM_vertex (h,emptySequence);
-		h_ptr->name = "h_" + to_string(this->h_ind);
-//		h_ptr->name = "h_" + to_string(h);		
-		this->h_ind += 1;
-		this->vertexMap->insert(pair<int,SEM_vertex*>(h,h_ptr));
-		(*this->vertexMap)[i_selected]->AddNeighbor((*this->vertexMap)[h]);
-		(*this->vertexMap)[j_selected]->AddNeighbor((*this->vertexMap)[h]);
-		(*this->vertexMap)[h]->AddNeighbor((*this->vertexMap)[i_selected]);
-		(*this->vertexMap)[h]->AddNeighbor((*this->vertexMap)[j_selected]);
-//		vertices.push_back(vertex_h_ptr);
-//		vertices[i_selected]->AddNeighbor(vertices[h]);
-//		vertices[j_selected]->AddNeighbor(vertices[h]);
-//		vertices[h]->AddNeighbor(vertices[i_selected]);
-//		vertices[h]->AddNeighbor(vertices[j_selected]);
-        R.erase(i_selected);
-        R.erase(j_selected);
-        R[h] = 0.0;
-		n -= 1;
-		for (unsigned int k_ind = 0; k_ind < n-1; k_ind++) {
-			k = vertexIndsForIterating[k_ind];
-			if (k < i_selected) {
-				newDist = distanceMap[pair<int,int>(k,i_selected)] + distanceMap[pair<int,int>(k,j_selected)];
-                newDist -= distanceMap[pair<int,int>(i_selected,j_selected)];
-                newDist *= 0.5;
-                R[k] = float(R[k]*(n-1)-distanceMap[pair<int,int>(k,i_selected)]-distanceMap[pair<int,int>(k,j_selected)] + newDist)/float(n-2);
-                distanceMap.erase(pair<int,int>(k,i_selected));
-				distanceMap.erase(pair<int,int>(k,j_selected));               
-			} else if (j_selected < k) {
-				newDist = distanceMap[pair<int,int>(i_selected,k)] + distanceMap[pair<int,int>(j_selected,k)];
-                newDist -= distanceMap[pair<int,int>(i_selected,j_selected)];
-                newDist *= 0.5;
-                R[k] = float(R[k]*(n-1)-distanceMap[pair<int,int>(i_selected,k)]-distanceMap[pair<int,int>(j_selected,k)] + newDist)/float(n-2);
-                distanceMap.erase(pair<int,int>(i_selected,k));
-                distanceMap.erase(pair<int,int>(j_selected,k));
-			} else {
-			    newDist = distanceMap[pair<int,int>(i_selected,k)] + distanceMap[pair<int,int>(k,j_selected)];
-                newDist -= distanceMap[pair<int,int>(i_selected,j_selected)];
-                newDist *= 0.5;
-                R[k] = float(R[k]*(n-1)-distanceMap[pair<int,int>(i_selected,k)]-distanceMap[pair<int,int>(k,j_selected)] + newDist)/float(n-2);
-                distanceMap.erase(pair<int,int>(i_selected,k));
-                distanceMap.erase(pair<int,int>(k,j_selected));
-			}            
-			distanceMap[pair<int,int>(k,h)] = newDist;
-            R[h] += newDist;
-		}
-        R[h] /= float(n-2);
-		h += 1;
-        distanceMap.erase(pair<int,int>(i_selected,j_selected));
-	}
-	SEM_vertex* h_ptr = new SEM_vertex (h,emptySequence);
-	h_ptr->name = "h_" + to_string(this->h_ind);
-//	h_ptr->name = "h_" + to_string(h);
-	this->h_ind += 1;
-	this->vertexMap->insert(pair<int,SEM_vertex*>(h,h_ptr));
-	for (int v:vertexIndsForIterating) {
-		(*this->vertexMap)[v]->AddNeighbor((*this->vertexMap)[h]);
-		(*this->vertexMap)[h]->AddNeighbor((*this->vertexMap)[v]);
-	}
-}
+// 	while (R.size() > 3) {
+// 		neighborDist = float(this->sequenceLength+1);
+//         for (unsigned int i_ind = 0; i_ind < n; i_ind++) {
+// 			for (unsigned int j_ind = i_ind+1; j_ind < n; j_ind++) {
+// 				i = vertexIndsForIterating[i_ind];
+// 				j = vertexIndsForIterating[j_ind];
+// 				neighborDist_current = distanceMap[pair<int,int>(i,j)]-R[i]-R[j];
+// 				if (neighborDist_current < neighborDist){
+// 					neighborDist = neighborDist_current;
+//                     i_selected = i;
+//                     j_selected = j;
+// 				}
+// 			}
+// 		}
+// 		vertexIndsForIterating.erase(remove(vertexIndsForIterating.begin(),vertexIndsForIterating.end(),i_selected),vertexIndsForIterating.end());
+// 		vertexIndsForIterating.erase(remove(vertexIndsForIterating.begin(),vertexIndsForIterating.end(),j_selected),vertexIndsForIterating.end());		
+// 		vertexIndsForIterating.push_back(h);
+// 		SEM_vertex* h_ptr = new SEM_vertex (h,emptySequence);
+// 		h_ptr->name = "h_" + to_string(this->h_ind);
+// //		h_ptr->name = "h_" + to_string(h);		
+// 		this->h_ind += 1;
+// 		this->vertexMap->insert(pair<int,SEM_vertex*>(h,h_ptr));
+// 		(*this->vertexMap)[i_selected]->AddNeighbor((*this->vertexMap)[h]);
+// 		(*this->vertexMap)[j_selected]->AddNeighbor((*this->vertexMap)[h]);
+// 		(*this->vertexMap)[h]->AddNeighbor((*this->vertexMap)[i_selected]);
+// 		(*this->vertexMap)[h]->AddNeighbor((*this->vertexMap)[j_selected]);
+// //		vertices.push_back(vertex_h_ptr);
+// //		vertices[i_selected]->AddNeighbor(vertices[h]);
+// //		vertices[j_selected]->AddNeighbor(vertices[h]);
+// //		vertices[h]->AddNeighbor(vertices[i_selected]);
+// //		vertices[h]->AddNeighbor(vertices[j_selected]);
+//         R.erase(i_selected);
+//         R.erase(j_selected);
+//         R[h] = 0.0;
+// 		n -= 1;
+// 		for (unsigned int k_ind = 0; k_ind < n-1; k_ind++) {
+// 			k = vertexIndsForIterating[k_ind];
+// 			if (k < i_selected) {
+// 				newDist = distanceMap[pair<int,int>(k,i_selected)] + distanceMap[pair<int,int>(k,j_selected)];
+//                 newDist -= distanceMap[pair<int,int>(i_selected,j_selected)];
+//                 newDist *= 0.5;
+//                 R[k] = float(R[k]*(n-1)-distanceMap[pair<int,int>(k,i_selected)]-distanceMap[pair<int,int>(k,j_selected)] + newDist)/float(n-2);
+//                 distanceMap.erase(pair<int,int>(k,i_selected));
+// 				distanceMap.erase(pair<int,int>(k,j_selected));               
+// 			} else if (j_selected < k) {
+// 				newDist = distanceMap[pair<int,int>(i_selected,k)] + distanceMap[pair<int,int>(j_selected,k)];
+//                 newDist -= distanceMap[pair<int,int>(i_selected,j_selected)];
+//                 newDist *= 0.5;
+//                 R[k] = float(R[k]*(n-1)-distanceMap[pair<int,int>(i_selected,k)]-distanceMap[pair<int,int>(j_selected,k)] + newDist)/float(n-2);
+//                 distanceMap.erase(pair<int,int>(i_selected,k));
+//                 distanceMap.erase(pair<int,int>(j_selected,k));
+// 			} else {
+// 			    newDist = distanceMap[pair<int,int>(i_selected,k)] + distanceMap[pair<int,int>(k,j_selected)];
+//                 newDist -= distanceMap[pair<int,int>(i_selected,j_selected)];
+//                 newDist *= 0.5;
+//                 R[k] = float(R[k]*(n-1)-distanceMap[pair<int,int>(i_selected,k)]-distanceMap[pair<int,int>(k,j_selected)] + newDist)/float(n-2);
+//                 distanceMap.erase(pair<int,int>(i_selected,k));
+//                 distanceMap.erase(pair<int,int>(k,j_selected));
+// 			}            
+// 			distanceMap[pair<int,int>(k,h)] = newDist;
+//             R[h] += newDist;
+// 		}
+//         R[h] /= float(n-2);
+// 		h += 1;
+//         distanceMap.erase(pair<int,int>(i_selected,j_selected));
+// 	}
+// 	SEM_vertex* h_ptr = new SEM_vertex (h,emptySequence);
+// 	h_ptr->name = "h_" + to_string(this->h_ind);
+// //	h_ptr->name = "h_" + to_string(h);
+// 	this->h_ind += 1;
+// 	this->vertexMap->insert(pair<int,SEM_vertex*>(h,h_ptr));
+// 	for (int v:vertexIndsForIterating) {
+// 		(*this->vertexMap)[v]->AddNeighbor((*this->vertexMap)[h]);
+// 		(*this->vertexMap)[h]->AddNeighbor((*this->vertexMap)[v]);
+// 	}
+// }
 
 #endif
