@@ -5708,7 +5708,7 @@ float SEM::ComputeDistance(int v_i, int v_j) {
 		for (int site = 0; site < numberOfSitePatterns; site++) {
 			if (seq_i[site] != seq_j[site]) {
 			p_distance += float(this->sitePatternWeights[site])/sequence_length;
-			}						
+			}
 		}
 		distance = -0.75 * log(1 - p_distance/0.75);
 	}
@@ -5730,7 +5730,9 @@ void SEM::ComputeNJTree() {
 		vertexIndsForIterating.push_back(i);			
 		for (unsigned int j = i+1; j < n; j++) {	
 			distance = this->ComputeDistance(i,j);
-			cout << "Distance measure for " << (*this->vertexMap)[i]->name <<"\t" << (*this->vertexMap)[j]->name << "\t"<<this->distance_measure_for_NJ << "\t" << distance << endl;
+			if (this->verbose) {
+				cout << "Distance measure for " << (*this->vertexMap)[i]->name <<"\t" << (*this->vertexMap)[j]->name << "\t"<<this->distance_measure_for_NJ << "\t" << distance << endl;
+			}			
 			distanceMap[pair<int,int>(i,j)] = distance;
 			R[i] += distance;
 			R[j] += distance;
