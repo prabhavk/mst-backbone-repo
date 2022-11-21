@@ -15,8 +15,7 @@ class SEM_vertex {
 public:
 	int degree = 0;
 	int timesVisited = 0;
-	bool observed = 0;
-	bool verbose = 0;
+	bool observed = 0;	
     vector <unsigned char> compressedSequence;
 	int id = -42;
 	int global_id = -42;
@@ -943,6 +942,7 @@ public:
 	int largestIdOfVertexInMST = 1;
 	default_random_engine generator;
 	bool setParameters;
+	bool verbose = 0;
 	string modelForRooting;
 	map <string,unsigned char> mapDNAtoInteger;
 	map <int, SEM_vertex*> * vertexMap;	 
