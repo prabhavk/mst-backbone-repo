@@ -1,10 +1,10 @@
 Constraint size is set at	10
 Prefix for output files is 	mstbackbone_output
 Number of vertices in MST is 16
-CPU time used for computing subtree with 16 leaves is 0.110663 seconds
-CPU time used for computing unrooted supertree T is 0.11424 seconds
+CPU time used for computing subtree with 16 leaves is 0.152935 seconds
+CPU time used for computing unrooted supertree T is 0.240259 seconds
 Root T by fitting a a GMM using EM
-CPU time used for rooting T using EM is 0.00435815 second(s)
+CPU time used for rooting T using EM is 0.00454397 second(s)
 Log likelihood is -4136.02
 BIC under the GM model is 10275.3
-Total CPU time used is 0.118826 second(s)
+Total CPU time used is 0.245089 second(s)

@@ -16,6 +16,7 @@ public:
 	int degree = 0;
 	int timesVisited = 0;
 	bool observed = 0;
+	bool verbose = 0;
     vector <unsigned char> compressedSequence;
 	int id = -42;
 	int global_id = -42;
