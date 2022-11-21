@@ -5731,7 +5731,7 @@ void SEM::ComputeNJTree() {
 		for (unsigned int j = i+1; j < n; j++) {	
 			distance = this->ComputeDistance(i,j);
 			if (this->verbose) {
-				cout << "Distance measure for " << (*this->vertexMap)[i]->name <<"\t" << (*this->vertexMap)[j]->name << "\t"<<this->distance_measure_for_NJ << "\t" << distance << endl;
+				cout << "Distance measure for " << (*this->vertexMap)[i]->name << "\t" << (*this->vertexMap)[j]->name << "\t"<<this->distance_measure_for_NJ << "\t" << distance << endl;
 			}			
 			distanceMap[pair<int,int>(i,j)] = distance;
 			R[i] += distance;
