@@ -39,7 +39,7 @@ int main(int argc, char **argv)
 	string distance_measure_for_NJ = "Hamming";
 	MSTBackbone * MSTBackboneObj;
     if (argc < 2) {        
-        cerr << "Usage: " << argv[0] << " --seq alignment.fas distance_measure_for_NJ logDet --constraint_size size_of_subtree --out prefix_for_output" << endl;
+        cerr << "Usage: " << argv[0] << " --seq alignment.fas --constraint_size size_of_subtree --distance_measure_for_NJ logDet --out prefix_for_output" << endl;
 		cerr << endl;
         return (-1);
     } else {        
@@ -89,7 +89,7 @@ int main(int argc, char **argv)
                     size_of_subtree = stoi(argv[++i]);
                 }
 			} else if (strcmp(argv[i], "--help") == 0) {
-				cout << "Example for mst-constrained tree construction: " << argv[0] << " --seq alignment.fas --constraint_size size --out prefix_for_output" << endl;
+				cout << "Example for mst-constrained tree construction: " << argv[0] << " --seq alignment.fas --constraint_size size --distance_measure_for_NJ logDet --out prefix_for_output" << endl;
 			}
         }
 
