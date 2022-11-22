@@ -36,7 +36,9 @@ int main(int argc, char **argv)
 	string arg_localPhyloOnly;
 	string arg_modelSelection;
 	string arg_chowliu;
+	string string_verbose;
 	string distance_measure_for_NJ = "Hamming";
+	bool flag_verbose = 0;
 	MSTBackbone * MSTBackboneObj;
     if (argc < 2) {        
         cerr << "Usage: " << argv[0] << " --seq alignment.fas --constraint_size size_of_subtree --distance_measure_for_NJ logDet --out prefix_for_output" << endl;
@@ -83,6 +85,13 @@ int main(int argc, char **argv)
 					cout << "prefix for output files is " << prefix_for_output_files << endl;					
                 }
         // size of subtree Vs
+            } else if (strcmp(argv[i], "--verbose") == 0) {
+                if (i < argc -1) {
+			string_verbose = argv[++i];
+			if (string_verbose == "True") {
+				flag_verbose = 1;
+			}			
+                }        
             } else if (strcmp(argv[i], "--constraint_size") == 0) {
                 if (i < argc -1) {
 					flag_size_of_subtree = 1;
@@ -102,7 +111,7 @@ int main(int argc, char **argv)
 			prefix_path_obj /= "mstbackbone_output";
 			// prefix_for_output_files = alignment_file_path_obj.parent_path().string() + "_mstbackbone";
 		}		
-		MSTBackboneObj = new MSTBackbone(path_to_alignment_file, size_of_subtree, prefix_path_obj.string(),patch_name,distance_measure_for_NJ);		
+		MSTBackboneObj = new MSTBackbone(path_to_alignment_file, size_of_subtree, prefix_path_obj.string(),patch_name,distance_measure_for_NJ,flag_verbose);		
 		delete MSTBackboneObj;
 		// MSTBackbone MSTBackboneObj(path_to_alignment_file, size_of_subtree, prefix_path_obj.string(),localPhyloOnly,modelSelection,modelForRooting,useChowLiu);
     }
