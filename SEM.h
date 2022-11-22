@@ -1194,7 +1194,7 @@ public:
 	// Select vertex for rooting Chow-Liu tree and update edges in T
 	// Modify T such that T is a bifurcating tree and likelihood of updated
 	// tree is equivalent to the likelihood of T
-	SEM (int largestIdOfVertexInMST_toSet, string distance_measure_for_NJ_to_set) {
+	SEM (int largestIdOfVertexInMST_toSet, string distance_measure_for_NJ_to_set, bool verbose_flag_to_set) {
 		this->distance_measure_for_NJ = distance_measure_for_NJ_to_set;
 		if (this->distance_measure_for_NJ == "logDet") {
 			this->flag_logDet = 1;
@@ -1203,6 +1203,7 @@ public:
 		} else if (this->distance_measure_for_NJ == "Jukes-Cantor") {
 			this->flag_JC = 1;
 		}
+		this->verbose = verbose_flag_to_set;
 		this->largestIdOfVertexInMST = largestIdOfVertexInMST_toSet;
 		this->h_ind = 1;
 		this->vertexMap = new map <int, SEM_vertex *> ;
