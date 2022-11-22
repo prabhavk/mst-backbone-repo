@@ -319,7 +319,7 @@ void MSTBackbone::MSTBackboneOnlyLocalPhylo() {
 	cout << "Number of edges in MST is " << this->M->edgeWeightsMap.size() << endl;
 	tie (names, sequences, sitePatternWeights, sitePatternRepetitions) = this->M->GetCompressedSequencesSiteWeightsAndSiteRepeats(idsOfVerticesForSEM);
 	this->numberOfVerticesInSubtree = sequences.size();
-	this->t = new SEM(largestIdOfVertexInMST,this->distance_measure_for_NJ);
+	this->t = new SEM(largestIdOfVertexInMST,this->distance_measure_for_NJ,this->verbose);
 	this->t->SetFlagForFinalIterationOfSEM();
 	this->t->AddSequences(sequences);
 	this->t->SetNumberOfVerticesInSubtree(this->numberOfVerticesInSubtree);
