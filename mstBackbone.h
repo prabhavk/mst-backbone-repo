@@ -245,7 +245,7 @@ void MSTBackbone::MSTBackboneOnlyLocalPhylo() {
 			//	4.	Compute local phylogeny t over (Vs U Ve) via SEM      	 //
 			//----########################################################---//
 //			cout << "4.	Compute local phylogeny t over (Vs U Ve) via SEM" << endl;			
-			this->t = new SEM(largestIdOfVertexInMST,this->distance_measure_for_NJ);
+			this->t = new SEM(largestIdOfVertexInMST,this->distance_measure_for_NJ,this->verbose);
 			this->t->AddSequences(sequences);
 			this->t->SetNumberOfVerticesInSubtree(this->numberOfVerticesInSubtree);
 			this->t->SetNumberOfInputSequences(numberOfInputSequences);
