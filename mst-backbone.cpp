@@ -70,7 +70,7 @@ int main(int argc, char **argv)
 					if (distance_measure_for_NJ == "logDet" || distance_measure_for_NJ == "Jukes-Cantor" ||distance_measure_for_NJ == "Hamming") {
 						continue;
 					} else {
-						cout << "Enter one of the following distance measures: logDet, Jukes-Cantor and Hamming" << endl;
+						cout << "Enter one of the following distance measures: logDet, Jukes-Cantor or Hamming" << endl;
 						exit (-1);
 					}
                 }
