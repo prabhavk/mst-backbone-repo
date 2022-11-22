@@ -70,6 +70,7 @@ private:
 //	void ComputeVMST(string sequenceFileName);
 	void WriteOutputFiles();
 	bool debug;
+	bool verbose;
 	bool localPhyloOnly;
 	bool useChowLiu;
 	bool modelSelection;
@@ -87,7 +88,7 @@ public:
 	void MSTBackboneOverlappingSets();
 	void MSTBackboneOnlyLocalPhylo();
 	void Apply_patch(string patch_name_to_apply);
-	MSTBackbone(string sequenceFileNameToAdd, int subtreeSizeThresholdToset, string prefix_for_output_files_to_set, string patch_name_to_apply, string distance_measure_for_NJ_to_set) {
+	MSTBackbone(string sequenceFileNameToAdd, int subtreeSizeThresholdToset, string prefix_for_output_files_to_set, string patch_name_to_apply, string distance_measure_for_NJ_to_set, bool verbose_flag_to_set) {
 		// MSTBackbone(string sequenceFileNameToAdd, int subtreeSizeThresholdToset, string prefix_for_output_files_to_set, bool localPhyloOnly_to_set, bool modelSelection_to_set, string modelForRooting_to_set, bool useChowLiu_toset) {
 		// bool localPhyloOnly = TRUE;
 		// this->useChowLiu = useChowLiu_toset;
@@ -96,6 +97,7 @@ public:
 		start_time = chrono::high_resolution_clock::now();				
 		this->sequenceFileName = sequenceFileNameToAdd;		
 		this->patch_name = patch_name_to_apply;
+		this->verbose = verbose_flag_to_set;
 		this->distance_measure_for_NJ = distance_measure_for_NJ_to_set;
 		cout << "Distance measure used for NJ is " << this->distance_measure_for_NJ << endl;
 		this->mstBackboneLogFile << "Distance measure used for NJ is " << this->distance_measure_for_NJ << endl;
@@ -135,7 +137,7 @@ public:
 		this->M->WriteToFile(MSTFileName);
 	    // compute Chow-Liu tree using UNREST and get probability distribution for root position
 		this->M->SetNumberOfLargeEdgesThreshold(this->numberOfLargeEdgesThreshold);
-		this->T = new SEM(1,this->distance_measure_for_NJ);
+		this->T = new SEM(1,this->distance_measure_for_NJ,this->verbose);
 		this->MSTBackboneWithFullSEMAndMultipleExternalVertices(); // MAIN MST_BACKBONE FUNCTION
 		// if (this->modelSelection){
 		// 	// set tree topology
@@ -394,8 +396,7 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 	//----##############################################################---//
 //	cout << "Starting MST-backbone" << endl;
 //	cout << "1.	Initialize the global phylogenetic tree T as the empty graph" << endl;
-	int numberOfInputSequences = (int) this->M->vertexMap->size();	
-	// this->T = new SEM(1);
+	int numberOfInputSequences = (int) this->M->vertexMap->size();		
 	current_time = chrono::high_resolution_clock::now();
 	// timeTakenToComputeEdgeAndVertexLogLikelihoods = chrono::duration_cast<chrono::seconds>(current_time-current_time);
 	
@@ -449,7 +450,7 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 			//	4.	Compute local phylogeny t over (Vs U Ve) via SEM      	 //
 			//----########################################################---//
 //			cout << "4.	Compute local phylogeny t over (Vs U Ve) via SEM" << endl;			
-			this->t = new SEM(largestIdOfVertexInMST,this->distance_measure_for_NJ);
+			this->t = new SEM(largestIdOfVertexInMST,this->distance_measure_for_NJ, this->verbose);
 			this->t->AddSequences(sequences);
 			this->t->SetNumberOfVerticesInSubtree(this->numberOfVerticesInSubtree);
 			this->t->SetNumberOfInputSequences(numberOfInputSequences);
@@ -530,7 +531,7 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 //	cout << "Number of edges in MST is " << this->M->edgeWeightsMap.size() << endl;
 	tie (names, sequences, sitePatternWeights, sitePatternRepetitions) = this->M->GetCompressedSequencesSiteWeightsAndSiteRepeats(idsOfVerticesForSEM);
 	this->numberOfVerticesInSubtree = sequences.size();
-	this->t = new SEM(largestIdOfVertexInMST,this->distance_measure_for_NJ);
+	this->t = new SEM(largestIdOfVertexInMST,this->distance_measure_for_NJ,this->verbose);
 	this->t->SetFlagForFinalIterationOfSEM();
 	this->t->AddSequences(sequences);
 	this->t->SetNumberOfVerticesInSubtree(this->numberOfVerticesInSubtree);
@@ -632,7 +633,7 @@ void MSTBackbone::MSTBackboneWithRootSEMAndMultipleExternalVertices() {
 //	cout << "Starting MST-backbone" << endl;
 //	cout << "1.	Initialize the global phylogenetic tree T as the empty graph" << endl;
 	int numberOfInputSequences = (int) this->M->vertexMap->size();	
-	this->T = new SEM(1,this->distance_measure_for_NJ);
+	this->T = new SEM(1,this->distance_measure_for_NJ,this->verbose);
 	// Initialize global phylogeny
 	idsOfVerticesForSEM.clear();
 	for (pair <int, MST_vertex *> vIdAndPtr : * this->M->vertexMap) {
@@ -682,7 +683,7 @@ void MSTBackbone::MSTBackboneWithRootSEMAndMultipleExternalVertices() {
 			//	4.	Compute local phylogeny t over (Vs U Ve) via SEM      	 //
 			//----########################################################---//
 //			cout << "4.	Compute local phylogeny t over (Vs U Ve) via SEM" << endl;
-			this->t = new SEM(largestIdOfVertexInMST,this->distance_measure_for_NJ);						
+			this->t = new SEM(largestIdOfVertexInMST,this->distance_measure_for_NJ,this->verbose);						
 			this->t->sequenceFileName = this->sequenceFileName;
 			this->t->AddSequences(sequences);			
 			this->t->SetNumberOfVerticesInSubtree(this->numberOfVerticesInSubtree);			
@@ -754,7 +755,7 @@ void MSTBackbone::MSTBackboneWithRootSEMAndMultipleExternalVertices() {
 	this->mstBackboneLogFile << "Number of vertices in MST is " << this->M->vertexMap->size() << endl;
 	tie (names, sequences, sitePatternWeights, sitePatternRepetitions) = this->M->GetCompressedSequencesSiteWeightsAndSiteRepeats(idsOfVerticesForSEM);
 	this->numberOfVerticesInSubtree = sequences.size();
-	this->t = new SEM(largestIdOfVertexInMST,this->distance_measure_for_NJ);
+	this->t = new SEM(largestIdOfVertexInMST,this->distance_measure_for_NJ,this->verbose);
 	this->t->SetFlagForFinalIterationOfSEM();
 	this->t->sequenceFileName = this->sequenceFileName;
 	this->t->AddSequences(sequences);
@@ -800,7 +801,7 @@ void MSTBackbone::MSTBackboneWithRootSEMAndMultipleExternalVertices() {
 
 
 void MSTBackbone::MSTBackboneWithOneExternalVertex() {
-	this->T = new SEM(1,this->distance_measure_for_NJ);
+	this->T = new SEM(1,this->distance_measure_for_NJ,this->verbose);
 //	ofstream edgeListFile;
 //	edgeListFile.open(this->sequenceFileName + ".edgeList");
 	cout << "Starting MST-backbone" << endl;
@@ -859,7 +860,7 @@ void MSTBackbone::MSTBackboneWithOneExternalVertex() {
 	cout << "Sequence length is " << this->T->sequenceLength << endl;
 	while (subtreeExtractionPossible) {
 		cout << "Number of vertices in MST is " << this->M->vertexMap->size() << endl;
-		this->t = new SEM(h_ind,this->distance_measure_for_NJ);	
+		this->t = new SEM(h_ind,this->distance_measure_for_NJ,this->verbose);	
 		// ids of vertices in subtree
 		idsOfVerticesForSEM = v_mst->idsOfVerticesInSubtree;
 		numberOfVerticesInSubtree = v_mst->idsOfVerticesInSubtree.size();
@@ -894,7 +895,7 @@ void MSTBackbone::MSTBackboneWithOneExternalVertex() {
 	for (pair <int, MST_vertex *> vIdAndPtr : * this->M->vertexMap) {
 		idsOfVerticesForSEM.push_back(vIdAndPtr.first);
 	}	
-	this->t = new SEM(h_ind,this->distance_measure_for_NJ);
+	this->t = new SEM(h_ind,this->distance_measure_for_NJ,this->verbose);
 	tie (names, sequences, sitePatternWeights, sitePatternRepetitions) = this->M->GetCompressedSequencesSiteWeightsAndSiteRepeats(idsOfVerticesForSEM);
 //	cout << "Number of distinct site patterns is " << sitePatternWeights.size() << endl;
 	this->t->SetFlagForFinalIterationOfSEM();
