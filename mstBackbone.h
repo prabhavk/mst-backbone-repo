@@ -609,7 +609,8 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 	this->mstBackboneLogFile << "CPU time used for rooting T using EM is " << timeTakenToRootViaRestrictedSEM.count() << " second(s)\n";
 	cout << "Log likelihood under the GM model is " << this->T->logLikelihood << endl;
 	this->mstBackboneLogFile << "Log likelihood is " << this->T->logLikelihood << endl;
-	double BIC = -2 * this->T->logLikelihood + (3 + 12 * (this->T->numberOfInputSequences -1) * log2(this->T->sequenceLength));	
+	double BIC = -2 * this->T->logLikelihood + (3 + 12 * (this->T->vertexMap->size() -1)) * log(this->T->sequenceLength);
+	
 	cout << "BIC under the GM model is " << BIC << endl;
 	this->mstBackboneLogFile << "BIC under the GM model is " << BIC << endl;
 	cout << "Writing rooted tree in edge list format and newick format" << endl;
