@@ -872,10 +872,10 @@ void MST_tree::ReadSequences(string sequenceFileNameToSet) {
 					// dna_char = this->mapDNAtoInteger[string(1,toupper(dna))];										
 				}
 				if (this->IsSequenceDuplicated(recodedSequence)) {
-					cout << seqName << " is dupl " << endl;
+					// cout << seqName << " is dupl " << endl;
 					this->AddDuplicatedSequenceName(seqName,recodedSequence);
 				} else {					
-					cout << seqName << " not dupl " << endl;
+					// cout << seqName << " not dupl " << endl;
 					this->AddVertex(seqName,recodedSequence);
 				}
 				// this->AddVertex(seqName,recodedSequence);
@@ -904,10 +904,10 @@ void MST_tree::ReadSequences(string sequenceFileNameToSet) {
 		}
 	}
 	if (this->IsSequenceDuplicated(recodedSequence)) {		
-		cout << seqName << " is dupl " << endl;
+		// cout << seqName << " is dupl " << endl;
 		this->AddDuplicatedSequenceName(seqName,recodedSequence);
 	} else {
-		cout << seqName << " not dupl " << endl;
+		// cout << seqName << " not dupl " << endl;
 		this->AddVertex(seqName,recodedSequence);
 	}
 	// this->AddVertex(seqName,recodedSequence);
