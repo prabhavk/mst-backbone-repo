@@ -8,6 +8,7 @@
 #include <boost/algorithm/string.hpp>
 #include <fstream>
 #include <math.h>
+#include "MST.h"
 //#include <boost/math/tools/minima.hpp>
 using namespace Eigen;
 
@@ -17,6 +18,7 @@ public:
 	int timesVisited = 0;
 	bool observed = 0;	
     vector <unsigned char> compressedSequence;
+	vector <string> dupl_seq_names;
 	int id = -42;
 	int global_id = -42;
 	string newickLabel = "";
@@ -32,7 +34,9 @@ public:
 	void AddNeighbor(SEM_vertex * v_ptr);
 	void RemoveNeighbor(SEM_vertex * v_ptr);
 	void AddParent(SEM_vertex * v_ptr);
+	void RemoveParent();
 	void AddChild(SEM_vertex * v_ptr);
+	void RemoveChild(SEM_vertex * v_ptr);
 	void SetVertexLogLikelihood(float vertexLogLikelihoodToSet);
 	int inDegree = 0;
 	int outDegree = 0;
@@ -68,9 +72,20 @@ void SEM_vertex::AddParent(SEM_vertex * v) {
 	this->inDegree += 1;
 }
 
+void SEM_vertex::RemoveParent() {
+	this->parent = this;
+	this->inDegree -=1;
+}
+
 void SEM_vertex::AddChild(SEM_vertex * v) {
 	this->children.push_back(v);
 	this->outDegree += 1;
+}
+
+void SEM_vertex::RemoveChild(SEM_vertex * v) {
+	int ind = find(this->children.begin(),this->children.end(),v) - this->children.begin();
+	this->children.erase(this->children.begin()+ind);
+	this->outDegree -=1;
 }
 
 void SEM_vertex::AddNeighbor(SEM_vertex * v) {
@@ -1067,9 +1082,11 @@ public:
 	void SetInfoForVerticesToAddToMST();
 	void SetIdsOfExternalVertices();
 	void ClearAncestralSequences();
+	void RemoveEdgeLength(SEM_vertex * u, SEM_vertex * v);
+	void AddEdgeLength(SEM_vertex * u, SEM_vertex * v, float t);
 	float GetEdgeLength(SEM_vertex * u, SEM_vertex * v);
 	float ComputeEdgeLength(SEM_vertex * u, SEM_vertex * v);
-	void SetEdgeLength(SEM_vertex * u, SEM_vertex * v, float);
+	void SetEdgeLength(SEM_vertex * u, SEM_vertex * v, float t);
 	void OptimizeTopology();
 	void ComputeChowLiuTree();
 	void AddSubforestOfInterest(SEM * localPhylogeneticTree);
@@ -1159,7 +1176,7 @@ public:
 	void RootTreeUsingEstimatedParametersViaML();
 	void SetFlagForFinalIterationOfSEM();
 	void OptimizeTopologyAndParametersOfGMM();	
-//	void RootNJTreeViaEM();	
+//	void RootNJTreeViaEM();
 	void SetRateCategories(float DeltaGCThreshold);
 	void ComputeGCCountsForEachVertex();
 	void SetSortedListOfDeltaGCThresholds();
@@ -1191,6 +1208,7 @@ public:
 	void WriteRootedTreeAsEdgeList(string fileName);
 	void WriteUnrootedTreeAsEdgeList(string fileName);
 	void ResetData();
+	void AddDuplicatedSequencesToTree(MST_tree * M);
 	// Select vertex for rooting Chow-Liu tree and update edges in T
 	// Modify T such that T is a bifurcating tree and likelihood of updated
 	// tree is equivalent to the likelihood of T
@@ -1232,6 +1250,60 @@ public:
 		delete this->cliqueT;
 	}
 };
+
+void SEM::AddDuplicatedSequencesToTree(MST_tree * M) {
+	// Store dupl seq names in uniq seq vertex
+	float t;
+	string uniq_seq_name;
+	vector <string> dupl_seq_name_vec;
+	SEM_vertex * u;
+	SEM_vertex * p;
+	SEM_vertex * d;
+	SEM_vertex * h;
+	vector <unsigned char> emptySequence;
+	// vector <SEM_vertex *> uniq_vertex_ptr_vec;
+	int v_id = this->vertexMap->size() - 1;
+	for (pair <string, vector <string> > uniq_seq_name_2_dupl_seq_name_vec : M->unique_seq_id_2_dupl_seq_ids) {
+		uniq_seq_name = uniq_seq_name_2_dupl_seq_name_vec.first;
+		dupl_seq_name_vec = uniq_seq_name_2_dupl_seq_name_vec.second;
+		u = (*this->vertexMap)[this->nameToIdMap[uniq_seq_name]];
+		p = u->parent;
+		t = this->edgeLengths[make_pair(p,u)];
+		
+		v_id += 1;
+		h = new SEM_vertex(v_id,emptySequence);
+		this->vertexMap->insert(pair<int,SEM_vertex*>(h->id,h));
+		h->name = "h_" + to_string(this->h_ind);
+		this->nameToIdMap.insert(make_pair(h->name,h->id));
+		this->h_ind += 1;
+		
+		u->RemoveParent();
+		p->RemoveChild(u);
+		this->RemoveEdgeLength(p,u);
+		
+		h->AddParent(p);
+		p->AddChild(h);
+		this->AddEdgeLength(p,h,t);
+
+		u->AddParent(h);
+		h->AddChild(u);
+		this->AddEdgeLength(h,u,0.0);
+
+		for (string dupl_seq_name: dupl_seq_name_vec) {
+			v_id += 1;
+			d = new SEM_vertex(v_id,emptySequence);
+			d->name = dupl_seq_name;
+			this->vertexMap->insert(pair<int,SEM_vertex*>(d->id,d));
+			this->nameToIdMap.insert(make_pair(d->name,d->id));
+			// v->dupl_seq_names.push_back(dupl_seq_name);
+			d->AddParent(h);	
+			h->AddChild(d);
+			this->AddEdgeLength(h,d,0.0);
+			// this->edgeLengths[make_pair(h,d)] = 0.0;
+		}
+	}
+}
+
 
 void SEM::SetEdgeAndVertexLogLikelihoods() {
 	SEM_vertex * u;	SEM_vertex * v;
@@ -1626,6 +1698,26 @@ void SEM::ClearAncestralSequences() {
 			idPtrPair.second->compressedSequence.clear();
 		}
 	}
+}
+
+void SEM::RemoveEdgeLength(SEM_vertex * u, SEM_vertex * v) {
+	pair <SEM_vertex *, SEM_vertex *> vertexPair;
+	if (u->id < v->id) {
+		vertexPair = make_pair(u,v);
+	} else {
+		vertexPair = make_pair(v,u);
+	}
+	this->edgeLengths.erase(vertexPair);
+}
+
+void SEM::AddEdgeLength(SEM_vertex * u, SEM_vertex * v, float t) {	
+	pair <SEM_vertex *, SEM_vertex *> vertexPair;
+	if (u->id < v->id) {
+		vertexPair = make_pair(u,v);
+	} else {
+		vertexPair = make_pair(v,u);
+	}
+	this->edgeLengths[vertexPair] = t;
 }
 
 float SEM::GetEdgeLength(SEM_vertex * u, SEM_vertex * v) {
@@ -3348,6 +3440,8 @@ void SEM::RootTreeByFittingAGMMViaEM() {
 	}
 	this->ComputeLogLikelihood();	
 }
+
+
 
 void SEM::RootTreeBySumOfExpectedLogLikelihoods() {
 	SEM_vertex * v;

@@ -116,49 +116,34 @@ public:
 			this->patch_name = patch_name_to_apply;
 			this->apply_patch = true;
 		}				
-		if (apply_patch) {
-			bool tasks_completed = false;
-			bool task_current = false;
-			this->must_have = vector <string> {"map_mut_id_2_fasta_list","vec_dup_seq_mut_id_list","Filter_duplicate_seqs()","Place_duplicate_seqs()"};
-			if (this->must_have.size() > 0) {
-				string current_task = this->must_have[0];
-				cout << "Perfoming task " << current_task << " for patch " << this->patch_name << endl;
-				cout << "All tasks for " << this->patch_name << " patch not complete" << endl;
-				cout << "Exiting to terminal" << endl;
-				exit(-1);
-			} else {
-				cout << "All tasks for " << this->patch_name << " patch complete" << endl;
-				cout << "Applying patch " << this->patch_name << " now" << endl;
-			}
-		}		
+		// if (apply_patch) {
+		// 	// bool tasks_completed = false;
+		// 	// bool task_current = false;
+		// 	// this->must_have = vector <string> {"map_mut_id_2_fasta_list","vec_dup_seq_mut_id_list","Filter_duplicate_seqs()","Place_duplicate_seqs()"};
+		// 	// if (this->must_have.size() > 0) {
+		// 	// 	string current_task = this->must_have[0];
+		// 	// 	cout << "Perfoming task " << current_task << " for patch " << this->patch_name << endl;
+		// 	// 	cout << "All tasks for " << this->patch_name << " patch not complete" << endl;
+		// 	// 	cout << "Exiting to terminal" << endl;
+		// 	// 	exit(-1);
+		// 	// } else {
+		// 	// 	cout << "All tasks for " << this->patch_name << " patch complete" << endl;
+		// 	// 	cout << "Applying patch " << this->patch_name << " now" << endl;
+		// 	// }
+		// }		
 		this->M = new MST_tree();
 		this->M->ReadSequences(this->sequenceFileName);
-		this->M->ComputeMST(); // modify to compute Chow Liu tree
+		this->M->ComputeMST();
 		this->M->WriteToFile(MSTFileName);
-	    // compute Chow-Liu tree using UNREST and get probability distribution for root position
+	    // Compute Chow-Liu tree using UNREST and get probability distribution for root position
 		this->M->SetNumberOfLargeEdgesThreshold(this->numberOfLargeEdgesThreshold);
 		this->T = new SEM(1,this->distance_measure_for_NJ,this->verbose);
 		this->MSTBackboneWithFullSEMAndMultipleExternalVertices(); // MAIN MST_BACKBONE FUNCTION
-		// if (this->modelSelection){
-		// 	// set tree topology
-		// 	this->T->PerformModelSelection();
-		// }			
-//		this->MSTBackboneWithRootSEMAndMultipleExternalVertices();
-		// cout << "Writing ancestral sequences to file " << endl;
-		// this->mstBackboneLogFile << "Writing ancestral sequences to file " << endl;
-		// ofstream ancestralSequencesFile;		
-		// ancestralSequencesFile.open(this->prefix_for_output_files+".ancestralSequences");
-		// ancestralSequencesFile << this->ancestralSequencesString;
-		// ancestralSequencesFile.close();
-		// if (! this->localPhyloOnly) {
-		// this->T->WriteRootedTreeAsEdgeList(this->prefix_for_output_files + ".edges");
-		// this->T->WriteRootedTreeInNewickFormat(this->prefix_for_output_files + ".nwk");
-		// }		
-//		this->MSTBackboneWithOneExternalVertex();	
+		// Add duplicated sequences to tree		
 		this->current_time = std::chrono::high_resolution_clock::now();
 		cout << "Total CPU time used is " << chrono::duration<double>(this->current_time-this->start_time).count() << " second(s)\n";
 		this->mstBackboneLogFile << "Total CPU time used is " << chrono::duration<double>(this->current_time-this->start_time).count() << " second(s)\n";
-		this->mstBackboneLogFile.close();		
+		this->mstBackboneLogFile.close();
 			}
 	~MSTBackbone(){
 		delete this->T;
@@ -412,6 +397,7 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 	this->T->AddSitePatternWeights(sitePatternWeights);
 	this->T->SetNumberOfInputSequences(numberOfInputSequences);	
 	this->T->numberOfObservedVertices = numberOfInputSequences;
+	// add duplicated sequences here
 	
 	int largestIdOfVertexInMST = numberOfInputSequences;
 	
@@ -607,15 +593,19 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 	// timeTakenToRootViaRestrictedSEM -= timeTakenToRootViaEdgeLoglikelihoods;
 	cout << "CPU time used for rooting T using EM is " << timeTakenToRootViaRestrictedSEM.count() << " second(s)\n";
 	this->mstBackboneLogFile << "CPU time used for rooting T using EM is " << timeTakenToRootViaRestrictedSEM.count() << " second(s)\n";
-	cout << "Log likelihood under the GM model is " << this->T->logLikelihood << endl;
+	cout << "Log likelihood under GMM is " << this->T->logLikelihood << endl;
 	this->mstBackboneLogFile << "Log likelihood is " << this->T->logLikelihood << endl;
-	double BIC = -2 * this->T->logLikelihood + (3 + 12 * (this->T->vertexMap->size() -1)) * log(this->T->sequenceLength);
-	
-	cout << "BIC under the GM model is " << BIC << endl;
-	this->mstBackboneLogFile << "BIC under the GM model is " << BIC << endl;
+	double BIC = -2 * this->T->logLikelihood + (3 + 12 * (this->T->vertexMap->size() -1)) * log(this->T->sequenceLength);	
+	cout << "BIC under GMM is " << BIC << endl;
+	this->mstBackboneLogFile << "BIC under GMM is " << BIC << endl;
 	cout << "Writing rooted tree in edge list format and newick format" << endl;
+	this->T->WriteRootedTreeAsEdgeList(this->prefix_for_output_files + "_unique_seqs_only.edges");
+	this->T->WriteRootedTreeInNewickFormat(this->prefix_for_output_files + "_unique_seqs_only.newick");
+	cout << "Adding duplicated sequences " << endl;
+	this->T->AddDuplicatedSequencesToTree(this->M);
 	this->T->WriteRootedTreeAsEdgeList(this->prefix_for_output_files + ".edges");
 	this->T->WriteRootedTreeInNewickFormat(this->prefix_for_output_files + ".newick");
+
 }
 
 void MSTBackbone::MSTBackboneWithRootSEMAndMultipleExternalVertices() {

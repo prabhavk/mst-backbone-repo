@@ -16,17 +16,6 @@
 #include <chrono>
 using namespace std;
 
-enum dna {a,c,g,t,n};
-enum aa {A, R, N, D, C, Q, E, G, H, I, L, K, M, F, P, S, T, W, Y, V};
-class mut {
-public:
-	int id;
-	string dna_mut_id;
-	string full_mut_id;
-	vector <pair <int,dna>> dna_mut_list; // store pos and DNA substitution
-	vector <pair <int,aa>> aa_mut_list; // store pos and AA substitution
-	vector <pair<int,int>> gap_list; // count ambiguous and N as gap store start and end pos
-};
 class MST_vertex {
 public:
 	string name;
@@ -36,14 +25,15 @@ public:
 	int id;
 	int idOfExternalVertex;
 	int rank = 0;
-	map <int,mut> mut_id_2_mut_obj;
+	// map <int,mut> mut_id_2_mut_obj;
 	vector <unsigned char> sequence;
 	vector <unsigned char> globallyCompressedSequence;
 	vector <int> idsOfVerticesInSubtree;
 	vector <MST_vertex *> neighbors;
+	vector <string> dupl_seq_names;
 	void AddNeighbor(MST_vertex * v_ptr);
-	void Get_mut_id(vector <pair<int,dna>> mut_list);
-	MST_vertex(int idToAdd, string nameToAdd, vector<unsigned char> sequenceToAdd) {
+	// void Get_mut_id(vector <pair<int,dna>> mut_list);
+	MST_vertex(int idToAdd, string nameToAdd, vector <unsigned char> sequenceToAdd) {
 		id = idToAdd;
 		sequence = sequenceToAdd;
 		name = nameToAdd;
@@ -76,11 +66,14 @@ public:
 	vector <int> siteWeights;
 	string sequenceFileName;
 	int v_ind;
-	int numberOfLargeEdgesThreshold_input = 0;	
+	int numberOfLargeEdgesThreshold_input = 0;
 	int numberOfLargeEdgesThreshold = 0;
 	int numberOfNonZeroWeightEdges = 0;
 	vector <int> idsOfExternalVertices;
 	map <string, unsigned char> mapDNAtoInteger;
+	// map <vector <unsigned char>, string> unique_seq_2_id;
+	map <string, vector <string>> unique_seq_id_2_dupl_seq_ids;
+	map <vector <unsigned char>, MST_vertex *> unique_seq_2_MST_vertex_ptr;
 	MST_vertex * subtree_v_ptr;
 	map <int, MST_vertex *> * vertexMap;
 	map <pair <int, int>, int> edgeWeightsMap;
@@ -89,6 +82,8 @@ public:
 	void AddEdgeWeightToDistanceGraph(int u_id, int v_id, int edgeWeight);
 	void RemoveWeightedEdgesIncidentToVertexInDistanceGraph(int u_id);
 	void SetCompressedSequencesAndSiteWeightsForInputSequences();
+	bool IsSequenceDuplicated(vector<unsigned char> sequence);
+	void AddDuplicatedSequenceName(string name, vector<unsigned char> sequence);
 	void SetNumberOfLargeEdgesThreshold(int numberOfLargeEdges);
 	void SetEdgeWeightThreshold(int edgeWeight){edgeWeightThreshold = edgeWeight;}
 	void AddVertex(string name, vector <unsigned char> sequence);
@@ -102,7 +97,7 @@ public:
 	void UpdateMaxDegree();
 	void UpdateMSTWithOneExternalVertex(vector <int> idsOfVerticesToRemove, string nameOfSequenceToAdd, vector <unsigned char> sequenceToAdd);
 	bool ContainsEdge(int u_id, int v_id);
-	int GetEdgeWeight(int u_id, int v_id);	
+	int GetEdgeWeight(int u_id, int v_id);
 	int GetEdgeIndex (int vertexIndex1, int vertexIndex2, int numberOfVertices);
 	int GetNumberOfVertices();
 	void ReadSequences(string sequenceFileNameToSet);
@@ -111,8 +106,8 @@ public:
 	void ComputeMST_nonACGT();
 	void ResetSubtreeSizeThreshold();
 	void DoubleSubtreeSizeThreshold();
-	int ComputeHammingDistance(vector <unsigned char> recodedSeq1, vector <unsigned char> recodedSeq2);			
-	pair <vector <int>, vector <int>> GetIdsForSubtreeVerticesAndExternalVertices();	
+	int ComputeHammingDistance(vector <unsigned char> recodedSeq1, vector <unsigned char> recodedSeq2);
+	pair <vector <int>, vector <int>> GetIdsForSubtreeVerticesAndExternalVertices();
 	pair <bool, MST_vertex *> GetPtrToVertexSubtendingSubtree();
 	pair <vector <int>,vector <int>> GetSubtreeVerticesAndExternalVertices();
 	tuple <vector <string>, vector <vector <unsigned char>>, vector <int>, vector <vector<int>>> GetCompressedSequencesSiteWeightsAndSiteRepeats(vector <int> vertexIdList);
@@ -158,16 +153,26 @@ public:
 	}
 };
 
+bool MST_tree::IsSequenceDuplicated(vector<unsigned char> query_seq) {
+	if (this->unique_seq_2_MST_vertex_ptr.find(query_seq) != this->unique_seq_2_MST_vertex_ptr.end()) {
+		return (true);
+	} else {
+		return (false);
+	}
+}
+
+void MST_tree::AddDuplicatedSequenceName(string dupl_seq_name, vector <unsigned char> sequence) {
+	MST_vertex * v = this->unique_seq_2_MST_vertex_ptr[sequence];
+	this->unique_seq_id_2_dupl_seq_ids[v->name].push_back(dupl_seq_name);
+	// v->dupl_seq_names.push_back(name);
+}
+
 void MST_tree::AddEdgeWeightToDistanceGraph(int u_id, int v_id, int edgeWeight) {
 	if (u_id < v_id) {
 		this->allEdgeWeights->insert(make_pair(make_pair(u_id,v_id),edgeWeight));
 	} else {
 		this->allEdgeWeights->insert(make_pair(make_pair(v_id,u_id),edgeWeight));
 	}
-}
-
-void MST_tree::RemoveWeightedEdgesIncidentToVertexInDistanceGraph(int u_id) {
-	
 }
 
 void MST_tree::SetIdsOfExternalVertices() {
@@ -244,7 +249,8 @@ bool MST_tree::ContainsVertex(int vertex_id) {
 
 void MST_tree::AddVertex(string name, vector <unsigned char> sequence) {
 	MST_vertex * v = new MST_vertex(this->v_ind, name, sequence);
-	this->vertexMap->insert(pair<int,MST_vertex*>(this->v_ind,v));	
+	this->vertexMap->insert(pair<int,MST_vertex*>(this->v_ind,v));
+	this->unique_seq_2_MST_vertex_ptr[sequence] = v;	
 	this->v_ind += 1;
 }
 
@@ -521,7 +527,7 @@ void MST_tree::UpdateMaxDegree() {
 }
 
 void MST_tree::UpdateMSTWithMultipleExternalVertices_simple(vector<int> idsOfVerticesToKeep, vector<int> idsOfVerticesToRemove, vector<tuple<int,string,vector<unsigned char>>> idAndNameAndSeqTupleForVerticesToAdd, vector<int> idsOfExternalVertices) {	
-	// Remove weights of edges incident to vertices to removess
+	// Remove weights of edges incident to vertices to removes
 	// Add weights of edges 
 	// Remove vertices
 	
@@ -834,13 +840,7 @@ unsigned char MST_tree::ConvertDNAToChar(char dna) {
 }
 
 
-void MST_tree::ComputeMST_nonACGT() {
-
-
-
-}
-
-void MST_tree::ReadSequences(string sequenceFileNameToSet){
+void MST_tree::ReadSequences(string sequenceFileNameToSet) {
 	this->sequenceFileName = sequenceFileNameToSet;
 	vector <unsigned char> recodedSequence;
 	recodedSequence.clear();
@@ -852,7 +852,7 @@ void MST_tree::ReadSequences(string sequenceFileNameToSet){
 	ifstream inputFile(this->sequenceFileName.c_str());
 	string seqName;
 	// vector mut_list;
-	string seq = "";	
+	string seq = "";
 	for(string line; getline(inputFile, line );) {
 		if (line[0]=='>') {
 			if (seq != "") {
@@ -871,7 +871,14 @@ void MST_tree::ReadSequences(string sequenceFileNameToSet){
 						}						
 					// dna_char = this->mapDNAtoInteger[string(1,toupper(dna))];										
 				}
-				this->AddVertex(seqName,recodedSequence);
+				if (this->IsSequenceDuplicated(recodedSequence)) {
+					cout << seqName << " is dupl " << endl;
+					this->AddDuplicatedSequenceName(seqName,recodedSequence);
+				} else {					
+					cout << seqName << " not dupl " << endl;
+					this->AddVertex(seqName,recodedSequence);
+				}
+				// this->AddVertex(seqName,recodedSequence);
 				recodedSequence.clear();
 			} 
 			seqName = line.substr(1,line.length());
@@ -896,18 +903,22 @@ void MST_tree::ReadSequences(string sequenceFileNameToSet){
 			site += 1;
 		}
 	}
-	this->AddVertex(seqName,recodedSequence);
+	if (this->IsSequenceDuplicated(recodedSequence)) {		
+		cout << seqName << " is dupl " << endl;
+		this->AddDuplicatedSequenceName(seqName,recodedSequence);
+	} else {
+		cout << seqName << " not dupl " << endl;
+		this->AddVertex(seqName,recodedSequence);
+	}
+	// this->AddVertex(seqName,recodedSequence);
 	recodedSequence.clear();
-//	sequenceNames.push_back(seqName);
+	//	sequenceNames.push_back(seqName);
 	inputFile.close();
 	cout << "Number of ambiguous characters is " << float(num_amb) << "\tNumber of nonambiguous characters is " << float(num_non_amb) << endl;
 	cout << "Fraction of ambiguous characters is " << float(num_amb)/float(num_amb + num_non_amb) << endl;
 }
 
-void MST_tree::ComputeMST() {	
-
-// Construct MST incrementally
-// Create distance matrix 
+void MST_tree::ComputeMST() {
 
 	int numberOfVertices = (this->v_ind);		
 	const int numberOfEdges = numberOfVertices*(numberOfVertices-1)/2;		
@@ -958,16 +969,5 @@ void MST_tree::ComputeMST() {
 //	MSTFile.close();
 	delete[] weights;
 }
-
-void MST_tree::ComputeChowLiuTree() {
-// UNREST
-// Fit Q
-// Fit Q
-
-
-
-
-}
-
 
 #endif

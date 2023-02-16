@@ -1,0 +1,10 @@
+Constraint size is set at	10
+Prefix for output files is 	process_all
+Number of vertices in MST is 19
+CPU time used for computing subtree with 19 leaves is 0.171605 seconds
+CPU time used for computing unrooted supertree T is 0.175366 seconds
+Root T by fitting a a GMM using EM
+CPU time used for rooting T using EM is 0.00542902 second(s)
+Log likelihood is -4111.22
+BIC under the GM model is 11480.6
+Total CPU time used is 0.180991 second(s)

@@ -1444,7 +1444,6 @@ void SEM::ReadRootedTree(string treeFileName) {
 		SEM_vertex * v = new SEM_vertex(v_id, emptySequence);
 		v->name = name;
 		v->observed = 1;
-//		cout << "v_name is " << name << endl;
 		this->vertexMap->insert(pair<int,SEM_vertex*>(v_id,v));
 		v_id += 1;
 	}
@@ -5456,7 +5455,7 @@ void SEM::AddWeightedEdges(vector < tuple <string,string,float> > weightedEdgesT
 void SEM::AddEdgeLogLikelihoods(vector<tuple<string,string,float>> edgeLogLikelihoodsToAdd) {
 	SEM_vertex * u; SEM_vertex * v; float edgeLogLikelihood;
 	string u_name; string v_name;
-	pair<SEM_vertex *, SEM_vertex *> vertexPair;
+	pair <SEM_vertex *, SEM_vertex *> vertexPair;
 	for (tuple<string,string,float> edgeLogLikelihoodTuple : edgeLogLikelihoodsToAdd) {
 		tie (u_name, v_name, edgeLogLikelihood) = edgeLogLikelihoodTuple;
 		u = (*this->vertexMap)[this->nameToIdMap[u_name]];
