@@ -33,6 +33,7 @@ int main(int argc, char **argv)
 	bool flag_modelSelection = 0;
 	// bool useChowLiu = 1;
 	string modelForRooting = "UNREST";
+	string root_supertree = "no";
 	string arg_localPhyloOnly;
 	string arg_modelSelection;
 	string arg_chowliu;
@@ -41,7 +42,7 @@ int main(int argc, char **argv)
 	bool flag_verbose = 0;
 	MSTBackbone * MSTBackboneObj;
     if (argc < 2) {        
-        cerr << "Usage: " << argv[0] << " --seq alignment.fas --constraint_size size_of_subtree --distance_measure_for_NJ logDet --out prefix_for_output" << endl;
+        cerr << "Usage: " << argv[0] << " --seq alignment.fas --constraint_size size_of_subtree --distance_measure_for_NJ logDet --out prefix_for_output --root_supertree no" << endl;
 		cerr << endl;
         return (-1);
     } else {        
@@ -70,7 +71,7 @@ int main(int argc, char **argv)
 					if (distance_measure_for_NJ == "logDet" || distance_measure_for_NJ == "Jukes-Cantor" ||distance_measure_for_NJ == "Hamming") {
 						continue;
 					} else {
-						cout << "Enter one of the following distance measures: logDet, Jukes-Cantor or Hamming" << endl;
+						cout << "Enter one of the following distance measures: logDet, Jukes-Cantor, Hamming" << endl;
 						exit (-1);
 					}
                 }
@@ -98,7 +99,17 @@ int main(int argc, char **argv)
                     size_of_subtree = stoi(argv[++i]);
                 }
 			} else if (strcmp(argv[i], "--help") == 0) {
-				cout << "Example for mst-constrained tree construction: " << argv[0] << " --seq alignment.fas --constraint_size size --distance_measure_for_NJ logDet --out prefix_for_output" << endl;
+				cout << "Example for mst-constrained tree construction: " << argv[0] << " --seq alignment.fas --constraint_size size --distance_measure_for_NJ logDet --out prefix_for_output --root_supertree no" << endl;
+			} else if (strcmp(argv[i], "--root_super_tree") == 0) {
+				if (i < argc -1) {					
+					root_supertree = argv[++i];
+					if (root_supertree == "yes" || root_supertree == "no") {
+						continue;
+					} else {
+						cout << "Enter one of the following options for root_supertree: no, yes" << endl;
+						exit (-1);
+					}					
+                }
 			}
         }
 
@@ -111,7 +122,7 @@ int main(int argc, char **argv)
 			prefix_path_obj /= "mstbackbone_output";
 			// prefix_for_output_files = alignment_file_path_obj.parent_path().string() + "_mstbackbone";
 		}		
-		MSTBackboneObj = new MSTBackbone(path_to_alignment_file, size_of_subtree, prefix_path_obj.string(),patch_name,distance_measure_for_NJ,flag_verbose);		
+		MSTBackboneObj = new MSTBackbone(path_to_alignment_file, size_of_subtree, prefix_path_obj.string(),patch_name,distance_measure_for_NJ,flag_verbose,root_supertree);		
 		delete MSTBackboneObj;
 		// MSTBackbone MSTBackboneObj(path_to_alignment_file, size_of_subtree, prefix_path_obj.string(),localPhyloOnly,modelSelection,modelForRooting,useChowLiu);
     }
