@@ -100,7 +100,7 @@ int main(int argc, char **argv)
                 }
 			} else if (strcmp(argv[i], "--help") == 0) {
 				cout << "Example for mst-constrained tree construction: " << argv[0] << " --seq alignment.fas --constraint_size size --distance_measure_for_NJ logDet --out prefix_for_output --root_supertree no" << endl;
-			} else if (strcmp(argv[i], "--root_super_tree") == 0) {
+			} else if (strcmp(argv[i], "--root_supertree") == 0) {
 				if (i < argc -1) {					
 					root_supertree = argv[++i];
 					if (root_supertree == "yes" || root_supertree == "no") {

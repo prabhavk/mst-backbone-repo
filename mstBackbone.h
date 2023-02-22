@@ -71,7 +71,7 @@ private:
 	void WriteOutputFiles();
 	bool debug;
 	bool verbose;
-	bool localPhyloOnly;
+	bool localPhyloOnly;	
 	bool useChowLiu;
 	bool modelSelection;
 	string modelForRooting = "UNREST";
@@ -84,6 +84,7 @@ public:
 	void SetThresholds();
 	void MSTBackboneWithOneExternalVertex();
 	void MSTBackboneWithFullSEMAndMultipleExternalVertices();
+	void RootSuperTree();
 	void MSTBackboneWithRootSEMAndMultipleExternalVertices();
 	void MSTBackboneOverlappingSets();
 	void MSTBackboneOnlyLocalPhylo();
@@ -93,7 +94,7 @@ public:
 		// bool localPhyloOnly = TRUE;
 		// this->useChowLiu = useChowLiu_toset;
 		// this->localPhyloOnly = localPhyloOnly_to_set;		
-		// this->modelForRooting = modelForRooting_to_set;
+		// this->modelForRooting = modelForRooting_to_set;		
 		start_time = chrono::high_resolution_clock::now();				
 		this->sequenceFileName = sequenceFileNameToAdd;		
 		this->patch_name = patch_name_to_apply;
@@ -101,6 +102,13 @@ public:
 		this->distance_measure_for_NJ = distance_measure_for_NJ_to_set;
 		cout << "Distance measure used for NJ is " << this->distance_measure_for_NJ << endl;
 		this->mstBackboneLogFile << "Distance measure used for NJ is " << this->distance_measure_for_NJ << endl;
+		if (root_supertree == "yes") {
+			cout << "Supertree will be rooted" << endl;
+			this->mstBackboneLogFile << "Supertree will be rooted " << endl;
+		} else {
+			cout << "Supertree will not be rooted" << endl;
+			this->mstBackboneLogFile << "Supertree will not be rooted " << endl;
+		}				
 		this->numberOfLargeEdgesThreshold = subtreeSizeThresholdToset;
 		this->prefix_for_output_files = prefix_for_output_files_to_set;
 		// output files		
@@ -139,7 +147,9 @@ public:
 		this->M->SetNumberOfLargeEdgesThreshold(this->numberOfLargeEdgesThreshold);
 		this->T = new SEM(1,this->distance_measure_for_NJ,this->verbose);
 		this->MSTBackboneWithFullSEMAndMultipleExternalVertices(); // MAIN MST_BACKBONE FUNCTION
-		// Add duplicated sequences to tree		
+		if (root_supertree == "yes"){
+			this->RootSuperTree();
+		}
 		this->current_time = std::chrono::high_resolution_clock::now();
 		cout << "Total CPU time used is " << chrono::duration<double>(this->current_time-this->start_time).count() << " second(s)\n";
 		this->mstBackboneLogFile << "Total CPU time used is " << chrono::duration<double>(this->current_time-this->start_time).count() << " second(s)\n";
@@ -552,18 +562,25 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 	delete this->t;
 	//	this->mstBackboneLogFile << "CPU time used for computing local phylogeny is " << chrono::duration_cast<chrono::seconds>(t_end_time-t_start_time).count() << " second(s)\n";		
 	// assert that T is a tree
-	cout << "Number of vertices in T is " << this->T->vertexMap->size() << endl;
-	cout << "Number of edges in T is " << this->T->edgeLengths.size() << endl;
-	assert(this->T->vertexMap->size() == this->T->edgeLengths.size() + 1);
-	//----##############---//		
+	// cout << "Number of vertices in T is " << this->T->vertexMap->size() << endl;
+	// cout << "Number of edges in T is " << this->T->edgeLengths.size() << endl;
+	// assert(this->T->vertexMap->size() == this->T->edgeLengths.size() + 1);
+	// timeTakenToComputeGlobalUnrootedPhylogeneticTree = chrono::duration_cast<chrono::seconds>(current_time-start_time);	
+	// timeTakenToComputeGlobalUnrootedPhylogeneticTree -= timeTakenToComputeEdgeAndVertexLogLikelihoods;		
+	this->T->AddDuplicatedSequencesToUnrootedTree(this->M);
+	this->T->WriteUnrootedTreeAsEdgeList(this->prefix_for_output_files + ".unrooted_edgeList");
+	this->T->RootTreeAtAVertexPickedAtRandom();
+	this->T->WriteRootedTreeInNewickFormat(this->prefix_for_output_files + ".unrooted_newick");
+	timeTakenToComputeGlobalUnrootedPhylogeneticTree = current_time-start_time;
+	// timeTakenToComputeGlobalUnrootedPhylogeneticTree -= timeTakenToComputeEdgeAndVertexLogLikelihoods;	
+	cout << "CPU time used for computing unrooted supertree is " << timeTakenToComputeGlobalUnrootedPhylogeneticTree.count() << " seconds\n";
+	this->mstBackboneLogFile << "CPU time used for computing unrooted supertree is " << timeTakenToComputeGlobalUnrootedPhylogeneticTree.count() << " seconds\n";
+}
+
+void MSTBackbone::RootSuperTree() {
+//----##############---//		
 	//	10.	Root T via EM  //
 	//----##############---//
-	current_time = chrono::high_resolution_clock::now();
-	// timeTakenToComputeGlobalUnrootedPhylogeneticTree = chrono::duration_cast<chrono::seconds>(current_time-start_time);
-	timeTakenToComputeGlobalUnrootedPhylogeneticTree = current_time-start_time;
-	// timeTakenToComputeGlobalUnrootedPhylogeneticTree -= timeTakenToComputeEdgeAndVertexLogLikelihoods;
-	cout << "CPU time used for computing unrooted supertree tree T is " << timeTakenToComputeGlobalUnrootedPhylogeneticTree.count() << " seconds\n";
-	this->mstBackboneLogFile << "CPU time used for computing unrooted supertree T is " << timeTakenToComputeGlobalUnrootedPhylogeneticTree.count() << " seconds\n";
 	// cout << "Fitting a general Markov model GMM to T using reconstructed ancestral sequences" << endl;
 	// this->mstBackboneLogFile << "Fitting a general Markov model GMM to T using reconstructed ancestral sequences" << endl;		
 	// this->T->RootTreeBySumOfExpectedLogLikelihoods();
@@ -581,6 +598,7 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 	// cout << "Writing rooted tree in edge list format and newick format" << endl;
 	// this->T->WriteRootedTreeAsEdgeList(sequenceFileName + ".edgeList_fullyLabeledRooting");
 	// this->T->WriteRootedTreeInNewickFormat(sequenceFileName + ".newick_fullyLabeledRooting");
+
 	cout << "Root T by fitting a GMM using EM" << endl;
 	this->mstBackboneLogFile << "Root T by fitting a a GMM using EM" << endl;
 	t_start_time = chrono::high_resolution_clock::now();
@@ -599,14 +617,17 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 	cout << "BIC under GMM is " << BIC << endl;
 	this->mstBackboneLogFile << "BIC under GMM is " << BIC << endl;
 	cout << "Writing rooted tree in edge list format and newick format" << endl;
-	this->T->WriteRootedTreeAsEdgeList(this->prefix_for_output_files + "_unique_seqs_only.edges");
-	this->T->WriteRootedTreeInNewickFormat(this->prefix_for_output_files + "_unique_seqs_only.newick");
+	this->T->WriteRootedTreeAsEdgeList(this->prefix_for_output_files + "_unique_seqs_only.directed_edges");
+	this->T->WriteRootedTreeInNewickFormat(this->prefix_for_output_files + "_unique_seqs_only.rooted_newick");
 	cout << "Adding duplicated sequences " << endl;
-	this->T->AddDuplicatedSequencesToTree(this->M);
-	this->T->WriteRootedTreeAsEdgeList(this->prefix_for_output_files + ".edges");
-	this->T->WriteRootedTreeInNewickFormat(this->prefix_for_output_files + ".newick");
+	this->T->AddDuplicatedSequencesToRootedTree(this->M);
+	this->T->WriteRootedTreeAsEdgeList(this->prefix_for_output_files + ".directed_edges");
+	this->T->WriteRootedTreeInNewickFormat(this->prefix_for_output_files + ".rooted_newick");
+
 
 }
+
+
 
 void MSTBackbone::MSTBackboneWithRootSEMAndMultipleExternalVertices() {
 	vector <string> names;

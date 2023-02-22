@@ -1208,7 +1208,8 @@ public:
 	void WriteRootedTreeAsEdgeList(string fileName);
 	void WriteUnrootedTreeAsEdgeList(string fileName);
 	void ResetData();
-	void AddDuplicatedSequencesToTree(MST_tree * M);
+	void AddDuplicatedSequencesToRootedTree(MST_tree * M);
+	void AddDuplicatedSequencesToUnrootedTree(MST_tree * M);
 	// Select vertex for rooting Chow-Liu tree and update edges in T
 	// Modify T such that T is a bifurcating tree and likelihood of updated
 	// tree is equivalent to the likelihood of T
@@ -1251,7 +1252,7 @@ public:
 	}
 };
 
-void SEM::AddDuplicatedSequencesToTree(MST_tree * M) {
+void SEM::AddDuplicatedSequencesToRootedTree(MST_tree * M) {
 	// Store dupl seq names in uniq seq vertex
 	float t;
 	string uniq_seq_name;
@@ -1298,6 +1299,59 @@ void SEM::AddDuplicatedSequencesToTree(MST_tree * M) {
 			// v->dupl_seq_names.push_back(dupl_seq_name);
 			d->AddParent(h);	
 			h->AddChild(d);
+			this->AddEdgeLength(h,d,0.0);
+			// this->edgeLengths[make_pair(h,d)] = 0.0;
+		}
+	}
+}
+
+void SEM::AddDuplicatedSequencesToUnrootedTree(MST_tree * M) {
+	// Store dupl seq names in uniq seq vertex
+	float t;
+	string uniq_seq_name;
+	vector <string> dupl_seq_name_vec;
+	SEM_vertex * l;
+	SEM_vertex * n;
+	SEM_vertex * d;
+	SEM_vertex * h;
+	vector <unsigned char> emptySequence;
+	// vector <SEM_vertex *> uniq_vertex_ptr_vec;
+	int v_id = this->vertexMap->size() - 1;
+	for (pair <string, vector <string> > uniq_seq_name_2_dupl_seq_name_vec : M->unique_seq_id_2_dupl_seq_ids) {
+		uniq_seq_name = uniq_seq_name_2_dupl_seq_name_vec.first;
+		dupl_seq_name_vec = uniq_seq_name_2_dupl_seq_name_vec.second;
+		l = (*this->vertexMap)[this->nameToIdMap[uniq_seq_name]];
+		n = l->neighbors[0];
+		t = this->edgeLengths[make_pair(n,l)];
+		
+		v_id += 1;
+		h = new SEM_vertex(v_id,emptySequence);
+		this->vertexMap->insert(pair<int,SEM_vertex*>(h->id,h));
+		h->name = "h_" + to_string(this->h_ind);
+		this->nameToIdMap.insert(make_pair(h->name,h->id));
+		this->h_ind += 1;
+		
+		l->RemoveNeighbor(n);
+		n->RemoveNeighbor(l);
+		this->RemoveEdgeLength(n,l);
+		
+		h->AddNeighbor(n);
+		n->AddNeighbor(h);
+		this->AddEdgeLength(n,h,t);
+
+		h->AddNeighbor(l);
+		l->AddNeighbor(h);
+		this->AddEdgeLength(h,l,0.0);
+
+		for (string dupl_seq_name: dupl_seq_name_vec) {
+			v_id += 1;
+			d = new SEM_vertex(v_id,emptySequence);
+			d->name = dupl_seq_name;
+			this->vertexMap->insert(pair<int,SEM_vertex*>(d->id,d));
+			this->nameToIdMap.insert(make_pair(d->name,d->id));
+			// v->dupl_seq_names.push_back(dupl_seq_name);
+			d->AddNeighbor(h);	
+			h->AddNeighbor(d);
 			this->AddEdgeLength(h,d,0.0);
 			// this->edgeLengths[make_pair(h,d)] = 0.0;
 		}
@@ -1942,11 +1996,13 @@ void SEM::WriteUnrootedTreeAsEdgeList(string fileName) {
 	ofstream treeFile;
 	treeFile.open(fileName);
 	SEM_vertex * v;
+	float t;
 	for (pair <int, SEM_vertex *> idPtrPair : * this->vertexMap) {
 		v = idPtrPair.second;
 		for (SEM_vertex * n : v->neighbors) {
 			if (v->id < n->id) {
-				treeFile << v->name << "\t" << n->name << "\t" << "1.0" << endl;
+				t = this->GetEdgeLength(v,n);
+				treeFile << v->name << "\t" << n->name << "\t" << t << endl;
 			}
 		}
 	}
