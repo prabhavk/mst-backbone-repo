@@ -138,11 +138,15 @@ public:
 		// 	// 	cout << "All tasks for " << this->patch_name << " patch complete" << endl;
 		// 	// 	cout << "Applying patch " << this->patch_name << " now" << endl;
 		// 	// }
-		// }		
+		// }
+		this->m_start_time = std::chrono::high_resolution_clock::now();		
 		this->M = new MST_tree();
 		this->M->ReadSequences(this->sequenceFileName);
-		this->M->ComputeMST();
+		this->M->ComputeMST();		
 		this->M->WriteToFile(MSTFileName);
+		this->current_time = std::chrono::high_resolution_clock::now();
+		cout << "Time taken to compute MST is " << chrono::duration<double>(this->current_time-this->m_start_time).count() << " second(s)\n";
+		this->mstBackboneLogFile << "Time taken to compute MST is " << chrono::duration<double>(this->current_time-this->m_start_time).count() << " second(s)\n";
 	    // Compute Chow-Liu tree using UNREST and get probability distribution for root position
 		this->M->SetNumberOfLargeEdgesThreshold(this->numberOfLargeEdgesThreshold);
 		this->T = new SEM(1,this->distance_measure_for_NJ,this->verbose);
