@@ -38,7 +38,7 @@ int main(int argc, char **argv)
 	string arg_modelSelection;
 	string arg_chowliu;
 	string string_verbose;
-	string distance_measure_for_NJ = "Hamming";
+	string distance_measure_for_NJ = "logDet";
 	bool flag_verbose = 0;
 	MSTBackbone * MSTBackboneObj;
     if (argc < 2) {        
