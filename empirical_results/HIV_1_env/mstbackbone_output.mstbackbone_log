@@ -1,0 +1,26 @@
+Constraint size is set at	10
+Prefix for output files is 	mstbackbone_output
+Time taken to compute MST is 0.0281982 second(s)
+Number of vertices in MST is 174
+CPU time used for computing subtree with 22 leaves is 0.205688 seconds
+Number of vertices in MST is 163
+CPU time used for computing subtree with 40 leaves is 4.23923 seconds
+Number of vertices in MST is 147
+CPU time used for computing subtree with 29 leaves is 0.455117 seconds
+Number of vertices in MST is 132
+CPU time used for computing subtree with 29 leaves is 0.487409 seconds
+Number of vertices in MST is 123
+CPU time used for computing subtree with 26 leaves is 0.441301 seconds
+Number of vertices in MST is 109
+CPU time used for computing subtree with 38 leaves is 2.8324 seconds
+Number of vertices in MST is 100
+CPU time used for computing subtree with 29 leaves is 1.02686 seconds
+Number of vertices in MST is 87
+CPU time used for computing subtree with 39 leaves is 3.94359 seconds
+Number of vertices in MST is 64
+CPU time used for computing subtree with 37 leaves is 3.3361 seconds
+Number of vertices in MST is 38
+CPU time used for computing subtree with 30 leaves is 1.03321 seconds
+CPU time used for computing subtree with 19 leaves is 0.395764 seconds
+Time taken for computing unrooted supertree is 18.4104 seconds
+Total CPU time used is 18.4393 second(s)

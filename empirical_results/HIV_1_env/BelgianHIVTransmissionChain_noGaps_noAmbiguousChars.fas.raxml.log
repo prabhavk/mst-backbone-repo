@@ -1,0 +1,210 @@
+
+RAxML-NG v. 1.0.1 released on 19.09.2020 by The Exelixis Lab.
+Developed by: Alexey M. Kozlov and Alexandros Stamatakis.
+Contributors: Diego Darriba, Tomas Flouri, Benoit Morel, Sarah Lutteropp, Ben Bettisworth.
+Latest version: https://github.com/amkozlov/raxml-ng
+Questions/problems/suggestions? Please visit: https://groups.google.com/forum/#!forum/raxml
+
+System: Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz, 6 cores, 30 GB RAM
+
+RAxML-NG was called at 23-Feb-2023 13:09:16 as follows:
+
+/home/pk/Tools/raxml-ng --msa BelgianHIVTransmissionChain_noGaps_noAmbiguousChars.fas --model GTR
+
+Analysis options:
+  run mode: ML tree search
+  start tree(s): random (10) + parsimony (10)
+  random seed: 1677154156
+  tip-inner: OFF
+  pattern compression: ON
+  per-rate scalers: OFF
+  site repeats: ON
+  fast spr radius: AUTO
+  spr subtree cutoff: 1.000000
+  branch lengths: proportional (ML estimate, algorithm: NR-FAST)
+  SIMD kernels: AVX2
+  parallelization: coarse-grained (auto), PTHREADS (auto)
+
+[00:00:00] Reading alignment from file: BelgianHIVTransmissionChain_noGaps_noAmbiguousChars.fas
+[00:00:00] Loaded alignment with 181 taxa and 1357 sites
+
+WARNING: Sequences A05cl03@05 and A05cl10@05 are exactly identical!
+WARNING: Sequences C02cl02@02 and C02cl12@02 are exactly identical!
+WARNING: Sequences C02cl03@02 and C02cl07@02 are exactly identical!
+WARNING: Sequences C03cl01@03 and C03cl03@03 are exactly identical!
+WARNING: Sequences C94cl03@94 and C94cl05@94 are exactly identical!
+WARNING: Sequences C94cl03@94 and C94cl09@94 are exactly identical!
+WARNING: Sequences C94cl03@94 and C94cl12@94 are exactly identical!
+WARNING: Duplicate sequences found: 7
+
+NOTE: Reduced alignment (with duplicates and gap-only sites/taxa removed) 
+NOTE: was saved to: /home/kalaghat/Projects/mst-backbone-repo/empirical_results/HIV_1_env/BelgianHIVTransmissionChain_noGaps_noAmbiguousChars.fas.raxml.reduced.phy
+
+Alignment comprises 1 partitions and 488 patterns
+
+Partition 0: noname
+Model: GTR+FO
+Alignment sites / patterns: 1357 / 488
+Gaps: 0.00 %
+Invariant sites: 61.24 %
+
+
+NOTE: Binary MSA file created: BelgianHIVTransmissionChain_noGaps_noAmbiguousChars.fas.raxml.rba
+
+Parallelization scheme autoconfig: 6 worker(s) x 1 thread(s)
+
+Parallel reduction/worker buffer size: 1 KB  / 0 KB
+
+[00:00:00] Generating 10 random starting tree(s) with 181 taxa
+[00:00:00] Generating 10 parsimony starting tree(s) with 181 taxa
+[00:00:00] Data distribution: max. partitions/sites/weight per thread: 1 / 488 / 1952
+[00:00:00] Data distribution: max. searches per worker: 4
+
+Starting ML tree search with 20 distinct starting trees
+
+[00:00:00 -73332.691084] Initial branch length optimization
+[00:00:00 -42927.754372] Model parameter optimization (eps = 10.000000)
+[00:00:00 -40754.122753] AUTODETECT spr round 1 (radius: 5)
+[00:00:01 -18239.275056] AUTODETECT spr round 2 (radius: 10)
+[00:00:02 -12097.609378] AUTODETECT spr round 3 (radius: 15)
+[00:00:03 -11917.292613] AUTODETECT spr round 4 (radius: 20)
+[00:00:05 -11917.292611] SPR radius for FAST iterations: 15 (autodetect)
+[00:00:05 -11917.292611] Model parameter optimization (eps = 3.000000)
+[00:00:05 -11893.227777] FAST spr round 1 (radius: 15)
+[00:00:06 -10909.348430] FAST spr round 2 (radius: 15)
+[00:00:06 -10823.552667] FAST spr round 3 (radius: 15)
+[00:00:07 -10813.202056] FAST spr round 4 (radius: 15)
+[00:00:07 -10813.202055] Model parameter optimization (eps = 1.000000)
+[00:00:08 -10811.593553] SLOW spr round 1 (radius: 5)
+[00:00:09 -10784.721581] SLOW spr round 2 (radius: 5)
+[00:00:10 -10784.721502] SLOW spr round 3 (radius: 10)
+[00:00:11 -10784.721500] SLOW spr round 4 (radius: 15)
+[00:00:15 -10784.721500] SLOW spr round 5 (radius: 20)
+[00:00:18 -10784.721500] SLOW spr round 6 (radius: 25)
+[00:00:18] [worker #3] ML tree search #4, logLikelihood: -10788.034863
+[00:00:19 -10784.721500] Model parameter optimization (eps = 0.100000)
+
+[00:00:19] [worker #0] ML tree search #1, logLikelihood: -10784.678889
+
+[00:00:19 -72768.376377] Initial branch length optimization
+[00:00:19 -41920.832706] Model parameter optimization (eps = 10.000000)
+[00:00:20 -39824.858042] AUTODETECT spr round 1 (radius: 5)
+[00:00:20] [worker #2] ML tree search #3, logLikelihood: -10776.344344
+[00:00:21 -19946.178917] AUTODETECT spr round 2 (radius: 10)
+[00:00:21] [worker #5] ML tree search #6, logLikelihood: -10776.382186
+[00:00:22 -11642.492017] AUTODETECT spr round 3 (radius: 15)
+[00:00:23 -11469.866073] AUTODETECT spr round 4 (radius: 20)
+[00:00:25] [worker #4] ML tree search #5, logLikelihood: -10793.117531
+[00:00:25 -11469.866073] SPR radius for FAST iterations: 15 (autodetect)
+[00:00:25 -11469.866073] Model parameter optimization (eps = 3.000000)
+[00:00:25 -11442.797787] FAST spr round 1 (radius: 15)
+[00:00:25] [worker #1] ML tree search #2, logLikelihood: -10766.646250
+[00:00:26 -10889.975952] FAST spr round 2 (radius: 15)
+[00:00:26 -10790.864327] FAST spr round 3 (radius: 15)
+[00:00:27 -10788.929730] FAST spr round 4 (radius: 15)
+[00:00:27 -10788.929730] Model parameter optimization (eps = 1.000000)
+[00:00:27 -10787.765169] SLOW spr round 1 (radius: 5)
+[00:00:29 -10784.301313] SLOW spr round 2 (radius: 5)
+[00:00:30 -10784.301254] SLOW spr round 3 (radius: 10)
+[00:00:32 -10776.464759] SLOW spr round 4 (radius: 5)
+[00:00:35 -10776.464753] SLOW spr round 5 (radius: 10)
+[00:00:37 -10769.990474] SLOW spr round 6 (radius: 5)
+[00:00:39] [worker #5] ML tree search #12, logLikelihood: -10760.189935
+[00:00:40 -10769.990471] SLOW spr round 7 (radius: 10)
+[00:00:42 -10769.990471] SLOW spr round 8 (radius: 15)
+[00:00:45] [worker #4] ML tree search #11, logLikelihood: -10779.867652
+[00:00:45 -10769.990471] SLOW spr round 9 (radius: 20)
+[00:00:48 -10769.990471] SLOW spr round 10 (radius: 25)
+[00:00:49] [worker #1] ML tree search #8, logLikelihood: -10778.593900
+[00:00:50 -10769.990471] Model parameter optimization (eps = 0.100000)
+
+[00:00:50] [worker #0] ML tree search #7, logLikelihood: -10769.383563
+
+[00:00:50 -53937.169137] Initial branch length optimization
+[00:00:50 -11403.066082] Model parameter optimization (eps = 10.000000)
+[00:00:51 -10890.794998] AUTODETECT spr round 1 (radius: 5)
+[00:00:51 -10819.643004] AUTODETECT spr round 2 (radius: 10)
+[00:00:53 -10819.015996] AUTODETECT spr round 3 (radius: 15)
+[00:00:54] [worker #3] ML tree search #10, logLikelihood: -10775.804801
+[00:00:56 -10819.015996] SPR radius for FAST iterations: 10 (autodetect)
+[00:00:56 -10819.015996] Model parameter optimization (eps = 3.000000)
+[00:00:56 -10817.633041] FAST spr round 1 (radius: 10)
+[00:00:57 -10787.716770] FAST spr round 2 (radius: 10)
+[00:00:58 -10787.715548] Model parameter optimization (eps = 1.000000)
+[00:00:58 -10787.523081] SLOW spr round 1 (radius: 5)
+[00:00:58] [worker #5] ML tree search #18, logLikelihood: -10803.711128
+[00:01:00 -10780.003429] SLOW spr round 2 (radius: 5)
+[00:01:01] [worker #2] ML tree search #9, logLikelihood: -10776.579963
+[00:01:01 -10779.129344] SLOW spr round 3 (radius: 5)
+[00:01:03 -10779.129291] SLOW spr round 4 (radius: 10)
+[00:01:05 -10779.129291] SLOW spr round 5 (radius: 15)
+[00:01:06] [worker #4] ML tree search #17, logLikelihood: -10765.775514
+[00:01:10 -10779.129291] SLOW spr round 6 (radius: 20)
+[00:01:13 -10779.129291] SLOW spr round 7 (radius: 25)
+[00:01:15 -10779.129291] Model parameter optimization (eps = 0.100000)
+
+[00:01:15] [worker #0] ML tree search #13, logLikelihood: -10779.069876
+
+[00:01:15 -53929.962549] Initial branch length optimization
+[00:01:15 -11396.254723] Model parameter optimization (eps = 10.000000)
+[00:01:16 -10879.162384] AUTODETECT spr round 1 (radius: 5)
+[00:01:17 -10812.501551] AUTODETECT spr round 2 (radius: 10)
+[00:01:18 -10812.499238] SPR radius for FAST iterations: 5 (autodetect)
+[00:01:18 -10812.499238] Model parameter optimization (eps = 3.000000)
+[00:01:18] [worker #3] ML tree search #16, logLikelihood: -10771.284002
+[00:01:19 -10812.348975] FAST spr round 1 (radius: 5)
+[00:01:19 -10811.104888] FAST spr round 2 (radius: 5)
+[00:01:20 -10811.104854] Model parameter optimization (eps = 1.000000)
+[00:01:20] [worker #1] ML tree search #14, logLikelihood: -10766.204587
+[00:01:20 -10811.086561] SLOW spr round 1 (radius: 5)
+[00:01:21] [worker #2] ML tree search #15, logLikelihood: -10771.532975
+[00:01:22 -10807.839636] SLOW spr round 2 (radius: 5)
+[00:01:23 -10803.193563] SLOW spr round 3 (radius: 5)
+[00:01:25 -10799.870969] SLOW spr round 4 (radius: 5)
+[00:01:26 -10798.434062] SLOW spr round 5 (radius: 5)
+[00:01:28 -10795.697050] SLOW spr round 6 (radius: 5)
+[00:01:29 -10795.697050] SLOW spr round 7 (radius: 10)
+[00:01:31 -10795.697050] SLOW spr round 8 (radius: 15)
+[00:01:35 -10792.469119] SLOW spr round 9 (radius: 5)
+[00:01:39 -10788.374271] SLOW spr round 10 (radius: 5)
+[00:01:42] [worker #1] ML tree search #20, logLikelihood: -10768.890917
+[00:01:42 -10777.256832] SLOW spr round 11 (radius: 5)
+[00:01:44 -10771.529082] SLOW spr round 12 (radius: 5)
+[00:01:46 -10770.698890] SLOW spr round 13 (radius: 5)
+[00:01:47 -10770.698889] SLOW spr round 14 (radius: 10)
+[00:01:49 -10770.698889] SLOW spr round 15 (radius: 15)
+[00:01:53 -10770.698889] SLOW spr round 16 (radius: 20)
+[00:01:57 -10770.698889] SLOW spr round 17 (radius: 25)
+[00:01:58 -10770.698889] Model parameter optimization (eps = 0.100000)
+
+[00:01:58] [worker #0] ML tree search #19, logLikelihood: -10769.712202
+
+
+Optimized model parameters:
+
+   Partition 0: noname
+   Rate heterogeneity: NONE
+   Base frequencies (ML): 0.333784 0.172269 0.263053 0.230894 
+   Substitution rates (ML): 1.757563 5.874788 0.730292 0.688637 5.786876 1.000000 
+
+
+Final LogLikelihood: -10760.189935
+
+AIC score: 22254.379870 / AICc score: 22527.496149 / BIC score: 24167.562489
+Free parameters (model + branch lengths): 367
+
+WARNING: Best ML tree contains 56 near-zero branches!
+
+Best ML tree with collapsed near-zero branches saved to: /home/kalaghat/Projects/mst-backbone-repo/empirical_results/HIV_1_env/BelgianHIVTransmissionChain_noGaps_noAmbiguousChars.fas.raxml.bestTreeCollapsed
+Best ML tree saved to: /home/kalaghat/Projects/mst-backbone-repo/empirical_results/HIV_1_env/BelgianHIVTransmissionChain_noGaps_noAmbiguousChars.fas.raxml.bestTree
+All ML trees saved to: /home/kalaghat/Projects/mst-backbone-repo/empirical_results/HIV_1_env/BelgianHIVTransmissionChain_noGaps_noAmbiguousChars.fas.raxml.mlTrees
+Optimized model saved to: /home/kalaghat/Projects/mst-backbone-repo/empirical_results/HIV_1_env/BelgianHIVTransmissionChain_noGaps_noAmbiguousChars.fas.raxml.bestModel
+
+Execution log saved to: /home/kalaghat/Projects/mst-backbone-repo/empirical_results/HIV_1_env/BelgianHIVTransmissionChain_noGaps_noAmbiguousChars.fas.raxml.log
+
+Analysis started: 23-Feb-2023 13:09:16 / finished: 23-Feb-2023 13:11:15
+
+Elapsed time: 119.001 seconds
+
+Consumed energy: 5124095854.364 Wh (= 25620479 km in an electric car, or 128102396 km with an e-scooter!)
+
