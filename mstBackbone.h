@@ -143,10 +143,12 @@ public:
 		this->M = new MST_tree();
 		this->M->ReadSequences(this->sequenceFileName);
 		this->M->ComputeMST();
+		cout << this->M->num_duplicated_sequences << " duplicate sequences found; duplicate sequences will be not be used by mst-backbone; instead they will be added to the supertree constructed by mst-backbone" << endl;
+		this->mstBackboneLogFile << this->M->num_duplicated_sequences << " duplicate sequences found; duplicate sequences will be not be used by mst-backbone; instead they will be added to the supertree constructed by mst-backbone" << endl;
 		this->M->WriteToFile(MSTFileName);
 		this->current_time = std::chrono::high_resolution_clock::now();
-		cout << "Time taken to compute MST is " << chrono::duration<double>(this->current_time-this->m_start_time).count() << " second(s)\n";
-		this->mstBackboneLogFile << "Time taken to compute MST is " << chrono::duration<double>(this->current_time-this->m_start_time).count() << " second(s)\n";
+		cout << "Time taken to compute MST is " << chrono::duration<double>(this->current_time-this->m_start_time).count() << " seconds\n";
+		this->mstBackboneLogFile << "Time taken to compute MST is " << chrono::duration<double>(this->current_time-this->m_start_time).count() << " seconds\n";
 	    // Compute Chow-Liu tree using UNREST and get probability distribution for root position
 		this->M->SetNumberOfLargeEdgesThreshold(this->numberOfLargeEdgesThreshold);
 		this->T = new SEM(1,this->distance_measure_for_NJ,this->verbose);
@@ -160,8 +162,8 @@ public:
 			this->RootSuperTree();
 		}
 		this->current_time = std::chrono::high_resolution_clock::now();
-		cout << "Total CPU time used is " << chrono::duration<double>(this->current_time-this->start_time).count() << " second(s)\n";
-		this->mstBackboneLogFile << "Total CPU time used is " << chrono::duration<double>(this->current_time-this->start_time).count() << " second(s)\n";
+		cout << "Total CPU time used is " << chrono::duration<double>(this->current_time-this->start_time).count() << " seconds\n";
+		this->mstBackboneLogFile << "Total CPU time used is " << chrono::duration<double>(this->current_time-this->start_time).count() << " seconds\n";
 		this->mstBackboneLogFile.close();
 			}
 	~MSTBackbone(){
@@ -576,6 +578,8 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 	// assert(this->T->vertexMap->size() == this->T->edgeLengths.size() + 1);
 	// timeTakenToComputeGlobalUnrootedPhylogeneticTree = chrono::duration_cast<chrono::seconds>(current_time-start_time);	
 	// timeTakenToComputeGlobalUnrootedPhylogeneticTree -= timeTakenToComputeEdgeAndVertexLogLikelihoods;		
+	cout << "Adding duplicated sequences to tree" << endl;
+	this->mstBackboneLogFile << "Adding duplicated sequences to tree" << endl;
 	this->T->AddDuplicatedSequencesToUnrootedTree(this->M);
 	this->T->WriteUnrootedTreeAsEdgeList(this->prefix_for_output_files + ".unrooted_edgeList");
 	this->T->RootTreeAtAVertexPickedAtRandom();

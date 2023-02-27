@@ -62,7 +62,8 @@ private:
 	chrono::system_clock::time_point time_to_compute_MST;
 	bool build_MST_incrementally = false;
 public:
-	int maxDegree;
+	int maxDegree;	
+	unsigned int num_duplicated_sequences = 0;
 	vector <int> siteWeights;
 	string sequenceFileName;
 	int v_ind;
@@ -117,7 +118,7 @@ public:
 	void WriteToFile(string fileName);
 	unsigned char ConvertDNAToChar(char dna);
 	MST_tree() {		
-		this->v_ind = 0;
+		this->v_ind = 0;		
 		vector <unsigned char> emptySequence;
 		this->allEdgeWeights = new map <pair<int,int>,int> ; 
 		this->vertexMap = new map <int, MST_vertex *>;
@@ -161,9 +162,10 @@ bool MST_tree::IsSequenceDuplicated(vector<unsigned char> query_seq) {
 	}
 }
 
-void MST_tree::AddDuplicatedSequenceName(string dupl_seq_name, vector <unsigned char> sequence) {
+void MST_tree::AddDuplicatedSequenceName(string dupl_seq_name, vector <unsigned char> sequence) {	
 	MST_vertex * v = this->unique_seq_2_MST_vertex_ptr[sequence];
 	this->unique_seq_id_2_dupl_seq_ids[v->name].push_back(dupl_seq_name);
+	this->num_duplicated_sequences += 1;
 	// v->dupl_seq_names.push_back(name);
 }
 
@@ -916,6 +918,8 @@ void MST_tree::ReadSequences(string sequenceFileNameToSet) {
 	inputFile.close();
 	cout << "Number of ambiguous characters is " << float(num_amb) << "\tNumber of nonambiguous characters is " << float(num_non_amb) << endl;
 	cout << "Fraction of ambiguous characters is " << float(num_amb)/float(num_amb + num_non_amb) << endl;
+	cout << this->num_duplicated_sequences << " duplicate sequences found; duplicate sequences will be not be used by mst-backbone; instead they will be added to the supertree constructed by mst-backbone" << endl;
+	
 }
 
 void MST_tree::ComputeMST() {

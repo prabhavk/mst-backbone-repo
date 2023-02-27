@@ -5840,6 +5840,10 @@ float SEM::ComputeDistance(int v_i, int v_j) {
 			f_j[seq_j[site]] += float(this->sitePatternWeights[site])/sequence_length;
 		}
 		det_of_count_frequency_matrix = F.determinant();
+		if (det_of_count_frequency_matrix <= 0) {
+			cout << "count frequency matrix is " << endl;
+			cout << F << endl;
+		}
 		assert (det_of_count_frequency_matrix > 0);
 		distance = log(det_of_count_frequency_matrix);
 		for (int dna = 0; dna < 4; dna ++) {
