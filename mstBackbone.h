@@ -123,7 +123,7 @@ public:
 		if (patch_name_to_apply.length() > 0){
 			this->patch_name = patch_name_to_apply;
 			this->apply_patch = true;
-		}				
+		}		
 		// if (apply_patch) {
 		// 	// bool tasks_completed = false;
 		// 	// bool task_current = false;
