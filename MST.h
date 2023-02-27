@@ -108,6 +108,7 @@ public:
 	void ResetSubtreeSizeThreshold();
 	void DoubleSubtreeSizeThreshold();
 	int ComputeHammingDistance(vector <unsigned char> recodedSeq1, vector <unsigned char> recodedSeq2);
+	// float ComputeLogDetDistance(vector <unsigned char> recodedSeq1, vector <unsigned char> recodedSeq2);
 	pair <vector <int>, vector <int>> GetIdsForSubtreeVerticesAndExternalVertices();
 	pair <bool, MST_vertex *> GetPtrToVertexSubtendingSubtree();
 	pair <vector <int>,vector <int>> GetSubtreeVerticesAndExternalVertices();
@@ -238,11 +239,11 @@ int MST_tree::ComputeHammingDistance(vector<unsigned char> recodedSeq1, vector<u
 		}		
 	}
 	return (hammingDistance);
-};
+}
 
 int MST_tree::GetNumberOfVertices() {
 	return this->vertexMap->size();
-};
+}
 
 
 bool MST_tree::ContainsVertex(int vertex_id) {
