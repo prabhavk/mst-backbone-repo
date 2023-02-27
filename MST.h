@@ -919,7 +919,7 @@ void MST_tree::ReadSequences(string sequenceFileNameToSet) {
 	inputFile.close();
 	cout << "Number of ambiguous characters is " << float(num_amb) << "\tNumber of nonambiguous characters is " << float(num_non_amb) << endl;
 	cout << "Fraction of ambiguous characters is " << float(num_amb)/float(num_amb + num_non_amb) << endl;
-	cout << this->num_duplicated_sequences << " duplicate sequences found; duplicate sequences will be not be used by mst-backbone; instead they will be added to the supertree constructed by mst-backbone" << endl;
+	// cout << this->num_duplicated_sequences << " duplicate sequences found; duplicate sequences will be not be used by mst-backbone; instead they will be added to the supertree constructed by mst-backbone" << endl;
 	
 }
 
