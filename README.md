@@ -24,7 +24,7 @@ UNRESTselector.py performs model selection by fitting non-stationary non-reversi
 # Using mst-backbone
 
 ```console
-mst-backbone --seq alignment.fas --size subtree_size --out output_prefix
+mst-backbone --seq alignment.fas --constraint_size size_of_subtree --distance_measure_for_NJ logDet --out prefix_for_output --root_supertree no
 ```
 Input file:
 
@@ -32,17 +32,21 @@ alignment.fas: a multiple sequence alignment file in fasta format
 
 Parameters:
 
-subtree_size: constraint on the minimum number of non-zero weighted edges in the subgraphs induced by vertex sets $V_S$ and $V_O$ 
+constraint_size: size constraint on the number of edges in the subgraphs induced by vertex sets $V_S$ and $V_O$ 
 
-output_prefix: used for naming output files. Default prefix is mstbackbone_output
+distance_measure_for_NJ: distance measure used for constructing NJ trees. Select among logDet, Jukes-Cantor and Hamming distance.
+
+out: prefix used for naming output files. Default prefix is mstbackbone_output
+
+root_supertree: Choose whether or not to root the supertree under the GMM via EM
 
 Output files:
 
 output_prefix.mst: the maximum parsimony spanning tree used for constraining search through tree-space 
 
-output_prefix.newick: the output tree in newick format
+output_prefix.unrooted_newick: the output tree in newick format
 
-output_prefix.edges: the output tree in edge list format
+output_prefix.unrooted_edges: the output tree in edge list format
 
 output_prefix.mstbackbone_log: contains all the messages that is printed to terminal
 
