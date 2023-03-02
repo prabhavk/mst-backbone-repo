@@ -980,11 +980,12 @@ int MSTBackbone::ComputeHammingDistance(string seq1, string seq2) {
 
 int MSTBackbone::ComputeHammingDistance(vector<unsigned char> recodedSeq1, vector<unsigned char> recodedSeq2) {
 	int hammingDistance = 0;
+	float ungappedSequenceLength = 0;
 	for (unsigned int i=0;i<recodedSeq1.size();i++) {
 		if (recodedSeq1[i] != recodedSeq2[i]) {
 			hammingDistance+=1;
 		}		
-	}
+	}	
 	return (hammingDistance);
 };
 
