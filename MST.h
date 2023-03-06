@@ -233,11 +233,18 @@ void MST_tree::DoubleSubtreeSizeThreshold() {
 }
 int MST_tree::ComputeHammingDistance(vector<unsigned char> recodedSeq1, vector<unsigned char> recodedSeq2) {
 	int hammingDistance = 0;
+	float pos_considered = 0;
 	for (unsigned int i=0;i<recodedSeq1.size();i++){
-		if (recodedSeq1[i] != recodedSeq2[i]){
-			hammingDistance+=1;
+		if (recodedSeq1[i] == 4 or recodedSeq1[i] == 4) {
+			continue;
+		} else {
+			pos_considered += 1;
+			if (recodedSeq1[i] != recodedSeq2[i]) {
+					hammingDistance+=1;
+				}
 		}		
 	}
+	hammingDistance /= pos_considered;
 	return (hammingDistance);
 }
 
@@ -865,7 +872,7 @@ void MST_tree::ReadSequences(string sequenceFileNameToSet) {
 						dna_char = this->ConvertDNAToChar(dna);
 						if (dna_char > 3) { // FIX_AMB
 							num_amb += 1;
-							dna_char = 3;
+							// dna_char = 3;
 						} else {
 							num_non_amb += 1;
 						}
@@ -898,7 +905,7 @@ void MST_tree::ReadSequences(string sequenceFileNameToSet) {
 			dna_char = this->ConvertDNAToChar(dna);
 			if (dna_char > 3) { // FIX_AMB
 				num_amb += 1;
-				dna_char = 3;
+				// dna_char = 3;
 			} else {
 				num_non_amb += 1;
 			}

@@ -42,7 +42,7 @@ int main(int argc, char **argv)
 	bool flag_verbose = 0;
 	MSTBackbone * MSTBackboneObj;
     if (argc < 2) {        
-        cerr << "Usage: " << argv[0] << " --seq alignment.fas --constraint_size size_of_subtree --distance_measure_for_NJ logDet --out prefix_for_output --root_supertree no" << endl;
+        cerr << "Usage: " << argv[0] << " --seq alignment.fas --constraint_size size_of_subtree --distance_measure_for_NJ LogDet --out prefix_for_output --root_supertree no" << endl;
 		cerr << endl;
         return (-1);
     } else {        
@@ -52,7 +52,7 @@ int main(int argc, char **argv)
 			if (strcmp(argv[i], "--patch") == 0) {		
                 if (i < argc -1) {					
                     patch_name = argv[++i];
-					cout << "Applying patch " << patch_name << endl;					
+					cout << "Applying patch " << patch_name << endl;
                 }        
             } else if (strcmp(argv[i], "--seq") == 0) {				
                 if (i < argc -1) {					

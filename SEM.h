@@ -4872,7 +4872,8 @@ void SEM::ComputeMPEstimateOfAncestralSequences() {
 		VU.clear();
 	//	Compute V and VU for leaves
 		for (SEM_vertex * c : this->leaves) {
-//			cout << c->name << endl;			
+//			cout << c->name << endl;
+			assert (c->compressedSequence[site] < 4);			
 			V.insert(make_pair(c,c->compressedSequence[site]));
 //			cout << "Insert 1 successful" << endl;
 			vector <unsigned char> vectorToAdd;
@@ -5866,15 +5867,6 @@ float SEM::ComputeDistance(int v_i, int v_j) {
 			distance += float(this->sitePatternWeights[site])/sequence_length;
 			}						
 		}				
-	} else if (flag_JC) {
-		float p_distance;
-		p_distance = 0;
-		for (int site = 0; site < numberOfSitePatterns; site++) {
-			if (seq_i[site] != seq_j[site]) {
-			p_distance += float(this->sitePatternWeights[site])/sequence_length;
-			}
-		}
-		distance = -0.75 * log(1 - p_distance/0.75);
 	}
 	return (distance);
 }
