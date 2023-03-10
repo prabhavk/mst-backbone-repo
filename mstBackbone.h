@@ -406,7 +406,7 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 	current_time = chrono::high_resolution_clock::now();
 	// timeTakenToComputeEdgeAndVertexLogLikelihoods = chrono::duration_cast<chrono::seconds>(current_time-current_time);
 	
-	// Initialize global phylogeny
+	// Initialize supertree
 	idsOfVerticesForSEM.clear();
 	for (pair <int, MST_vertex *> vIdAndPtr : * this->M->vertexMap) {
 		idsOfVerticesForSEM.push_back(vIdAndPtr.first);

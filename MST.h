@@ -248,6 +248,7 @@ int MST_tree::ComputeHammingDistance(vector<unsigned char> recodedSeq1, vector<u
 	return (hammingDistance);
 }
 
+
 int MST_tree::GetNumberOfVertices() {
 	return this->vertexMap->size();
 }
