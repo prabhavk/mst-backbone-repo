@@ -84,9 +84,11 @@ public:
 	void SetThresholds();
 	void MSTBackboneWithOneExternalVertex();
 	void MSTBackboneWithFullSEMAndMultipleExternalVertices();
+	void ChowLiuGroupingParallel();
 	void RootSuperTree();
 	void MSTBackboneWithRootSEMAndMultipleExternalVertices();
 	void MSTBackboneOverlappingSets();
+	void SteinerMinimalTree();
 	void MSTBackboneOnlyLocalPhylo();
 	void Apply_patch(string patch_name_to_apply);
 	MSTBackbone(string sequenceFileNameToAdd, int subtreeSizeThresholdToset, string prefix_for_output_files_to_set, string patch_name_to_apply, string distance_measure_for_NJ_to_set, bool verbose_flag_to_set, string root_supertree) {
@@ -356,7 +358,7 @@ void MSTBackbone::MSTBackboneOnlyLocalPhylo() {
 
 }
 
-void MSTBackbone::MSTBackboneOverlappingSets() {
+void MSTBackbone::MSTBackboneOverlappingSets() {	
 // Implement here
 // Print the vertex names and edges (u_name, v_name) in the MST
 // this->M ;
@@ -367,7 +369,6 @@ void MSTBackbone::MSTBackboneOverlappingSets() {
 //		Select the neighborhood of the vertex
 //	Print the list of vertex names in each neighborhood
 }
-
 
 //	Input:	Multiple sequence alignment A, MST M = (Vm,Em), subtree size threshold s_min
 //	1.	Initialize global phylogenetic tree T as the empty graph
@@ -386,6 +387,24 @@ void MSTBackbone::MSTBackboneOverlappingSets() {
 //		add vertices/edges in t to T
 //	10.	Root T via EM
 //	Output: T
+
+// Chow-Liu grouping style parallelization (Furong )
+// Minimum evolution based tree search (FastME)
+// Model based ancestral state reconstruction (Pupko)
+// Ishikawa and colleagues for phylogeography
+void MSTBackbone::MJ() {
+	int numberOfInputSequences = (int) this->M->vertexMap->size();		
+	// 
+	current_time = chrono::high_resolution_clock::now();
+	// timeTakenToComputeEdgeAndVertexLogLikelihoods = chrono::duration_cast<chrono::seconds>(current_time-current_time);
+
+	cout << "Adding duplicated sequences to tree" << endl;
+	this->mstBackboneLogFile << "Adding duplicated sequences to tree" << endl;
+	this->T->AddDuplicatedSequencesToUnrootedTree(this->M);
+	this->T->WriteUnrootedTreeAsEdgeList(this->prefix_for_output_files + ".unrooted_edgeList");
+	this->T->RootTreeAtAVertexPickedAtRandom();
+	this->T->WriteRootedTreeInNewickFormat(this->prefix_for_output_files + ".unrooted_newick");	
+}
 
 void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 	vector <string> names;
