@@ -106,6 +106,7 @@ public:
 	void ComputeChowLiuTree();
 	void ComputeMST_nonACGT();
 	void ResetSubtreeSizeThreshold();
+	
 	void DoubleSubtreeSizeThreshold();
 	int ComputeHammingDistance(vector <unsigned char> recodedSeq1, vector <unsigned char> recodedSeq2);
 	// float ComputeLogDetDistance(vector <unsigned char> recodedSeq1, vector <unsigned char> recodedSeq2);
@@ -766,7 +767,7 @@ tuple <vector<string>,vector<vector<unsigned char>>,vector<int>,vector<vector<in
 	}
 	int numberOfSites = vertexPtrList[0]->sequence.size();
 	vector<unsigned char> sitePattern;
-	for(int site=0; site < numberOfSites; site++){
+	for(int site = 0; site < numberOfSites; site++){
 		sitePattern.clear();
 		for (MST_vertex* v_ptr: vertexPtrList){
 			sitePattern.push_back(v_ptr->sequence[site]);}

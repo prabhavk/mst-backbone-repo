@@ -389,15 +389,11 @@ void MSTBackbone::MSTBackboneOverlappingSets() {
 //	Output: T
 
 // Chow-Liu grouping style parallelization (Furong )
-// Minimum evolution based tree search (FastME)
-// Model based ancestral state reconstruction (Pupko)
-// Ishikawa and colleagues for phylogeography
-void MSTBackbone::MJ() {
+void MSTBackbone::ChowLiuGroupingParallel() {
 	int numberOfInputSequences = (int) this->M->vertexMap->size();		
-	// 
+	
 	current_time = chrono::high_resolution_clock::now();
 	// timeTakenToComputeEdgeAndVertexLogLikelihoods = chrono::duration_cast<chrono::seconds>(current_time-current_time);
-
 	cout << "Adding duplicated sequences to tree" << endl;
 	this->mstBackboneLogFile << "Adding duplicated sequences to tree" << endl;
 	this->T->AddDuplicatedSequencesToUnrootedTree(this->M);
