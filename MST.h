@@ -55,6 +55,7 @@ private:
 	int largestVertexIndex;
 	int edgeWeightThreshold = 0;
 	vector <MST_vertex*> verticesToVisit;
+	vector <int> leaderIds;
 	bool ContainsVertex(int vertex_id);
 	map <pair<int,int>,int> * allEdgeWeights;
 	chrono::system_clock::time_point current_time;
@@ -93,6 +94,7 @@ public:
 	void AddEdge(int u_id, int v_id, int edgeWeight);
 	void RemoveEdge(int u_id, int v_id);
 	void ResetVertexAttributesForSubtreeSearch();
+	void SelectLeaders();
 	void UpdateMSTWithMultipleExternalVertices(vector <int> idsOfVerticesToKeep, vector <int> idsOfVerticesToRemove, vector <tuple<int,string,vector<unsigned char>>> idAndNameAndSeqTupleForVerticesToAdd, vector <int> idsOfExternalVertices);
     void UpdateMSTWithMultipleExternalVertices_simple(vector <int> idsOfVerticesToKeep, vector <int> idsOfVerticesToRemove, vector <tuple<int,string,vector<unsigned char>>> idAndNameAndSeqTupleForVerticesToAdd, vector <int> idsOfExternalVertices);	
 	void UpdateMaxDegree();
@@ -103,6 +105,7 @@ public:
 	int GetNumberOfVertices();
 	void ReadSequences(string sequenceFileNameToSet);
 	void ComputeMST();
+	void DisjointTreeMerger_CLGrouping();
 	void ComputeChowLiuTree();
 	void ComputeMST_nonACGT();
 	void ResetSubtreeSizeThreshold();
@@ -930,6 +933,25 @@ void MST_tree::ReadSequences(string sequenceFileNameToSet) {
 	cout << "Fraction of ambiguous characters is " << float(num_amb)/float(num_amb + num_non_amb) << endl;
 	// cout << this->num_duplicated_sequences << " duplicate sequences found; duplicate sequences will be not be used by mst-backbone; instead they will be added to the supertree constructed by mst-backbone" << endl;
 	
+}
+
+void MST_tree::SelectLeaders(){
+	this->leaders;
+	for (pair <int,MST_vertex*> idPtr_pair: *this->vertexMap){			
+			if (idPtr_pair.second->degree > 1) {
+				this->leaderIds;
+			}
+		}
+	// MST_vertex* v_ptr = (*this->vertexMap)[vertexIdList[i]];
+}
+
+// Follows the terminology in Huang and colleagues 2019
+// parallelize using OpenMP
+void MST_tree::DisjointTreeMerger_CLGrouping(){
+	// select leaders (internal vertices)
+	// build subtree for each leader
+	// Perform pairwise merger of subtrees 
+	// Merge subtree for each pair of adjacent vertices on MST
 }
 
 void MST_tree::ComputeMST() {

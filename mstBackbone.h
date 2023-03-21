@@ -388,9 +388,9 @@ void MSTBackbone::MSTBackboneOverlappingSets() {
 //	10.	Root T via EM
 //	Output: T
 
-// Chow-Liu grouping style parallelization (Furong )
+// Chow-Liu grouping style parallelization (Furong and colleagues 2019)
 void MSTBackbone::ChowLiuGroupingParallel() {
-	int numberOfInputSequences = (int) this->M->vertexMap->size();		
+	int numberOfInputSequences = (int) this->M->vertexMap->size();	
 	
 	current_time = chrono::high_resolution_clock::now();
 	// timeTakenToComputeEdgeAndVertexLogLikelihoods = chrono::duration_cast<chrono::seconds>(current_time-current_time);
@@ -399,7 +399,9 @@ void MSTBackbone::ChowLiuGroupingParallel() {
 	this->T->AddDuplicatedSequencesToUnrootedTree(this->M);
 	this->T->WriteUnrootedTreeAsEdgeList(this->prefix_for_output_files + ".unrooted_edgeList");
 	this->T->RootTreeAtAVertexPickedAtRandom();
-	this->T->WriteRootedTreeInNewickFormat(this->prefix_for_output_files + ".unrooted_newick");	
+	this->T->WriteRootedTreeInNewickFormat(this->prefix_for_output_files + ".unrooted_newick");
+	// build a supertree for each
+	// this->T->AddWeightedEdges(this->t->weightedEdgesToAddToGlobalPhylogeneticTree);
 }
 
 void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
