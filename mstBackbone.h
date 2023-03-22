@@ -427,7 +427,7 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 	idsOfVerticesForSEM.clear();
 	for (pair <int, MST_vertex *> vIdAndPtr : * this->M->vertexMap) {
 		idsOfVerticesForSEM.push_back(vIdAndPtr.first);
-	}
+	}	
 	tie (names, sequences, sitePatternWeights, sitePatternRepetitions) = this->M->GetCompressedSequencesSiteWeightsAndSiteRepeats(idsOfVerticesForSEM);	
 	this->T->sequenceFileName = this->sequenceFileName;
 	this->T->AddSequences(sequences);
@@ -483,6 +483,8 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 			this->t->AddGlobalIds(idsOfVerticesForSEM);
 			this->t->AddSitePatternWeights(sitePatternWeights);
 			this->t->AddSitePatternRepeats(sitePatternRepetitions);
+			cout << "Computing subtree with " << this->t->numberOfObservedVertices << " leaves ";
+			this->mstBackboneLogFile << "Computing subtree with " << this->t->numberOfObservedVertices << " leaves ";
 			t_start_time = chrono::high_resolution_clock::now();
 			this->t->OptimizeTopologyAndParametersOfGMM();
 			t_end_time = chrono::high_resolution_clock::now();
@@ -564,7 +566,9 @@ void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {
 	this->t->AddNames(names);
 	this->t->AddGlobalIds(idsOfVerticesForSEM);
 	this->t->AddSitePatternWeights(sitePatternWeights);
-	this->t->AddSitePatternRepeats(sitePatternRepetitions);	
+	this->t->AddSitePatternRepeats(sitePatternRepetitions);
+	cout << "Computing subtree with " << this->t->numberOfObservedVertices << " leaves ";
+	this->mstBackboneLogFile << "Computing subtree with " << this->t->numberOfObservedVertices << " leaves ";	
 	t_start_time = chrono::high_resolution_clock::now();
 	this->t->OptimizeTopologyAndParametersOfGMM();
 	t_end_time = chrono::high_resolution_clock::now();

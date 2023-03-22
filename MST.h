@@ -105,6 +105,7 @@ public:
 	int GetNumberOfVertices();
 	void ReadSequences(string sequenceFileNameToSet);
 	void ComputeMST();
+	void ComputeMSTMultiThread();
 	void DisjointTreeMerger_CLGrouping();
 	void ComputeChowLiuTree();
 	void ComputeMST_nonACGT();
@@ -952,6 +953,58 @@ void MST_tree::DisjointTreeMerger_CLGrouping(){
 	// build subtree for each leader
 	// Perform pairwise merger of subtrees 
 	// Merge subtree for each pair of adjacent vertices on MST
+}
+
+void MST_tree::ComputeMSTMultiThread() {
+
+	int numberOfVertices = (this->v_ind);		
+	const int numberOfEdges = numberOfVertices*(numberOfVertices-1)/2;		
+	
+	int * weights;
+	weights = new int [numberOfEdges];
+		
+	int edgeIndex = 0;
+	for (int i=0; i<numberOfVertices; i++) {
+		for (int j=i+1; j<numberOfVertices; j++) {			
+			weights[edgeIndex] = ComputeHammingDistance((*this->vertexMap)[i]->sequence,(*this->vertexMap)[j]->sequence);
+			edgeIndex += 1;
+		}
+	}
+	typedef pair <int,int > E;
+
+	E * edges;
+	edges = new E [numberOfEdges];
+	edgeIndex = 0;
+	for (int i=0; i<numberOfVertices; i++) {
+		for (int j=i+1; j<numberOfVertices; j++) {
+			edges[edgeIndex] = E(i,j);
+			edgeIndex += 1;
+		}
+	}
+	typedef boost::adjacency_list < boost::vecS, boost::vecS, boost::undirectedS, boost::property<boost::vertex_distance_t, int>, boost::property < boost::edge_weight_t, int> > Graph;
+	Graph g(edges, edges + numberOfEdges, weights, numberOfVertices);
+
+	vector < boost::graph_traits < Graph >::vertex_descriptor >  p(num_vertices(g));
+	prim_minimum_spanning_tree(g, &p[0]);
+	delete[] edges;		
+	int edgeCount = 0;
+//	ofstream MSTFile;
+//	MSTFile.open(sequenceFileName+".mst");
+	for (size_t u = 0; u != p.size(); u++) {
+		if (p[u] != u) {
+			edgeCount += 1;
+			if (u < p[u]) {
+				edgeIndex = GetEdgeIndex(u,p[u],numberOfVertices);
+			} else {
+				edgeIndex = GetEdgeIndex(p[u],u,numberOfVertices);
+			}
+			this->AddEdge(u, p[u], weights[edgeIndex]);
+//			MSTFile << (*this->vertexMap)[u]->name << "\t" << (*this->vertexMap)[p[u]]->name << "\t" << weights[edgeIndex] << endl;
+		}
+	}
+	this->UpdateMaxDegree();
+//	MSTFile.close();
+	delete[] weights;
 }
 
 void MST_tree::ComputeMST() {

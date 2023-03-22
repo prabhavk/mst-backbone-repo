@@ -11,15 +11,7 @@ namespace fs = std::experimental::filesystem;
 int main(int argc, char **argv)
 {
     string path_to_alignment_file;
-	string patch_name;
-		// duplicate_sequences
-		// highly similar sequnces (Hamming distance of 1; try upto 5)
-		// incremental construction		
-		// genotype-recombination network
-		// Select subset of vertices based on phenotypes
-		// Amino acid/Drug resistance/Phenotype network
-		// Network layout
-		// Dynamic network layout?		
+	string patch_name;	
 	fs::path alignment_file_path_obj;
 	fs::path prefix_path_obj;
     string prefix_for_output_files;
