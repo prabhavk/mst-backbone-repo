@@ -94,7 +94,7 @@ public:
 	void AddEdge(int u_id, int v_id, int edgeWeight);
 	void RemoveEdge(int u_id, int v_id);
 	void ResetVertexAttributesForSubtreeSearch();
-	void SelectLeaders();
+	// void SelectLeaders();
 	void UpdateMSTWithMultipleExternalVertices(vector <int> idsOfVerticesToKeep, vector <int> idsOfVerticesToRemove, vector <tuple<int,string,vector<unsigned char>>> idAndNameAndSeqTupleForVerticesToAdd, vector <int> idsOfExternalVertices);
     void UpdateMSTWithMultipleExternalVertices_simple(vector <int> idsOfVerticesToKeep, vector <int> idsOfVerticesToRemove, vector <tuple<int,string,vector<unsigned char>>> idAndNameAndSeqTupleForVerticesToAdd, vector <int> idsOfExternalVertices);	
 	void UpdateMaxDegree();
@@ -936,15 +936,15 @@ void MST_tree::ReadSequences(string sequenceFileNameToSet) {
 	
 }
 
-void MST_tree::SelectLeaders(){
-	this->leaders;
-	for (pair <int,MST_vertex*> idPtr_pair: *this->vertexMap){			
-			if (idPtr_pair.second->degree > 1) {
-				this->leaderIds;
-			}
-		}
-	// MST_vertex* v_ptr = (*this->vertexMap)[vertexIdList[i]];
-}
+// void MST_tree::SelectLeaders(){
+// 	this->leaders;
+// 	for (pair <int,MST_vertex*> idPtr_pair: *this->vertexMap){			
+// 			if (idPtr_pair.second->degree > 1) {
+// 				this->leaderIds;
+// 			}
+// 		}
+// 	// MST_vertex* v_ptr = (*this->vertexMap)[vertexIdList[i]];
+// }
 
 // Follows the terminology in Huang and colleagues 2019
 // parallelize using OpenMP
