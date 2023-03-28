@@ -5844,22 +5844,14 @@ float SEM::ComputeDistance(int v_i, int v_j) {
 		if (det_of_count_frequency_matrix <= 0) {
 			cout << "count frequency matrix is " << endl;
 			cout << F << endl;
-			cout << "Using the Hamming distance instead of the logDet because the determinant of the count frequency matrix is not positive" << endl;			
-			distance = 0;
-			for (int site = 0; site < numberOfSitePatterns; site++) {
-				if (seq_i[site] != seq_j[site]) {
-				distance += float(this->sitePatternWeights[site])/sequence_length;
-				}
-			}
-		} else {
-			assert (det_of_count_frequency_matrix > 0);
-			distance = log(det_of_count_frequency_matrix);
-			for (int dna = 0; dna < 4; dna ++) {
-				distance -= 0.5 * log(f_i[dna]);
-				distance -= 0.5 * log(f_j[dna]);
-			}
-			distance *= -0.25;
-		}		
+		}
+		assert (det_of_count_frequency_matrix > 0);
+		distance = log(det_of_count_frequency_matrix);
+		for (int dna = 0; dna < 4; dna ++) {
+			distance -= 0.5 * log(f_i[dna]);
+			distance -= 0.5 * log(f_j[dna]);
+		}
+		distance *= -0.25;
 	} else if (flag_Hamming) {
 		distance = 0;
 		for (int site = 0; site < numberOfSitePatterns; site++) {
