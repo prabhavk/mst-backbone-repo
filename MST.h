@@ -201,7 +201,7 @@ void MST_tree::SetNumberOfLargeEdgesThreshold(int numberOfLargeEdges_toSet) {
 
 bool MST_tree::ShouldIComputeALocalPhylogeneticTree() {
 	bool valueToReturn;
-	bool verbose = 0;
+	bool verbose = 1;
 	bool subtreeExtractionPossible;
 	int numberOfNonZeroWeightEdgesInVmWithoutVs;
 	tie (subtreeExtractionPossible, this->subtree_v_ptr) = this->GetPtrToVertexSubtendingSubtree();	
@@ -218,7 +218,7 @@ bool MST_tree::ShouldIComputeALocalPhylogeneticTree() {
 		}
 	} else {
 		if (verbose) {
-			cout << "Case 1: subtree extraction is not possible" << endl;
+			cout << "Case 2: subtree extraction is not possible" << endl;
 		}
 		valueToReturn = 0;
 	}
@@ -235,19 +235,21 @@ void MST_tree::DoubleSubtreeSizeThreshold() {
 	this->numberOfLargeEdgesThreshold = this->numberOfLargeEdgesThreshold * 2;
 }
 int MST_tree::ComputeHammingDistance(vector<unsigned char> recodedSeq1, vector<unsigned char> recodedSeq2) {
-	int hammingDistance = 0;
-	float pos_considered = 0;
+	// int hammingDistance_int = 0;
+	// int pos_considered_int = 0;
+	int hammingDistance = 0;	
 	for (unsigned int i=0;i<recodedSeq1.size();i++){
 		if (recodedSeq1[i] == 4 or recodedSeq1[i] == 4) {
 			continue;
-		} else {
-			pos_considered += 1;
+		} else {			
 			if (recodedSeq1[i] != recodedSeq2[i]) {
-					hammingDistance+=1;
+					hammingDistance+=1.0;
 				}
 		}		
 	}
-	hammingDistance /= pos_considered;
+	// cout << "Hamming distance before normalizing is " << hammingDistance << endl;
+	// hammingDistance /= pos_considered;
+	// cout << "Hamming distance after normalizing is " << hammingDistance << endl;
 	return (hammingDistance);
 };
 
@@ -965,6 +967,9 @@ void MST_tree::ComputeMST() {
 	for (int i=0; i<numberOfVertices; i++) {
 		for (int j=i+1; j<numberOfVertices; j++) {			
 			weights[edgeIndex] = ComputeHammingDistance((*this->vertexMap)[i]->sequence,(*this->vertexMap)[j]->sequence);
+			if (weights[edgeIndex] == 0) {
+				cout << EncodeAsDNA((*this->vertexMap)[i]->sequence) << endl;
+			}
 			edgeIndex += 1;
 		}
 	}
