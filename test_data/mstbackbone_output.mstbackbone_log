@@ -1,7 +1,9 @@
 Constraint size is set at	10
 Prefix for output files is 	mstbackbone_output
+3 duplicate sequences found; duplicate sequences will be not be used by mst-backbone; instead they will be added to the supertree constructed by mst-backbone
+Time taken to compute MST is 0.0922797 seconds
 Number of vertices in MST is 16
-CPU time used for computing subtree with 16 leaves is 0.287504 seconds
-CPU time used for computing unrooted supertree is 0.291891 seconds
-CPU time used for computing unrooted supertree is 0.291891 seconds
-Total CPU time used is 0.29216 second(s)
+Computing subtree with 16 leaves CPU time used for computing subtree with 16 leaves is 0.12566 seconds
+Adding duplicated sequences to tree
+Time taken for computing unrooted supertree is 0.128885 seconds
+Total CPU time used is 0.221453 seconds
