@@ -11,17 +11,12 @@ namespace fs = std::experimental::filesystem;
 int main(int argc, char **argv)
 {	
 	string path_to_alignment_file;
-	string patch_name;
-		// duplicate_sequences
-		// highly similar sequnces (Hamming distance of 1; try upto 5)
-		// incremental construction		
-		// genotype-recombination network
-		// Select subset of vertices based on phenotypes
-		// Amino acid/Drug resistance/Phenotype network
-		// Network layout
-		// Dynamic network layout?		
+	string path_to_input_mst_file = "";
+	string supertree_algorithm = "mstbackbone";
+	string patch_name;		
 	fs::path alignment_file_path_obj;
 	fs::path prefix_path_obj;
+	fs::path mst_file_path_obj;
     string prefix_for_output_files;
 	string path_to_directory;
     int size_of_subtree;
@@ -76,6 +71,17 @@ int main(int argc, char **argv)
 					}
                 }
         // prefix_to_output_files (e.g. prefix is "covid-19_size_42" and the alignment is in directory "/foo/bar/data/")		
+            } else if (strcmp(argv[i], "--supertree_method") == 0) {
+                if (i < argc -1) {
+					supertree_algorithm = argv[++i];
+					if (supertree_algorithm == "CLG_serial" || supertree_algorithm == "CLG_parallel" || supertree_algorithm == "mstbackbone") {
+						continue;
+					} else {
+						cout << "Enter one of the following supertree algorithms: mstbackbone, CLG_serial, CLG_parallel" << endl;
+						exit (-1);
+					}
+                }
+        // prefix_to_output_files (e.g. prefix is "covid-19_size_42" and the alignment is in directory "/foo/bar/data/")		
             } else if (strcmp(argv[i], "--out") == 0) {
                 if (i < argc -1) {
 					flag_prefix = 1;
@@ -88,11 +94,11 @@ int main(int argc, char **argv)
         // size of subtree Vs
             } else if (strcmp(argv[i], "--verbose") == 0) {
                 if (i < argc -1) {
-			string_verbose = argv[++i];
-			if (string_verbose == "True") {
-				flag_verbose = 1;
-			}			
-                }        
+					string_verbose = argv[++i];
+					if (string_verbose == "True") {
+						flag_verbose = 1;
+					}
+				}        
             } else if (strcmp(argv[i], "--constraint_size") == 0) {
                 if (i < argc -1) {
 					flag_size_of_subtree = 1;
@@ -110,19 +116,27 @@ int main(int argc, char **argv)
 						exit (-1);
 					}					
                 }
+			} else if (strcmp(argv[i], "--input_mst") == 0) {
+				if (i < argc -1) {					
+					path_to_input_mst_file = argv[++i];
+					cout << "Input mst filename is " << path_to_input_mst_file << endl;
+					if (stat (path_to_input_mst_file.c_str(), &buffer) != 0) { // check if input file exists
+						cout << "Please check if the input mst filename is correct" << endl;
+						exit (-1);
+					}					
+                }
 			}
         }
 
 		if (!flag_size_of_subtree) {
 			size_of_subtree = 10;
 		}
-
 		if (!flag_prefix) {
 			prefix_path_obj =  alignment_file_path_obj.parent_path();
 			prefix_path_obj /= "mstbackbone_output";
 			// prefix_for_output_files = alignment_file_path_obj.parent_path().string() + "_mstbackbone";
 		}		
-		MSTBackboneObj = new MSTBackbone(path_to_alignment_file, size_of_subtree, prefix_path_obj.string(),patch_name,distance_measure_for_NJ,flag_verbose,root_supertree);		
+		MSTBackboneObj = new MSTBackbone(path_to_alignment_file, size_of_subtree, prefix_path_obj.string(),patch_name,distance_measure_for_NJ,flag_verbose,root_supertree, path_to_input_mst_file, supertree_algorithm);		
 		delete MSTBackboneObj;
 		// MSTBackbone MSTBackboneObj(path_to_alignment_file, size_of_subtree, prefix_path_obj.string(),localPhyloOnly,modelSelection,modelForRooting,useChowLiu);
     }
