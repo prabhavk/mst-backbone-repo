@@ -1,0 +1,5 @@
+Constraint size is set at	10
+Prefix for output files is 	/home/kalaghat/Projects/mst-backbone-repo/empirical_results/HIV_1_env/HIV_trans
+7 duplicate sequences found; duplicate sequences will be not be used by mst-backbone; instead they will be added to the supertree constructed by mst-backbone
+Time taken to compute MST is 0.0458803 seconds
+Number of vertices in MST is 174

@@ -147,7 +147,13 @@ public:
 		this->T = new SEM(1,this->distance_measure_for_NJ,this->verbose);
 		this->m_start_time = std::chrono::high_resolution_clock::now();
 		// timeTakenToComputeGlobalUnrootedPhylogeneticTree -= timeTakenToComputeEdgeAndVertexLogLikelihoods;
-		this->MSTBackboneWithFullSEMAndMultipleExternalVertices(); // MAIN MST_BACKBONE FUNCTION
+		cout << "supertree_algorithm is " << this->supertree_algorithm << endl;
+		if (this->supertree_algorithm == "mstbackbone") {
+			this->MSTBackboneWithFullSEMAndMultipleExternalVertices(); // MAIN MST_BACKBONE FUNCTION
+		} else if (this->supertree_algorithm == "CLG_serial") {
+			continue;
+		}		
+
 		this->current_time = std::chrono::high_resolution_clock::now();
 		cout << "Time taken for computing unrooted supertree is " << chrono::duration<double>(this->current_time-this->m_start_time).count() << " seconds\n";
 		this->mstBackboneLogFile << "Time taken for computing unrooted supertree is " << chrono::duration<double>(this->current_time-this->m_start_time).count() << " seconds\n";

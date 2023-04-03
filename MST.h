@@ -105,7 +105,7 @@ public:
 	int GetNumberOfVertices();
 	void ReadSequences(string sequenceFileNameToSet);
 	void ComputeMST();
-	void ReadMST();
+	void ReadMST(); // How to deal with duplicated sequences?
 	void ComputeMSTMultiThread();
 	void DisjointTreeMerger_CLGrouping();
 	void ComputeChowLiuTree();
