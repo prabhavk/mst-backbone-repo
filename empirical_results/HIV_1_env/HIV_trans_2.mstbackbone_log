@@ -1,5 +1,5 @@
 Constraint size is set at	10
 Prefix for output files is 	HIV_trans_2
 7 duplicate sequences found; duplicate sequences will be not be used by mst-backbone; instead they will be added to the supertree constructed by mst-backbone
-Time taken to compute MST is 0.0392983 seconds
+Time taken to compute MST is 0.0393262 seconds
 Number of vertices in MST is 174

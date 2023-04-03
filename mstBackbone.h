@@ -150,8 +150,7 @@ public:
 		cout << "supertree_algorithm is " << this->supertree_algorithm << endl;
 		if (this->supertree_algorithm == "mstbackbone") {
 			this->MSTBackboneWithFullSEMAndMultipleExternalVertices(); // MAIN MST_BACKBONE FUNCTION
-		} else if (this->supertree_algorithm == "CLG_serial") {
-			continue;
+		} else if (this->supertree_algorithm == "CLG_serial") {			
 		}		
 
 		this->current_time = std::chrono::high_resolution_clock::now();
