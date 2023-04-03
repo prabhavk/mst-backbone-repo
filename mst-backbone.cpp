@@ -39,6 +39,7 @@ int main(int argc, char **argv)
 	string arg_chowliu;
 	string string_verbose;
 	string distance_measure_for_NJ = "logDet";
+	string supertree_method = "mstbackbone";
 	bool flag_verbose = 0;
 	MSTBackbone * MSTBackboneObj;
     if (argc < 2) {        
@@ -72,6 +73,17 @@ int main(int argc, char **argv)
 						continue;
 					} else {
 						cout << "Enter one of the following distance measures: logDet, Jukes-Cantor, Hamming" << endl;
+						exit (-1);
+					}
+                }
+        // prefix_to_output_files (e.g. prefix is "covid-19_size_42" and the alignment is in directory "/foo/bar/data/")		
+            }  else if (strcmp(argv[i], "--supertree_method") == 0) {
+                if (i < argc -1) {
+					supertree_method = argv[++i];
+					if (supertree_method == "mstbackbone" || supertree_method == "clg") {
+						continue;
+					} else {
+						cout << "Enter one of the following supertree methods: mstbackbone, clg" << endl;
 						exit (-1);
 					}
                 }
@@ -122,7 +134,8 @@ int main(int argc, char **argv)
 			prefix_path_obj /= "mstbackbone_output";
 			// prefix_for_output_files = alignment_file_path_obj.parent_path().string() + "_mstbackbone";
 		}		
-		MSTBackboneObj = new MSTBackbone(path_to_alignment_file, size_of_subtree, prefix_path_obj.string(),patch_name,distance_measure_for_NJ,flag_verbose,root_supertree);		
+		cout << "supertree method is " << supertree_method << endl;
+		MSTBackboneObj = new MSTBackbone(path_to_alignment_file, size_of_subtree, prefix_path_obj.string(),patch_name,distance_measure_for_NJ,flag_verbose,root_supertree, supertree_method);		
 		delete MSTBackboneObj;
 		// MSTBackbone MSTBackboneObj(path_to_alignment_file, size_of_subtree, prefix_path_obj.string(),localPhyloOnly,modelSelection,modelForRooting,useChowLiu);
     }

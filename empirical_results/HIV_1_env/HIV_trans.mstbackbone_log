@@ -1,0 +1,28 @@
+Constraint size is set at	10
+Prefix for output files is 	/home/kalaghat/Projects/mst-backbone-repo/empirical_results/HIV_1_env/HIV_trans
+7 duplicate sequences found; duplicate sequences will be not be used by mst-backbone; instead they will be added to the supertree constructed by mst-backbone
+Time taken to compute MST is 0.0507813 seconds
+Number of vertices in MST is 174
+CPU time used for computing subtree with 22 leaves is 0.248802 seconds
+Number of vertices in MST is 163
+CPU time used for computing subtree with 40 leaves is 4.72725 seconds
+Number of vertices in MST is 147
+CPU time used for computing subtree with 29 leaves is 0.332454 seconds
+Number of vertices in MST is 134
+CPU time used for computing subtree with 26 leaves is 0.345395 seconds
+Number of vertices in MST is 122
+CPU time used for computing subtree with 25 leaves is 0.41742 seconds
+Number of vertices in MST is 109
+CPU time used for computing subtree with 38 leaves is 3.35807 seconds
+Number of vertices in MST is 99
+CPU time used for computing subtree with 28 leaves is 1.13232 seconds
+Number of vertices in MST is 87
+CPU time used for computing subtree with 39 leaves is 4.06762 seconds
+Number of vertices in MST is 64
+CPU time used for computing subtree with 37 leaves is 1.56867 seconds
+Number of vertices in MST is 38
+CPU time used for computing subtree with 31 leaves is 1.0732 seconds
+CPU time used for computing subtree with 19 leaves is 0.37626 seconds
+Adding duplicated sequences to tree
+Time taken for computing unrooted supertree is 17.6624 seconds
+Total CPU time used is 17.7133 seconds

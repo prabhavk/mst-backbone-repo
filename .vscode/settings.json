@@ -8,7 +8,8 @@
         "ostream": "cpp",
         "matrixfunctions": "cpp",
         "dense": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "*.tcc": "cpp"
     },
     "jupyter.jupyterServerType": "local"
 }

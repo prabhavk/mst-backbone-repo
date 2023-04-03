@@ -75,6 +75,7 @@ private:
 	bool useChowLiu;
 	bool modelSelection;
 	string modelForRooting = "UNREST";
+	string supertree_method;
 	int numberOfVerticesInSubtree;
 	string GetSequenceListToWriteToFile(map <string, vector <unsigned char>> compressedSeqMap, vector <vector <int> > sitePatternRepetitions);
 	vector <string> must_have;
@@ -84,14 +85,14 @@ public:
 	void SetThresholds();
 	void MSTBackboneWithOneExternalVertex();
 	void MSTBackboneWithFullSEMAndMultipleExternalVertices();
-	void ChowLiuGroupingParallel();
+	void ChowLiuGrouping();
 	void RootSuperTree();
 	void MSTBackboneWithRootSEMAndMultipleExternalVertices();
 	void MSTBackboneOverlappingSets();
 	void SteinerMinimalTree();
 	void MSTBackboneOnlyLocalPhylo();
 	void Apply_patch(string patch_name_to_apply);
-	MSTBackbone(string sequenceFileNameToAdd, int subtreeSizeThresholdToset, string prefix_for_output_files_to_set, string patch_name_to_apply, string distance_measure_for_NJ_to_set, bool verbose_flag_to_set, string root_supertree) {
+	MSTBackbone(string sequenceFileNameToAdd, int subtreeSizeThresholdToset, string prefix_for_output_files_to_set, string patch_name_to_apply, string distance_measure_for_NJ_to_set, bool verbose_flag_to_set, string root_supertree, string supertree_method_to_set) {
 		// MSTBackbone(string sequenceFileNameToAdd, int subtreeSizeThresholdToset, string prefix_for_output_files_to_set, bool localPhyloOnly_to_set, bool modelSelection_to_set, string modelForRooting_to_set, bool useChowLiu_toset) {
 		// bool localPhyloOnly = TRUE;
 		// this->useChowLiu = useChowLiu_toset;
@@ -99,6 +100,7 @@ public:
 		// this->modelForRooting = modelForRooting_to_set;		
 		start_time = chrono::high_resolution_clock::now();				
 		this->sequenceFileName = sequenceFileNameToAdd;		
+		this->supertree_method = supertree_method_to_set;
 		this->patch_name = patch_name_to_apply;
 		this->verbose = verbose_flag_to_set;
 		this->distance_measure_for_NJ = distance_measure_for_NJ_to_set;
@@ -156,7 +158,13 @@ public:
 		this->T = new SEM(1,this->distance_measure_for_NJ,this->verbose);
 		this->m_start_time = std::chrono::high_resolution_clock::now();
 		// timeTakenToComputeGlobalUnrootedPhylogeneticTree -= timeTakenToComputeEdgeAndVertexLogLikelihoods;
-		this->MSTBackboneWithFullSEMAndMultipleExternalVertices(); // MAIN MST_BACKBONE FUNCTION
+		cout << "Supertree method is " << this->supertree_method << endl;
+		if (this->supertree_method == "mstbackbone") {
+			this->MSTBackboneWithFullSEMAndMultipleExternalVertices(); // MAIN MST_BACKBONE FUNCTION
+		} else if (this->supertree_method == "clg") {
+			this->ChowLiuGrouping(); // Huang and colleagues 2020
+		}
+		
 		this->current_time = std::chrono::high_resolution_clock::now();
 		cout << "Time taken for computing unrooted supertree is " << chrono::duration<double>(this->current_time-this->m_start_time).count() << " seconds\n";
 		this->mstBackboneLogFile << "Time taken for computing unrooted supertree is " << chrono::duration<double>(this->current_time-this->m_start_time).count() << " seconds\n";
@@ -388,18 +396,20 @@ void MSTBackbone::MSTBackboneOverlappingSets() {
 //	10.	Root T via EM
 //	Output: T
 
-// Chow-Liu grouping style parallelization (Furong and colleagues 2019)
-void MSTBackbone::ChowLiuGroupingParallel() {
-	int numberOfInputSequences = (int) this->M->vertexMap->size();	
-	
-	current_time = chrono::high_resolution_clock::now();
-	// timeTakenToComputeEdgeAndVertexLogLikelihoods = chrono::duration_cast<chrono::seconds>(current_time-current_time);
-	cout << "Adding duplicated sequences to tree" << endl;
-	this->mstBackboneLogFile << "Adding duplicated sequences to tree" << endl;
-	this->T->AddDuplicatedSequencesToUnrootedTree(this->M);
-	this->T->WriteUnrootedTreeAsEdgeList(this->prefix_for_output_files + ".unrooted_edgeList");
-	this->T->RootTreeAtAVertexPickedAtRandom();
-	this->T->WriteRootedTreeInNewickFormat(this->prefix_for_output_files + ".unrooted_newick");
+// Chow-Liu grouping (Huang and colleagues 2020)
+// serial version
+void MSTBackbone::ChowLiuGrouping() {		
+	// this->M->SetLeaders();
+	this->M->CLGrouping();
+	// int numberOfInputSequences = (int) this->M->vertexMap->size();		
+	// current_time = chrono::high_resolution_clock::now();
+	// // timeTakenToComputeEdgeAndVertexLogLikelihoods = chrono::duration_cast<chrono::seconds>(current_time-current_time);
+	// cout << "Adding duplicated sequences to tree" << endl;
+	// this->mstBackboneLogFile << "Adding duplicated sequences to tree" << endl;
+	// this->T->AddDuplicatedSequencesToUnrootedTree(this->M);
+	// this->T->WriteUnrootedTreeAsEdgeList(this->prefix_for_output_files + ".unrooted_edgeList");
+	// this->T->RootTreeAtAVertexPickedAtRandom();
+	// this->T->WriteRootedTreeInNewickFormat(this->prefix_for_output_files + ".unrooted_newick");
 	// build a supertree for each
 	// this->T->AddWeightedEdges(this->t->weightedEdgesToAddToGlobalPhylogeneticTree);
 }
