@@ -1,6 +1,6 @@
 Constraint size is set at	10
 Prefix for output files is 	HIV_trans_clg
 7 duplicate sequences found; duplicate sequences will be not be used by mst-backbone; instead they will be added to the supertree constructed by mst-backbone
-Time taken to compute MST is 0.0794968 seconds
-Time taken for computing unrooted supertree is 0.00015777 seconds
-Total CPU time used is 0.0799528 seconds
+Time taken to compute MST is 0.0517073 seconds
+Time taken for computing unrooted supertree is 0.000170353 seconds
+Total CPU time used is 0.0526032 seconds

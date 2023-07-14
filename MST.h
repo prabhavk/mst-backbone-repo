@@ -8,7 +8,7 @@
 #include <iostream>
 #include <stdio.h>
 #include "utilities.h"
-// #include <SEM.h>
+// #include <Phylo.h>
 #include <boost/bind.hpp>
 #include <boost/config.hpp>
 #include <boost/graph/graph_traits.hpp>
@@ -32,7 +32,7 @@ public:
 	vector <int> idsOfVerticesInSubtree;
 	vector <MST_vertex *> neighbors;
 	vector <string> dupl_seq_names;
-	void AddNeighbor(MST_vertex * v_ptr);
+	void AddNeighbor(MST_vertex * v_ptr);	
 	// void Get_mut_id(vector <pair<int,dna>> mut_list);
 	MST_vertex(int idToAdd, string nameToAdd, vector <unsigned char> sequenceToAdd) {
 		id = idToAdd;
@@ -62,6 +62,7 @@ private:
 	chrono::system_clock::time_point start_time;
 	chrono::system_clock::time_point time_to_compute_MST;
 	bool build_MST_incrementally = false;
+		
 public:
 	int maxDegree;	
 	unsigned int num_duplicated_sequences = 0;
@@ -111,8 +112,7 @@ public:
 	void CLGrouping();
 	void ComputeChowLiuTree();
 	void ComputeMST_nonACGT();
-	void ResetSubtreeSizeThreshold();
-	
+	void ResetSubtreeSizeThreshold();	
 	void DoubleSubtreeSizeThreshold();
 	int ComputeHammingDistance(vector <unsigned char> recodedSeq1, vector <unsigned char> recodedSeq2);
 	pair <vector <int>, vector <int>> GetIdsForSubtreeVerticesAndExternalVertices();
