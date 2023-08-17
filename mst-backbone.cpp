@@ -38,12 +38,12 @@ int main(int argc, char **argv)
 	string arg_modelSelection;
 	string arg_chowliu;
 	string string_verbose;
-	string distance_measure_for_NJ = "logDet";
+	string distance_measure = "logDet";
 	string supertree_method = "mstbackbone";
 	bool flag_verbose = 0;
 	MSTBackbone * MSTBackboneObj;
     if (argc < 2) {        
-        cerr << "Usage: " << argv[0] << " --seq alignment.fas --constraint_size size_of_subtree --distance_measure_for_NJ LogDet --out prefix_for_output --root_supertree no" << endl;
+        cerr << "Usage: " << argv[0] << " --seq alignment.fas --constraint_size size_of_subtree --distance_measure LogDet --out prefix_for_output --root_supertree no" << endl;
 		cerr << endl;
         return (-1);
     } else {        
@@ -66,10 +66,10 @@ int main(int argc, char **argv)
 					alignment_file_path_obj = path_to_alignment_file;
                 }
         // prefix_to_output_files (e.g. prefix is "covid-19_size_42" and the alignment is in directory "/foo/bar/data/")		
-            } else if (strcmp(argv[i], "--distance_measure_for_NJ") == 0) {
+            } else if (strcmp(argv[i], "--distance_measure") == 0) {
                 if (i < argc -1) {
-					distance_measure_for_NJ = argv[++i];
-					if (distance_measure_for_NJ == "logDet" || distance_measure_for_NJ == "Jukes-Cantor" ||distance_measure_for_NJ == "Hamming") {
+					distance_measure = argv[++i];
+					if (distance_measure == "logDet" || distance_measure == "Jukes-Cantor" ||distance_measure == "Hamming") {
 						continue;
 					} else {
 						cout << "Enter one of the following distance measures: logDet, Jukes-Cantor, Hamming" << endl;
@@ -111,7 +111,7 @@ int main(int argc, char **argv)
                     size_of_subtree = stoi(argv[++i]);
                 }
 			} else if (strcmp(argv[i], "--help") == 0) {
-				cout << "Example for mst-constrained tree construction: " << argv[0] << " --seq alignment.fas --constraint_size size --distance_measure_for_NJ logDet --out prefix_for_output --root_supertree no" << endl;
+				cout << "Example for mst-constrained tree construction: " << argv[0] << " --seq alignment.fas --constraint_size size --distance_measure logDet --out prefix_for_output --root_supertree no" << endl;
 			} else if (strcmp(argv[i], "--root_supertree") == 0) {
 				if (i < argc -1) {					
 					root_supertree = argv[++i];
@@ -135,7 +135,7 @@ int main(int argc, char **argv)
 			// prefix_for_output_files = alignment_file_path_obj.parent_path().string() + "_mstbackbone";
 		}		
 		cout << "supertree method is " << supertree_method << endl;
-		MSTBackboneObj = new MSTBackbone(path_to_alignment_file, size_of_subtree, prefix_path_obj.string(),patch_name,distance_measure_for_NJ,flag_verbose,root_supertree, supertree_method);		
+		MSTBackboneObj = new MSTBackbone(path_to_alignment_file, size_of_subtree, prefix_path_obj.string(),patch_name,distance_measure,flag_verbose,root_supertree, supertree_method);		
 		delete MSTBackboneObj;
 		// MSTBackbone MSTBackboneObj(path_to_alignment_file, size_of_subtree, prefix_path_obj.string(),localPhyloOnly,modelSelection,modelForRooting,useChowLiu);
     }
