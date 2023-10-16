@@ -366,38 +366,7 @@ void MSTBackbone::MSTBackboneOnlyLocalPhylo() {
 
 }
 
-void MSTBackbone::MSTBackboneOverlappingSets() {	
-// Implement here
-// Print the vertex names and edges (u_name, v_name) in the MST
-// this->M ;
-// this->M->vertexMap (contains map of vertex names)
-// this->M->edgeWeightsMap (map from name of the edge to weight of the edge)
-// Select non-leaf vertices
-// For each non-leaf vertex
-//		Select the neighborhood of the vertex
-//	Print the list of vertex names in each neighborhood
-}
-
-//	Input:	Multiple sequence alignment A, MST M = (Vm,Em), subtree size threshold s_min
-//	1.	Initialize global phylogenetic tree T as the empty graph
-//	2.	Compute the size of smallest subtree ts = (Vs,Es) of M s.t.
-//		(# of non-zero weighted edges in Es) > s. 
-//		Check if |Vm\Vs| > s. If yes then go to step 3 else go to step 9
-//	3.	Extract vertices inducing subtree (Vs), and external vertices (Ve)			
-//	4.	Compute local phylogeny t over (Vs U Ve) via SEM
-//  5.	Check if # of non-singleton components of forest f in t that
-//		is induced by Vs is greater than zero
-//  6.	If no then double subtree size and go to step 2 else reset
-//		subtree size and go to to step 7			
-//  7.	Add vertices/edges in f to T
-//  8.	Update M and go to step 1
-//	9.	Compute phylogenetic tree t over vertices in M, and
-//		add vertices/edges in t to T
-//	10.	Root T via EM
-//	Output: T
-
-// Chow-Liu grouping (Huang and colleagues 2020)
-// serial version
+// Chow-Liu grouping + SEM-GMM
 void MSTBackbone::ChowLiuGrouping() {		
 	// this->M->SetLeaders();
 	this->M->CLGrouping();

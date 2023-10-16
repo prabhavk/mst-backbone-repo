@@ -174,6 +174,17 @@ def GetMaxGCCompDiff(alignment):
     gcCompRange = [GetGCComp(seq) for seq in alignment.values()]
     return (max(gcCompRange) - min(gcCompRange))
 
+# Assess root support
+
+def GetRecallDistributionForNullHypothesis(modelTree, estimatedTree, n_rooted_trees):
+    
+    # RT = RootTreeAlongBranchSelectedAtRandom
+    # root unrooted tree at random n_rooted_trees times (?)
+    # compute recall value
+
+    #pr, re, rf = ComputePrecisionRecallAndRFforRootedTrees(modelTree, estimatedTree) 
+
+    pass
 
 def WriteFullyLabeledRootedPrecisionRecallAndRFForExpPhyloGMForBootstrapReps(modelTree,sequenceFileName,numberOfReplicates):
     fileNameSuffix = sequenceFileName.split("/")[-1].split(".fas")[0]
