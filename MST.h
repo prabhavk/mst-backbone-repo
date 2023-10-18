@@ -17,6 +17,8 @@
 #include <chrono>
 using namespace std;
 
+typedef boost::adjacency_list < boost::vecS, boost::vecS, boost::undirectedS, boost::property<boost::vertex_distance_t, int>, boost::property < boost::edge_weight_t, int> > Graph;
+
 class MST_vertex {
 public:
 	string name;
@@ -110,8 +112,9 @@ public:
 	void ReadSequences(string sequenceFileNameToSet);
 	void ComputeMST();
 	void CLGrouping();
+	void PlaceOnDegreeRestrictedSubtree(int max_degree);
 	void ComputeChowLiuTree();
-	void ComputeMST_nonACGT();
+	void ComputeMST_nonACGT();	
 	void ResetSubtreeSizeThreshold();	
 	void DoubleSubtreeSizeThreshold();
 	int ComputeHammingDistance(vector <unsigned char> recodedSeq1, vector <unsigned char> recodedSeq2);
@@ -1004,10 +1007,8 @@ void MST_tree::ComputeMST() {
 			edges[edgeIndex] = E(i,j);
 			edgeIndex += 1;
 		}
-	}
-	typedef boost::adjacency_list < boost::vecS, boost::vecS, boost::undirectedS, boost::property<boost::vertex_distance_t, int>, boost::property < boost::edge_weight_t, int> > Graph;
+	}	
 	Graph g(edges, edges + numberOfEdges, weights, numberOfVertices);
-
 	vector < boost::graph_traits < Graph >::vertex_descriptor >  p(num_vertices(g));
 	prim_minimum_spanning_tree(g, &p[0]);
 	delete[] edges;		
@@ -1030,5 +1031,12 @@ void MST_tree::ComputeMST() {
 //	MSTFile.close();
 	delete[] weights;
 }
+
+void MST_tree::PlaceOnDegreeRestrictedSubtree(int max_degree) {
+
+
+
+}
+
 
 #endif

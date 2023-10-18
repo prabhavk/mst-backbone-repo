@@ -26,7 +26,7 @@ private:
 	vector <string> sequenceNames;
 	map <string,unsigned char> mapDNAtoInteger;		
 	ofstream mstBackboneLogFile;
-	int numberOfLargeEdgesThreshold;
+	int numberOfLargeEdgesThreshold; // equal to num of hairs for the phc algorithm
 	int numberOfHiddenVertices = 0;
 	int edgeWeightThreshold;	
 	chrono::system_clock::time_point start_time;
@@ -50,8 +50,7 @@ private:
 	string sequenceFileName;	
 	string prefix_for_output_files;
 	string ancestralSequencesString;
-	string MSTFileName;
-	string patch_name;
+	string MSTFileName;	
 	string distance_measure_for_NJ = "Hamming";
 	bool apply_patch = false;
 	bool grow_tree_incrementally = false;
@@ -85,14 +84,14 @@ public:
 	void SetThresholds();
 	void MSTBackboneWithOneExternalVertex();
 	void MSTBackboneWithFullSEMAndMultipleExternalVertices();
+	void PlaceOnDegreeRestrictedSubtree(int max_degree);
 	void ChowLiuGrouping();
 	void RootSuperTree();
 	void MSTBackboneWithRootSEMAndMultipleExternalVertices();
-	void MSTBackboneOverlappingSets();
+	void MSTBackboneOverlappingSets();	
 	void SteinerMinimalTree();
-	void MSTBackboneOnlyLocalPhylo();
-	void Apply_patch(string patch_name_to_apply);
-	MSTBackbone(string sequenceFileNameToAdd, int subtreeSizeThresholdToset, string prefix_for_output_files_to_set, string patch_name_to_apply, string distance_measure_for_NJ_to_set, bool verbose_flag_to_set, string root_supertree, string supertree_method_to_set) {
+	void MSTBackboneOnlyLocalPhylo();	
+	MSTBackbone(string sequenceFileNameToAdd, int subtreeSizeThresholdToset, string prefix_for_output_files_to_set, string distance_measure_for_NJ_to_set, bool verbose_flag_to_set, bool flag_root_supertree, string supertree_method_to_set) {
 		// MSTBackbone(string sequenceFileNameToAdd, int subtreeSizeThresholdToset, string prefix_for_output_files_to_set, bool localPhyloOnly_to_set, bool modelSelection_to_set, string modelForRooting_to_set, bool useChowLiu_toset) {
 		// bool localPhyloOnly = TRUE;
 		// this->useChowLiu = useChowLiu_toset;
@@ -100,13 +99,12 @@ public:
 		// this->modelForRooting = modelForRooting_to_set;		
 		start_time = chrono::high_resolution_clock::now();				
 		this->sequenceFileName = sequenceFileNameToAdd;		
-		this->supertree_method = supertree_method_to_set;
-		this->patch_name = patch_name_to_apply;
+		this->supertree_method = supertree_method_to_set;		
 		this->verbose = verbose_flag_to_set;
 		this->distance_measure_for_NJ = distance_measure_for_NJ_to_set;
 		cout << "Distance measure used for NJ is " << this->distance_measure_for_NJ << endl;
 		this->mstBackboneLogFile << "Distance measure used for NJ is " << this->distance_measure_for_NJ << endl;
-		if (root_supertree == "yes") {
+		if (flag_root_supertree) {
 			cout << "Supertree will be rooted" << endl;
 			this->mstBackboneLogFile << "Supertree will be rooted " << endl;
 		} else {
@@ -123,33 +121,16 @@ public:
 		cout << "Prefix for output files is \t" << this->prefix_for_output_files << endl;
 		MSTFileName = prefix_for_output_files + ".initial_MST";
 		this->SetDNAMap();
-		this->ancestralSequencesString = "";
-		if (patch_name_to_apply.length() > 0){
-			this->patch_name = patch_name_to_apply;
-			this->apply_patch = true;
-		}				
-		// if (apply_patch) {
-		// 	// bool tasks_completed = false;
-		// 	// bool task_current = false;
-		// 	// this->must_have = vector <string> {"map_mut_id_2_fasta_list","vec_dup_seq_mut_id_list","Filter_duplicate_seqs()","Place_duplicate_seqs()"};
-		// 	// if (this->must_have.size() > 0) {
-		// 	// 	string current_task = this->must_have[0];
-		// 	// 	cout << "Perfoming task " << current_task << " for patch " << this->patch_name << endl;
-		// 	// 	cout << "All tasks for " << this->patch_name << " patch not complete" << endl;
-		// 	// 	cout << "Exiting to terminal" << endl;
-		// 	// 	exit(-1);
-		// 	// } else {
-		// 	// 	cout << "All tasks for " << this->patch_name << " patch complete" << endl;
-		// 	// 	cout << "Applying patch " << this->patch_name << " now" << endl;
-		// 	// }
-		// }
+		this->ancestralSequencesString = "";								
 		this->m_start_time = std::chrono::high_resolution_clock::now();
 		this->M = new MST_tree();
 		this->M->ReadSequences(this->sequenceFileName);
 		this->M->ComputeMST();
 		cout << this->M->num_duplicated_sequences << " duplicate sequences found; duplicate sequences will be not be used by mst-backbone; instead they will be added to the supertree constructed by mst-backbone" << endl;
 		this->mstBackboneLogFile << this->M->num_duplicated_sequences << " duplicate sequences found; duplicate sequences will be not be used by mst-backbone; instead they will be added to the supertree constructed by mst-backbone" << endl;
-		this->M->WriteToFile(MSTFileName);
+		if (true) { // replace with user input
+			this->M->WriteToFile(MSTFileName);
+		}		
 		this->current_time = std::chrono::high_resolution_clock::now();
 		cout << "Time taken to compute MST is " << chrono::duration<double>(this->current_time-this->m_start_time).count() << " seconds\n";
 		this->mstBackboneLogFile << "Time taken to compute MST is " << chrono::duration<double>(this->current_time-this->m_start_time).count() << " seconds\n";
@@ -159,16 +140,19 @@ public:
 		this->m_start_time = std::chrono::high_resolution_clock::now();
 		// timeTakenToComputeGlobalUnrootedPhylogeneticTree -= timeTakenToComputeEdgeAndVertexLogLikelihoods;
 		cout << "Supertree method is " << this->supertree_method << endl;
-		if (this->supertree_method == "mstbackbone") {
-			this->MSTBackboneWithFullSEMAndMultipleExternalVertices(); // MAIN MST_BACKBONE FUNCTION
+		if (this->supertree_method == "mstbackbone") { // MST_BACKBONE BioRxiv v1 and v2, Bioinformatics submission
+			this->MSTBackboneWithFullSEMAndMultipleExternalVertices(); 
 		} else if (this->supertree_method == "clg") {
 			this->ChowLiuGrouping(); // Huang and colleagues 2020
+		} else if (this->supertree_method == "drs") { // place on degree restricted subtree
+			this->M->PlaceOnDegreeRestrictedSubtree(this->numberOfLargeEdgesThreshold);			
 		}
 		
 		this->current_time = std::chrono::high_resolution_clock::now();
 		cout << "Time taken for computing unrooted supertree is " << chrono::duration<double>(this->current_time-this->m_start_time).count() << " seconds\n";
 		this->mstBackboneLogFile << "Time taken for computing unrooted supertree is " << chrono::duration<double>(this->current_time-this->m_start_time).count() << " seconds\n";
-		if (root_supertree == "yes"){
+		if (flag_root_supertree){
+			cout << "Rooting supertree by fitting the GMM via EM" << endl;
 			this->RootSuperTree();
 		}
 		this->current_time = std::chrono::high_resolution_clock::now();
@@ -181,10 +165,6 @@ public:
 		delete this->M;	
 	}
 };
-
-void MSTBackbone::Apply_patch(string patch_name_to_apply){
-	this->patch_name = patch_name_to_apply;
-}
 
 void MSTBackbone::SetDNAMap() {
 	this->mapDNAtoInteger["A"] = 0;
@@ -381,6 +361,32 @@ void MSTBackbone::ChowLiuGrouping() {
 	// this->T->WriteRootedTreeInNewickFormat(this->prefix_for_output_files + ".unrooted_newick");
 	// build a supertree for each
 	// this->T->AddWeightedEdges(this->t->weightedEdgesToAddToGlobalPhylogeneticTree);
+}
+
+void MSTBackbone::PlaceOnDegreeRestrictedSubtree(int max_degree = 10) {
+	// Algorithm
+	// Input:
+	//  MST M
+	//  k = max_degree
+	// Select V_internal = all internal (non-leaf) vertices of M
+	// Select V_leaves = leaves of M such that k neighbors of V_internal are present in V_degree U V_internal
+	//    ; select leaves in order of decreasing distance with neighbor in V_internal
+	// Graph T_degree_restricted = subgraph of M which is induced by V_internal U V_leaves	
+	// Compute supertree T_super = by performing CLGrouping(SEM-GMM) 
+		// parallelize using Huang et al approach
+		// root T_super at centroid
+		// store mutations on branches  
+	// Select V_place = V(M) \ V_internal U V_degree
+	// Place vertices in V_place onto T_super
+	// Restrict placement of any vertex v_p to subtree in T_super that contains the internal neighbor of v_p in M
+	// Place using branch mutations approach
+	// Parallelize placement
+	// optimize num of hairs based on 
+	// compute time
+	// accuracy
+	// Let T_final be the tree computed after placing all vertices 
+	
+	this->M->PlaceOnDegreeRestrictedSubtree(max_degree);
 }
 
 void MSTBackbone::MSTBackboneWithFullSEMAndMultipleExternalVertices() {

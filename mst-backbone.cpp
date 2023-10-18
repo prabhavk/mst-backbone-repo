@@ -24,13 +24,17 @@ int main(int argc, char **argv)
 	fs::path prefix_path_obj;
     string prefix_for_output_files;
 	string path_to_directory;
-    int size_of_subtree;
+    int max_degree;
  	struct stat buffer;
 	// bool alignment_file_not_set = 0;
-	bool flag_size_of_subtree = 0;
+	bool flag_max_degree = 0;
+	bool flag_supertree = 0;
 	bool flag_prefix = 0;
+	bool flag_distance = 0;
+	bool flag_root_supertree = 0;
 	// bool localPhyloOnly = 0;
 	bool flag_modelSelection = 0;
+	bool flag_verbose = 0;
 	// bool useChowLiu = 1;
 	string modelForRooting = "UNREST";
 	string root_supertree = "no";
@@ -40,22 +44,18 @@ int main(int argc, char **argv)
 	string string_verbose;
 	string distance_measure = "logDet";
 	string supertree_method = "mstbackbone";
-	bool flag_verbose = 0;
+	
 	MSTBackbone * MSTBackboneObj;
     if (argc < 2) {        
-        cerr << "Usage: " << argv[0] << " --seq alignment.fas --constraint_size size_of_subtree --distance_measure LogDet --out prefix_for_output --root_supertree no" << endl;
+		cerr << "Usage: " << argv[0] << " --seq alignment --max_degree k --out filename " << endl;
+        // cerr << "Usage: " << argv[0] << " --seq alignment.fas --max_degree k --distance_measure LogDet --out filename --root_supertree no" << endl;
 		cerr << endl;
         return (-1);
     } else {        
         // parse arguments            
         for (int i = 1; i < argc ; i++) {
         // path to multiple sequence alignment file
-			if (strcmp(argv[i], "--patch") == 0) {		
-                if (i < argc -1) {					
-                    patch_name = argv[++i];
-					cout << "Applying patch " << patch_name << endl;
-                }        
-            } else if (strcmp(argv[i], "--seq") == 0) {				
+			if (strcmp(argv[i], "--seq") == 0) {				
                 if (i < argc -1) {					
                     path_to_alignment_file = argv[++i];
 					cout << "Alignment file name is " << path_to_alignment_file << endl;
@@ -69,6 +69,7 @@ int main(int argc, char **argv)
             } else if (strcmp(argv[i], "--distance_measure") == 0) {
                 if (i < argc -1) {
 					distance_measure = argv[++i];
+					flag_distance = 1;
 					if (distance_measure == "logDet" || distance_measure == "Jukes-Cantor" ||distance_measure == "Hamming") {
 						continue;
 					} else {
@@ -80,10 +81,11 @@ int main(int argc, char **argv)
             }  else if (strcmp(argv[i], "--supertree_method") == 0) {
                 if (i < argc -1) {
 					supertree_method = argv[++i];
-					if (supertree_method == "mstbackbone" || supertree_method == "clg") {
+					flag_supertree = 1;
+					if (supertree_method == "mstbackbone" || supertree_method == "pdrs") {
 						continue;
 					} else {
-						cout << "Enter one of the following supertree methods: mstbackbone, clg" << endl;
+						cout << "Enter one of the following supertree methods: \n \t mstbackbone \n \t pdrs (place on degree-restricted subtree)" << endl;
 						exit (-1);
 					}
                 }
@@ -105,28 +107,30 @@ int main(int argc, char **argv)
 				flag_verbose = 1;
 			}			
                 }        
-            } else if (strcmp(argv[i], "--constraint_size") == 0) {
+            } else if (strcmp(argv[i], "--max_degree") == 0) {
                 if (i < argc -1) {
-					flag_size_of_subtree = 1;
-                    size_of_subtree = stoi(argv[++i]);
+					flag_max_degree = 1;
+                    max_degree = stoi(argv[++i]);
                 }
 			} else if (strcmp(argv[i], "--help") == 0) {
-				cout << "Example for mst-constrained tree construction: " << argv[0] << " --seq alignment.fas --constraint_size size --distance_measure logDet --out prefix_for_output --root_supertree no" << endl;
+				cout << "Example for mst-constrained tree construction: " << argv[0] << " --seq alignment.fas --max_degree k --distance_measure logDet --out prefix_for_output --root_supertree no" << endl;
 			} else if (strcmp(argv[i], "--root_supertree") == 0) {
 				if (i < argc -1) {					
 					root_supertree = argv[++i];
-					if (root_supertree == "yes" || root_supertree == "no") {
-						continue;
+					if (root_supertree == "yes" || root_supertree == "y") {
+						flag_root_supertree = 1;						
+					} else if (root_supertree == "no" || root_supertree == "n") {
+						flag_root_supertree = 0;
 					} else {
-						cout << "Enter one of the following options for root_supertree: no, yes" << endl;
+						cout << "Enter one of the following options for root_supertree: yes, y, no, n" << endl;
 						exit (-1);
 					}					
                 }
 			}
         }
 
-		if (!flag_size_of_subtree) {
-			size_of_subtree = 10;
+		if (!flag_max_degree) {
+			max_degree = 10;
 		}
 
 		if (!flag_prefix) {
@@ -134,8 +138,15 @@ int main(int argc, char **argv)
 			prefix_path_obj /= "mstbackbone_output";
 			// prefix_for_output_files = alignment_file_path_obj.parent_path().string() + "_mstbackbone";
 		}		
+
+		if (!flag_supertree) {
+			supertree_method = "pdrs" // place on degree-restricted subtree
+		}		
+		if (!flag_distance) {
+			distance_measure = "LogDet" // place on degree-restricted subtree
+		}
 		cout << "supertree method is " << supertree_method << endl;
-		MSTBackboneObj = new MSTBackbone(path_to_alignment_file, size_of_subtree, prefix_path_obj.string(),patch_name,distance_measure,flag_verbose,root_supertree, supertree_method);		
+		MSTBackboneObj = new MSTBackbone(path_to_alignment_file, max_degree, prefix_path_obj.string(),distance_measure,flag_verbose,flag_root_supertree, supertree_method);		
 		delete MSTBackboneObj;
 		// MSTBackbone MSTBackboneObj(path_to_alignment_file, size_of_subtree, prefix_path_obj.string(),localPhyloOnly,modelSelection,modelForRooting,useChowLiu);
     }
