@@ -1,3 +1,5 @@
+all: mst-backbone test
+
 mst-backbone: mst-backbone.o
 	g++ -o mst-backbone mst-backbone.o -lstdc++fs
 
@@ -15,5 +17,7 @@ UNRESTselector_perEdge.o: UNRESTselector_perEdge.cpp
 clean:
 	rm mst-backbone mst-backbone.o UNRESTselector_perEdge UNRESTselector_perEdge.o
 
-test: mstbackbone
-	./mstbackbone --seq test.fas --constraint_size 10 --distance_measure LogDet --out test --root_supertree no
+test:
+	./mst-backbone --seq alignment.fas --subtree_size 4 --distance_measure LogDet --out test_mstbackbone
+
+
