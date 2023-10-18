@@ -144,8 +144,8 @@ public:
 			this->MSTBackboneWithFullSEMAndMultipleExternalVertices(); 
 		} else if (this->supertree_method == "clg") {
 			this->ChowLiuGrouping(); // Huang and colleagues 2020
-		} else if (this->supertree_method == "drs") { // place on degree restricted subtree
-			this->M->PlaceOnDegreeRestrictedSubtree(this->numberOfLargeEdgesThreshold);			
+		} else if (this->supertree_method == "drs") { // place on degree restricted subtree					
+			this->PlaceOnDegreeRestrictedSubtree(this->numberOfLargeEdgesThreshold);
 		}
 		
 		this->current_time = std::chrono::high_resolution_clock::now();
@@ -363,29 +363,7 @@ void MSTBackbone::ChowLiuGrouping() {
 	// this->T->AddWeightedEdges(this->t->weightedEdgesToAddToGlobalPhylogeneticTree);
 }
 
-void MSTBackbone::PlaceOnDegreeRestrictedSubtree(int max_degree = 10) {
-	// Algorithm
-	// Input:
-	//  MST M
-	//  k = max_degree
-	// Select V_internal = all internal (non-leaf) vertices of M
-	// Select V_leaves = leaves of M such that k neighbors of V_internal are present in V_degree U V_internal
-	//    ; select leaves in order of decreasing distance with neighbor in V_internal
-	// Graph T_degree_restricted = subgraph of M which is induced by V_internal U V_leaves	
-	// Compute supertree T_super = by performing CLGrouping(SEM-GMM) 
-		// parallelize using Huang et al approach
-		// root T_super at centroid
-		// store mutations on branches  
-	// Select V_place = V(M) \ V_internal U V_degree
-	// Place vertices in V_place onto T_super
-	// Restrict placement of any vertex v_p to subtree in T_super that contains the internal neighbor of v_p in M
-	// Place using branch mutations approach
-	// Parallelize placement
-	// optimize num of hairs based on 
-	// compute time
-	// accuracy
-	// Let T_final be the tree computed after placing all vertices 
-	
+void MSTBackbone::PlaceOnDegreeRestrictedSubtree(int max_degree = 10) {	
 	this->M->PlaceOnDegreeRestrictedSubtree(max_degree);
 }
 
