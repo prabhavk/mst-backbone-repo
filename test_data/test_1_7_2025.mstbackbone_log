@@ -1,0 +1,6 @@
+Constraint size is set at	10
+Prefix for output files is 	test_data/test_1_7_2025
+0 duplicate sequences found; duplicate sequences will be not be used by mst-backbone; instead they will be added to the supertree constructed by mst-backbone
+Time taken to compute MST is 0.00191097 seconds
+Time taken for computing unrooted supertree is 1.069e-06 seconds
+Total CPU time used is 0.00212403 seconds

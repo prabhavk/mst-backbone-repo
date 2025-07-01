@@ -5,6 +5,8 @@
 #include <experimental/filesystem>
 // #include <boost/filesystem.hpp>
 #include <sys/stat.h>
+#include <boost/bind/bind.hpp>
+using namespace boost::placeholders;
 using namespace std;
 namespace fs = std::experimental::filesystem;
 
@@ -140,10 +142,10 @@ int main(int argc, char **argv)
 		}		
 
 		if (!flag_supertree) {
-			supertree_method = "pdrs" // place on degree-restricted subtree
+			supertree_method = "pdrs"; // place on degree-restricted subtree
 		}		
 		if (!flag_distance) {
-			distance_measure = "LogDet" // place on degree-restricted subtree
+			distance_measure = "LogDet"; // place on degree-restricted subtree
 		}
 		cout << "supertree method is " << supertree_method << endl;
 		MSTBackboneObj = new MSTBackbone(path_to_alignment_file, max_degree, prefix_path_obj.string(),distance_measure,flag_verbose,flag_root_supertree, supertree_method);		

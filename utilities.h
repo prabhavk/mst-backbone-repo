@@ -8,6 +8,7 @@ using namespace std;
 #include <vector>
 #include <algorithm>
 #include <fstream>
+#include <array>
 #include <stdio.h>
 #include <tuple>
 #include <eigen3/Eigen/Dense>
